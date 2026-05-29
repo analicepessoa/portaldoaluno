@@ -153,8 +153,8 @@
     </header>
 
     <nav>
-        <button class="nav-btn active" onclick="switchView('estudante')">👨‍🎓 ÁREA DO ESTUDANTE</button>
-        <button class="nav-btn" onclick="switchView('professor')">👩‍🏫 ÁREA DO PROFESSOR</button>
+        <button class="nav-btn active" id="nav-estudante-btn" onclick="mudarAba('estudante')">👨‍🎓 ÁREA DO ESTUDANTE</button>
+        <button class="nav-btn" id="nav-professor-btn" onclick="mudarAba('professor')">👩‍🏫 ÁREA DO PROFESSOR</button>
     </nav>
 
     <div class="container">
@@ -208,20 +208,34 @@
             </div>
         </section>
 
+        <section id="view-professor-bloqueado" class="view-section" style="text-align: center;">
+            <div class="card" style="max-width: 500px; margin: 40px auto; border-color: #ef4444;">
+                <h2 style="color:#ef4444;">🔐 Acesso Restrito ao Professor</h2>
+                <p>Digite a senha administrativa para liberar o gerenciador:</p>
+                <input type="password" id="input-senha-admin" style="text-align: center; font-size: 2rem; padding: 12px;" placeholder="***">
+                <br><br>
+                <button class="btn-action" style="background:#ef4444; width:100%; padding:15px;" onclick="validarAcessoProfessor()">DESBLOQUEAR PAINEL 🛠️</button>
+            </div>
+        </section>
+
         <section id="view-professor" class="view-section">
             <div class="card" style="background: #f8fafc; border-color: #cbd5e1;">
-                <h3>🔐 Configuração de Senhas dos Cursos</h3>
+                <h3>⚙️ Configuração de Segurança de Senhas</h3>
                 <div class="row-inputs">
                     <div style="flex:1;">
                         <label for="senha-prof-inf">Senha de Informática 5.0:</label>
-                        <input type="text" id="senha-prof-inf" placeholder="Ex: 123">
+                        <input type="text" id="senha-prof-inf">
                     </div>
                     <div style="flex:1;">
                         <label for="senha-prof-sen">Senha do Curso Sênior:</label>
-                        <input type="text" id="senha-prof-sen" placeholder="Ex: 456">
+                        <input type="text" id="senha-prof-sen">
+                    </div>
+                    <div style="flex:1;">
+                        <label for="senha-prof-admin" style="color:#ef4444;">Senha do Professor (Admin):</label>
+                        <input type="text" id="senha-prof-admin" style="border-color:#ef4444;">
                     </div>
                 </div>
-                <button class="btn-action" style="background:#7c3aed;" onclick="salvarSenhasNuvem()">Sincronizar Novas Senhas</button>
+                <button class="btn-action" style="background:#7c3aed;" onclick="salvarSenhasNuvem()">Sincronizar Todas as Senhas</button>
             </div>
 
             <div class="card">
@@ -283,15 +297,31 @@
         let passoAtual = 0;
         
         let nomesCustomizados = {};
-        let senhasCursos = { informatica: "123", senior: "456" };
+        let senhasCursos = { informatica: "123", senior: "456", admin: "admin123" };
+        let professorAutenticado = false;
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            
+            document.getElementById(`nav-${aba}-btn`).classList.add('active');
+
+            if (aba === 'professor') {
+                if (professorAutenticado) {
+                    document.getElementById('view-professor').style.display = 'block';
+                } else {
+                    document.getElementById('input-senha-admin').value = '';
+                    document.getElementById('view-professor-bloqueado').style.display = 'block';
+                }
+            } else {
+                document.getElementById('view-estudante').style.display = 'block';
+                renderizarModulosEstudante();
+            }
+        }
 
         function switchView(view) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            if(window.event && window.event.target && window.event.target.classList) {
-                window.event.target.classList.add('active');
-            }
-            document.getElementById(`view-${view}`).classList.add('active');
+            // Mantido para compatibilidade com assinaturas antigas de clique interno
+            mudarAba(view);
         }
 
         function inicializarPainel() {
@@ -319,7 +349,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // Puxa as senhas configuradas do banco
         async function baixarSenhasNuvem() {
             try {
                 const { data } = await bancoDados.from('config_cursos').select('*');
@@ -328,22 +357,37 @@
                         senhasCursos[c.id] = c.senha;
                         if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
                         if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
+                        if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
                     });
                 }
             } catch (e) { console.error(e); }
         }
 
-        // Professor altera e sincroniza senhas na nuvem
         async function salvarSenhasNuvem() {
             const infS = document.getElementById('senha-prof-inf').value.trim();
             const senS = document.getElementById('senha-prof-sen').value.trim();
+            const admS = document.getElementById('senha-prof-admin').value.trim();
+
+            if(admS === '') { alert("A senha do administrador não pode ficar em branco!"); return; }
 
             try {
                 await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS });
                 await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
-                alert("Senhas dos cursos atualizadas com sucesso!");
+                await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS });
+                alert("Todas as senhas foram sincronizadas com sucesso!");
                 baixarSenhasNuvem();
             } catch (e) { alert("Erro ao atualizar senhas: " + e.message); }
+        }
+
+        function validarAcessoProfessor() {
+            const senhaDigitada = document.getElementById('input-senha-admin').value.trim();
+            if (senhaDigitada === senhasCursos.admin) {
+                professorAutenticado = true;
+                document.getElementById('view-professor-bloqueado').style.display = 'none';
+                document.getElementById('view-professor').style.display = 'block';
+            } else {
+                alert("Senha administrativa incorreta!");
+            }
         }
 
         async function baixarNomesCustomizados() {
@@ -453,11 +497,11 @@
             } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
-        // --- INTERFACE DO ESTUDANTE COM VALIDOR DE PORTARIA ---
+        // --- INTERFACE DO ESTUDANTE ---
         function solicitarSenhaCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
             cursoNomeTemp = nomeExibicao;
-            document.getElementById('input-senha-aluno').value = ''; // limpa anterior
+            document.getElementById('input-senha-aluno').value = '';
             document.getElementById('estudante-cursos').style.display = 'none';
             document.getElementById('estudante-senha-tela').style.display = 'block';
             document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeExibicao}. Digite a senha:`;
@@ -478,7 +522,6 @@
         }
 
         function selecionarCurso(idCurso, nomeExibicao) {
-            // Mantido apenas por compatibilidade interna estrutural rápida
             solicitarSenhaCurso(idCurso, nomeExibicao);
         }
 
