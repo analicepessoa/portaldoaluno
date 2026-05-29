@@ -337,8 +337,6 @@
                         <select id="prof-modulo-ativo-inf">
                             <option value="1">Módulo 01</option><option value="2">Módulo 02</option><option value="3">Módulo 03</option><option value="4">Módulo 04</option><option value="5">Módulo 05</option><option value="6">Módulo 06</option><option value="7">Módulo 07</option><option value="8">Módulo 08</option><option value="9">Módulo 09</option><option value="10">Módulo 10</option>
                         </select>
-                        <label for="prof-chave-revisao-inf">Chave Secreta de Revisão:</label>
-                        <input type="text" id="prof-chave-revisao-inf" placeholder="Ex: revisao50">
                     </div>
                     
                     <div style="flex:1; padding-left: 15px;">
@@ -347,8 +345,6 @@
                         <select id="prof-modulo-ativo-sen">
                             <option value="1">Módulo 01</option><option value="2">Módulo 02</option><option value="3">Módulo 03</option><option value="4">Módulo 04</option><option value="5">Módulo 05</option><option value="6">Módulo 06</option><option value="7">Módulo 07</option><option value="8">Módulo 08</option><option value="9">Módulo 09</option><option value="10">Módulo 10</option>
                         </select>
-                        <label for="prof-chave-revisao-sen">Chave Secreta de Revisão:</label>
-                        <input type="text" id="prof-chave-revisao-sen" placeholder="Ex: revisaosenior">
                     </div>
                 </div>
                 <br>
@@ -388,13 +384,18 @@
                     </div>
                 </div>
 
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 12px; border: 2px solid #bbf7d0; margin-top: 15px;">
+                    <label for="prof-senha-modulo-especifica" style="color: var(--success); margin-top:0;">🔑 Senha de Revisão Exclusiva para este Módulo:</label>
+                    <input type="text" id="prof-senha-modulo-especifica" placeholder="Deixe em branco para usar o padrão ou crie uma senha única para este módulo">
+                </div>
+
                 <hr style="border:1px solid #e2e8f0; margin:25px 0;">
                 <h3> Roteiro Passo a Passo Dinâmico</h3>
                 <div id="editor-passos-container"></div>
                 
                 <button class="btn-action" style="background:#2563eb;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo</button>
                 <br><br>
-                <button class="btn-action" onclick="salvarDadosProfessor()">💾 Salvar Tudo na Nuvem (Supabase)</button>
+                <button class="btn-action" onclick="salvadDadosNovoFormato()">💾 Salvar Tudo na Nuvem (Supabase)</button>
             </div>
         </section>
 
@@ -433,12 +434,11 @@
         let passoAtual = 0;
         
         let nomesCustomizados = {};
+        let senhasModulosGerais = {}; // Guarda na memória do app as senhas de cada módulo puxadas da nuvem
         
-        // Parâmetros expandidos com suporte a regras divididas por modalidade de curso
         let senhasCursos = { 
             informatica: "123", senior: "456", admin: "admin123", 
-            modAtivoInf: "9", chvRevInf: "revisao50",
-            modAtivoSen: "1", chvRevSen: "revisaoisenior"
+            modAtivoInf: "9", modAtivoSen: "1"
         };
         let professorAutenticado = false;
         let modAlvoClicado = 0;
@@ -503,9 +503,7 @@
                         if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
                         if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
                         if(c.id === 'modAtivoInf') document.getElementById('prof-modulo-ativo-inf').value = c.senha;
-                        if(c.id === 'chvRevInf') document.getElementById('prof-chave-revisao-inf').value = c.senha;
                         if(c.id === 'modAtivoSen') document.getElementById('prof-modulo-ativo-sen').value = c.senha;
-                        if(c.id === 'chvRevSen') document.getElementById('prof-chave-revisao-sen').value = c.senha;
                     });
                 }
             } catch (e) { console.error(e); }
@@ -517,9 +515,7 @@
             const senS = document.getElementById('senha-prof-sen').value.trim();
             const admS = document.getElementById('senha-prof-admin').value.trim();
             const mInf = document.getElementById('prof-modulo-ativo-inf').value;
-            const cInf = document.getElementById('prof-chave-revisao-inf').value.trim();
             const mSen = document.getElementById('prof-modulo-ativo-sen').value;
-            const cSen = document.getElementById('prof-chave-revisao-sen').value.trim();
 
             if(admS === '') { alert("A senha do administrador não pode ficar em branco!"); return; }
 
@@ -528,12 +524,10 @@
                 await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
                 await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS });
                 await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf });
-                await bancoDados.from('config_cursos').upsert({ id: 'chvRevInf', senha: cInf });
                 await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen });
-                await bancoDados.from('config_cursos').upsert({ id: 'chvRevSen', senha: cSen });
-                alert("Parâmetros divididos salvos com sucesso na nuvem! 🌐");
+                alert("Parâmetros de controle coletivos salvos!");
                 baixarSenhasNuvem();
-            } catch (e) { alert("Erro ao sincronizar parâmetros: " + e.message); }
+            } catch (e) { alert("Erro: " + e.message); }
         }
 
         function validarAcessoProfessor() {
@@ -548,11 +542,18 @@
         async function baixarNomesCustomizados() {
             if (!bancoDados) return;
             try {
-                const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
+                // Modificado para trazer também a coluna opcional de texto onde salvaremos a senha do módulo
+                const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula, passos');
                 if (!error && data) {
                     nomesCustomizados = {};
+                    senhasModulosGerais = {};
                     data.forEach(item => {
                         nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
+                        // Se houver uma senha guardada na coluna 'passos' na linha da Aula 1 daquele módulo, mapeia ela
+                        if(item.id.includes('aula_1') && item.passos && item.passos.length > 0 && item.passos[0].startsWith('KEY_SENHA:')) {
+                            let senhaLimpa = item.passos[0].replace('KEY_SENHA:', '').trim();
+                            senhasModulosGerais[item.id.replace('_aula_1', '')] = senhaLimpa;
+                        }
                     });
                     if (cursoSelecionado) renderizarModulosEstudante();
                 }
@@ -561,7 +562,6 @@
 
         function adicionarPassoAoEditor(texto = '', urlImg = '', urlLink = '') {
             const container = document.getElementById('editor-passos-container');
-
             const div = document.createElement('div');
             div.className = 'step-editor-item';
             div.innerHTML = `
@@ -572,9 +572,9 @@
                         <button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button>
                     </div>
                 </div>
-                <textarea class="edit-texto" rows="3" placeholder="Instrução do Aluno (Use chaves para GIF flutuante: {link_do_gif})">${texto}</textarea>
+                <textarea class="edit-texto" rows="3" placeholder="Instrução do Aluno">${texto}</textarea>
                 <div class="row-inputs">
-                    <input type="text" class="edit-img" placeholder="URL das Imagens/Prints (Separe por vírgula se quiser várias)" value="${urlImg}">
+                    <input type="text" class="edit-img" placeholder="URL das Imagens/Prints" value="${urlImg}">
                     <input type="text" class="edit-link" placeholder="Link de Apoio (Opcional)" value="${urlLink}">
                     <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarNumeracaoEditor();">Excluir</button>
                 </div>
@@ -586,7 +586,6 @@
         function moverPassoElemento(botao, direcao) {
             const itemItem = botao.parentElement.parentElement.parentElement;
             const container = document.getElementById('editor-passos-container');
-            
             if (direcao === -1) {
                 const vizinhoCima = itemItem.previousElementSibling;
                 if (vizinhoCima) container.insertBefore(itemItem, vizinhoCima);
@@ -611,14 +610,19 @@
             const idUnico = `${c}_${m}_${a}`;
 
             document.getElementById('editor-passos-container').innerHTML = '';
+            document.getElementById('prof-senha-modulo-especifica').value = '';
+
+            // Tenta carregar a senha guardada na Aula 01 desse módulo
+            let idModuloAula1 = `${c}_${m}_aula_1`;
+            try {
+                const { data: dataAula1 } = await bancoDados.from('roteiros_aulas').select('passos').eq('id', idModuloAula1).maybeSingle();
+                if(dataAula1 && dataAula1.passos && dataAula1.passos.length > 0 && dataAula1.passos[0].startsWith('KEY_SENHA:')) {
+                    document.getElementById('prof-senha-modulo-especifica').value = dataAula1.passos[0].replace('KEY_SENHA:', '').trim();
+                }
+            } catch (e) {}
 
             try {
-                const { data } = await bancoDados
-                    .from('roteiros_aulas')
-                    .select('nome_modulo, nome_aula, passos_midia')
-                    .eq('id', idUnico)
-                    .maybeSingle();
-
+                const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', idUnico).maybeSingle();
                 if (data) {
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
                     document.getElementById('prof-nome-aula').value = data.nome_aula || '';
@@ -639,8 +643,9 @@
             } catch (err) { console.error(err); }
         }
 
-        async function salvarDadosProfessor() {
-            if (!bancoDados) { alert("Erro: Conexão com a nuvem indisponível."); return; }
+        // SALVA NA NUVEM INCLUINDO AS CHAVES INDIVIDUAIS POR MÓDULO
+        async function salvDadosNovoFormato() {
+            if (!bancoDados) return;
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
@@ -648,17 +653,15 @@
             
             const nModulo = document.getElementById('prof-nome-modulo').value.trim();
             const nAula = document.getElementById('prof-nome-aula').value.trim();
+            const senhaModuloDigitada = document.getElementById('prof-senha-modulo-especifica').value.trim();
 
             const itemsEditor = document.querySelectorAll('.step-editor-item');
             let pacotePassos = [];
-
             itemsEditor.forEach(item => {
                 const txt = item.querySelector('.edit-texto').value.trim();
                 const img = item.querySelector('.edit-img').value.trim();
                 const lnk = item.querySelector('.edit-link').value.trim();
-                if(txt !== '') {
-                    pacotePassos.push({ texto: txt, imagem: img, link: lnk });
-                }
+                if(txt !== '') pacotePassos.push({ texto: txt, imagem: img, link: lnk });
             });
 
             if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
@@ -666,84 +669,98 @@
             const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
             const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
 
-            try {
-                const { error } = await bancoDados
-                    .from('roteiros_aulas')
-                    .upsert({ 
-                        id: idUnico, 
-                        modulo_id: `${c}_${m}`, 
-                        aula_id: a,
-                        nome_modulo: moduloFinal,
-                        nome_aula: aulaFinal,
-                        passos_midia: pacotePassos,
-                        passos: pacotePassos.map(p => p.texto)
-                    });
+            // Salva a senha individual do módulo injetando um marcador na coluna legada 'passos' do banco
+            let arrayPassosTexto = pacotePassos.map(p => p.texto);
+            if (senhaModuloDigitada !== '') {
+                // Adiciona o cabeçalho técnico de senha na primeira posição do array
+                arrayPassosTexto.unshift(`KEY_SENHA:${senhaModuloDigitada}`);
+            }
 
-                if (error) throw error;
-                alert("Dados salvos e sincronizados com a nuvem com sucesso! 🌐");
+            try {
+                await bancoDados.from('roteiros_aulas').upsert({ 
+                    id: idUnico, modulo_id: `${c}_${m}`, aula_id: a,
+                    nome_modulo: moduloFinal, nome_aula: aulaFinal,
+                    passos_midia: pacotePassos, passos: arrayPassosTexto
+                });
+
+                // Se o professor criou uma senha, mas está salvando outra aula (ex: aula 2), força o espelhamento na aula 1 para a portaria ler com precisão
+                if(senhaModuloDigitada !== '' && a !== 'aula_1') {
+                    await bancoDados.from('roteiros_aulas').upsert({
+                        id: `${c}_${m}_aula_1`, modulo_id: `${c}_${m}`, aula_id: 'aula_1',
+                        nome_modulo: moduloFinal, nome_aula: "Aula 01",
+                        passos_midia: [{texto: "Início do Módulo", imagem: "", link: ""}],
+                        passos: [`KEY_SENHA:${senhaModuloDigitada}`, "Início do Módulo"]
+                    });
+                }
+
+                alert("Dados de roteiro e senhas do módulo sincronizados com a nuvem!");
                 await baixarNomesCustomizados();
-            } catch (err) { alert("Erro ao salvar: " + err.message); }
+            } catch (err) { alert("Erro: " + err.message); }
         }
 
-        // --- INTERFACE DO ESTUDANTE CONTROLE PORTARIA PORTAL ---
+        // --- INTERFACE DO ESTUDANTE CONTROLE PORTAL ---
         function solicitarSenhaCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
             cursoNomeTemp = nomeExibicao;
-            
             document.getElementById('main-title').innerText = `Portal - ${cursoNomeTemp}`;
             document.getElementById('estudante-cursos').style.display = 'none';
             document.getElementById('estudante-modulos').style.display = 'block';
             renderizarModulosEstudante();
         }
 
-        // LÓGICA DE VALIDAÇÃO INTELIGENTE POR CURSO INDEPENDENTE
+        // 🔒 NOVA LÓGICA DE VALIDAÇÃO DE SENHA UNITÁRIA POR MÓDULO INDEPENDENTE
         function tentarAcessarModulo(mNum, nomeModulo) {
-            // Puxa o módulo alvo do curso correto
-            const mAtivo = cursoSelecionado === 'informatica' 
-                ? parseInt(senhasCursos.modAtivoInf || "9") 
-                : parseInt(senhasCursos.modAtivoSen || "1");
-            
+            const mAtivo = cursoSelecionado === 'informatica' ? parseInt(senhasCursos.modAtivoInf || "9") : parseInt(senhasCursos.modAtivoSen || "1");
             const chaveMemoria = `modulo_liberado_${cursoSelecionado}_mod_${mNum}`;
             const jaLiberadoAnteriormente = localStorage.getItem(chaveMemoria) === "sim";
 
             modAlvoClicado = mNum;
 
             if (mNum === mAtivo) {
+                // Módulo de Hoje: Pede a senha comum do curso
                 document.getElementById('estudante-modulos').style.display = 'none';
                 document.getElementById('estudante-senha-tela').style.display = 'block';
                 document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeModulo}`;
-                document.getElementById('subtitulo-senha-contexto').innerText = "Digite a senha comum do curso informada pela professora.";
+                document.getElementById('subtitulo-senha-contexto').innerText = "Digite a senha de alunos desse curso para assistir a aula de hoje.";
             } else if (jaLiberadoAnteriormente || mNum < mAtivo) {
                 if (jaLiberadoAnteriormente) {
                     avancarParaAulasModulo();
                 } else {
+                    // Módulo Antigo: Pede a senha exclusiva gerada para ESTE módulo
                     document.getElementById('estudante-modulos').style.display = 'none';
                     document.getElementById('estudante-senha-tela').style.display = 'block';
                     document.getElementById('titulo-senha-curso').innerText = `Revisar: ${nomeModulo}`;
-                    document.getElementById('subtitulo-senha-contexto').innerText = "Módulo de revisão! Digite a Chave Secreta de Liberação dada pela professora.";
+                    
+                    let senhaDefinidaPeloProf = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`];
+                    if(!senhaDefinidaPeloProf) {
+                        document.getElementById('subtitulo-senha-contexto').innerText = "Este módulo antigo está trancado para revisões. Peça a chave para a professora.";
+                    } else {
+                        document.getElementById('subtitulo-senha-contexto').innerText = "Digite a chave secreta exclusiva que a Professora Analice deu para este módulo.";
+                    }
                 }
             } else {
-                alert("🔒 Módulo trancado! Nós vamos aprender essa matéria nas próximas aulas.");
+                alert("🔒 Módulo trancado! Nós vamos aprender essa matéria nas próximas semanas.");
             }
         }
 
         function validarSenhaAcesso() {
             const senhaDigitada = document.getElementById('input-senha-aluno').value.trim();
-            const mAtivo = cursoSelecionado === 'informatica' 
-                ? parseInt(senhasCursos.modAtivoInf || "9") 
-                : parseInt(senhasCursos.modAtivoSen || "1");
+            const mAtivo = cursoSelecionado === 'informatica' ? parseInt(senhasCursos.modAtivoInf || "9") : parseInt(senhasCursos.modAtivoSen || "1");
             
             if (modAlvoClicado === mAtivo) {
-                const senhaCorreta = senhasCursos[cursoSelecionado];
-                if (senhaDigitada === senhaCorreta) {
+                if (senhaDigitada === senhasCursos[cursoSelecionado]) {
                     avancarParaAulasModulo();
                 } else { alert("Senha incorreta para a sala de aula de hoje! 👩‍🏫"); }
             } else {
-                const chaveCorreta = cursoSelecionado === 'informatica' ? senhasCursos.chvRevInf : senhasCursos.chvRevSen;
-                if (senhaDigitada === chaveCorreta) {
+                // Puxa a senha individual guardada na nuvem daquele módulo alvo específico
+                const senhaModuloExclusiva = senhasModulosGerais[`${cursoSelecionado}_modulo_${modAlvoClicado}`];
+                
+                if (senhaModuloExclusiva && senhaDigitada === senhaModuloExclusiva) {
                     localStorage.setItem(`modulo_liberado_${cursoSelecionado}_mod_${modAlvoClicado}`, "sim");
                     avancarParaAulasModulo();
-                } else { alert("Chave secreta de revisão incorreta!"); }
+                } else { 
+                    alert("Chave de revisão incorreta para este módulo! Cada módulo possui uma chave diferente. Peça ajuda à professora."); 
+                }
             }
         }
 
@@ -771,14 +788,10 @@
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
-            
-            const mAtivo = cursoSelecionado === 'informatica' 
-                ? parseInt(senhasCursos.modAtivoInf || "9") 
-                : parseInt(senhasCursos.modAtivoSen || "1");
+            const mAtivo = cursoSelecionado === 'informatica' ? parseInt(senhasCursos.modAtivoInf || "9") : parseInt(senhasCursos.modAtivoSen || "1");
 
             for (let m = 1; m <= 10; m++) {
                 let nomeExibir = `Módulo ${String(m).padStart(2, '0')}`;
-                
                 for(let a=1; a<=8; a++){
                     let cacheId = `${cursoSelecionado}_modulo_${m}_aula_${a}`;
                     if(nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo){
@@ -832,13 +845,11 @@
 
                 let btn = document.createElement('button');
                 btn.className = 'huge-btn aula-btn';
-                
                 if (nomeExibirAula !== `Aula 0${a}`) {
                     btn.innerHTML = `<div class="btn-header">Aula 0${a}</div><div class="btn-desc">${nomeExibirAula}</div>`;
                 } else {
                     btn.innerHTML = `<div class="btn-header">Aula 0${a}</div>`;
                 }
-                
                 btn.onclick = () => buscarAulaNuvem(`aula_${a}`);
                 container.appendChild(btn);
             }
@@ -856,11 +867,7 @@
 
             if (!bancoDados) return;
             try {
-                const { data } = await bancoDados
-                    .from('roteiros_aulas')
-                    .select('passos_midia, nome_aula')
-                    .eq('id', idUnico)
-                    .maybeSingle();
+                const { data } = await bancoDados.from('roteiros_aulas').select('passos_midia, nome_aula').eq('id', idUnico).maybeSingle();
 
                 if (data && data.passos_midia && data.passos_midia.length > 0) {
                     passosAulaAtual = data.passos_midia;
@@ -871,7 +878,6 @@
                     mostrarPasso();
                     return;
                 } 
-                
                 if (idUnico === "informatica_modulo_9_aula_3") {
                     passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
                     passoAtual = 0;
@@ -879,9 +885,7 @@
                     document.getElementById('estudante-passos').style.display = 'block';
                     document.getElementById('titulo-aula-atual').innerText = "Aula 03 - Meu Aplicativo de Mensagens";
                     mostrarPasso();
-                } else { 
-                    alert("Roteiro vazio ou não configurado para esta aula."); 
-                }
+                } else { alert("Roteiro vazio ou não configurado para esta aula."); }
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
@@ -891,12 +895,12 @@
             const linkContainer = document.getElementById('link-passo-container');
             const bar = document.getElementById('progressBar');
 
-            let结构Passo = passosAulaAtual[passoAtual];
-            let rawText =结构Passo.texto;
+            let estruturaPasso = passosAulaAtual[passoAtual];
+            let rawText = estruturaPasso.texto;
 
             galeriaImagens.innerHTML = '';
-            if (结构Passo.imagem && 结构Passo.imagem.trim() !== '') {
-                let listaUrls = 结构Passo.imagem.split(',');
+            if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
+                let listaUrls = estruturaPasso.imagem.split(',');
                 listaUrls.forEach(url => {
                     let urlLimpa = url.trim();
                     if(urlLimpa !== '') {
@@ -917,8 +921,8 @@
             
             containerTexto.innerHTML = textoFormatado;
 
-            if (结构Passo.link && 结构Passo.link.trim() !== '') {
-                linkContainer.innerHTML = `<a href="${结构Passo.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
+            if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
+                linkContainer.innerHTML = `<a href="${estruturaPasso.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
             } else { linkContainer.innerHTML = ''; }
 
             const pct = ((passoAtual + 1) / passosAulaAtual.length) * 100;
@@ -926,21 +930,6 @@
 
             document.getElementById('btnPrev').disabled = passoAtual === 0;
             document.getElementById('btnNext').innerText = (passoAtual === passosAulaAtual.length - 1) ? "FINALIZAR AULA 🏁" : "AVANÇAR ▶";
-        }
-
-        function mudarPasso(direcao) {
-            passoAtual += direcao;
-            if (passoAtual >= passosAulaAtual.length) {
-                alert("Parabéns! Você concluiu todas as etapas da aula de hoje! 🎓");
-                voltarParaAulas();
-                return;
-            }
-            mostrarPasso();
-        }
-
-        function voltarParaAulas() {
-            document.getElementById('estudante-passos').style.display = 'none';
-            document.getElementById('estudante-aulas').style.display = 'block';
         }
 
         window.onload = inicializarPainel;
