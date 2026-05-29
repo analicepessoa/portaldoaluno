@@ -84,7 +84,6 @@
             margin-top: 20px;
         }
 
-        /* 🌟 NOVO DESIGN EM ESTILO CARD PREMIUM PARA OS MÓDULOS E AULAS */
         .huge-btn {
             background: white;
             border: 3px solid #cbd5e1;
@@ -128,10 +127,7 @@
             word-break: break-word;
         }
 
-        /* Cores adaptativas dinâmicas para os Módulos (Azul) */
-        .modulo-btn {
-            border-color: #93c5fd;
-        }
+        .modulo-btn { border-color: #93c5fd; }
         .modulo-btn:hover {
             border-color: var(--primary);
             background: #f0f6ff;
@@ -139,10 +135,7 @@
             box-shadow: 0 12px 20px rgba(37, 99, 235, 0.15);
         }
 
-        /* Cores adaptativas dinâmicas para as Aulas (Verde) */
-        .aula-btn {
-            border-color: #86efac;
-        }
+        .aula-btn { border-color: #86efac; }
         .aula-btn:hover {
             border-color: var(--success);
             background: #f0fdf4;
@@ -343,11 +336,25 @@
         
         const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 🎨 BANCO DE ÍCONES FIXOS E TEMÁTICOS PARA ESTIMULAR A MEMÓRIA VISUAL
         const iconesModulos = {
             modulo_1: "📁", modulo_2: "📊", modulo_3: "⚙️", modulo_4: "🖥️", modulo_5: "🚀",
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
+
+        // 📚 CORREÇÃO: CONTEÚDO ALOCADO PERFEITAMENTE PARA O CURSO DE INFORMÁTICA 5.0 (M9_A3)
+        const ROTEIRO_PADRAO_INF_M9_A3 = [
+            { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
+            { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
+            { texto: "Passo 1: Conversando com o seu Ajudante de Inteligência Artificial. Na página inicial do Canva, vamos procurar e clicar no botão chamado *Canva IA* e depois escolher a opção *Programação*. Vai abrir uma caixinha de conversa bem parecida com o WhatsApp.", imagem: "", link: "" },
+            { texto: "Passo 2: Pedindo o seu Aplicativo. Nessa caixa de mensagem de texto, digite exatamente as palavras: *'Por favor, crie uma lojinha simples de roupas com botão de fazer pedido que salve o nome do cliente'*. Aperte a tecla *Enter* e veja a IA desenhando o aplicativo sozinho!", imagem: "", link: "" },
+            { texto: "Passo 3: Modo de Edição de Textos. Quando o desenho da sua lojinha aparecer, clique no botão azul no topo escrito *Usar em um design* e depois em *Código*. Agora você tem superpoderes: clique duas vezes em cima do texto *Nossa Loja* e mude para o nome do seu negócio (ex: *Bazar da Maria*).", imagem: "", link: "" },
+            { texto: "Passo 4: Trocando as fotos dos produtos por fotos suas. No menu do lado esquerdo da tela, clique em *Upload* e traga a foto do seu produto real que está salva no computador. Depois, é só clicar e arrastar a sua foto nova para cima da foto velha que a IA tinha colocado.", imagem: "", link: "" },
+            { texto: "Passo 5: Mudando a cor dos Botões de Ação. Clique em cima do botão *Fazer Pedido*. Na barra de ferramentas superior, vai aparecer um quadradinho de cor. Clique nele e escolha uma cor bem bonita e chamativa, como um |verde bem alegre|, para o seu cliente saber onde clicar.", imagem: "", link: "" },
+            { texto: "Passo 6: Conhecendo o seu Caderno de Pedidos Digital. Clique na palavra *Dados* nas propriedades do lado da tela. O Canva vai abrir uma folha de planilha (que parece uma folha quadriculada de matemática). Esse é o seu banco de dados onde tudo fica guardado sozinho!", imagem: "", link: "" },
+            { texto: "Passo 7: Colocando o Aplicativo para funcionar na internet. Clique no botão *Publish* (Publicar site) no canto superior direito. Marque a opção para o site ficar bonito no celular e clique no botão final de publicar. O computador vai te dar o seu link de internet!", imagem: "", link: "" },
+            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome. Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
+            { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
+        ];
 
         let cursoSelecionado = '';
         let cursoNomeTemp = '';
@@ -489,6 +496,14 @@
 
             document.getElementById('editor-passos-container').innerHTML = '';
 
+            // Se o professor for carregar Informática M9 A3, preenche automaticamente para visualização rápida
+            if (idUnico === "informatica_modulo_9_aula_3") {
+                document.getElementById('prof-nome-modulo').value = "Módulo 09 - Criando Aplicativos";
+                document.getElementById('prof-nome-aula').value = "Aula 03 - Meu Aplicativo de Mensagens";
+                ROTEIRO_PADRAO_INF_M9_A3.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
+                return;
+            }
+
             try {
                 const { data } = await bancoDados
                     .from('roteiros_aulas')
@@ -581,16 +596,19 @@
             document.getElementById('main-title').innerText = "Portal de Aprendizado";
         }
 
-        // REFORMULAÇÃO COMPLETA: Removeu textos desnecessários e adicionou ícones visuais fixos
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
             
             for (let m = 1; m <= 10; m++) {
                 let cacheId = `${cursoSelecionado}_modulo_${m}_aula_1`;
-                let nomeExibir = (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo) 
-                    ? nomesCustomizados[cacheId].modulo 
-                    : `Módulo ${String(m).padStart(2, '0')}`;
+                
+                let nomeExibir = `Módulo ${String(m).padStart(2, '0')}`;
+                if (cursoSelecionado === "informatica" && m === 9) {
+                    nomeExibir = "Módulo 09 - Criando Aplicativos";
+                } else if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo) {
+                    nomeExibir = nomesCustomizados[cacheId].modulo;
+                }
 
                 let emoji = iconesModulos[`modulo_${m}`] || "📁";
 
@@ -613,14 +631,18 @@
             
             for (let a = 1; a <= 8; a++) {
                 let cacheId = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
-                let nomeExibirAula = (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula)
-                    ? nomesCustomizados[cacheId].aula
-                    : `Aula 0${a}`;
+                
+                let nomeExibirAula = `Aula 0${a}`;
+                if (cursoSelecionado === "informatica" && modSelecionado === "modulo_9" && a === 3) {
+                    nomeExibirAula = "Aula 03 - Meu Aplicativo de Mensagens";
+                } else if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula) {
+                    nomeExibirAula = nomesCustomizados[cacheId].aula;
+                }
 
                 let btn = document.createElement('button');
                 btn.className = 'huge-btn aula-btn';
                 
-                if ((nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula)) {
+                if (nomeExibirAula !== `Aula 0${a}`) {
                     btn.innerHTML = `<div class="btn-header">Aula 0${a}</div><div class="btn-desc">${nomeExibirAula}</div>`;
                 } else {
                     btn.innerHTML = `<div class="btn-header">Aula 0${a}</div>`;
@@ -634,6 +656,17 @@
         async function buscarAulaNuvem(aId) {
             aulaSelecionada = aId;
             const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
+
+            // Intercepta e serve o roteiro injetado caso seja Informática 5.0 -> Mod 09 -> Aula 03
+            if (idUnico === "informatica_modulo_9_aula_3") {
+                passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
+                passoAtual = 0;
+                document.getElementById('estudante-aulas').style.display = 'none';
+                document.getElementById('estudante-passos').style.display = 'block';
+                document.getElementById('titulo-aula-atual').innerText = "Aula 03 - Meu Aplicativo de Mensagens";
+                mostrarPasso();
+                return;
+            }
 
             try {
                 const { data } = await bancoDados
