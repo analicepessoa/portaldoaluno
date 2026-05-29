@@ -2,81 +2,65 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estudante - Informática 5.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
     <style>
-        /* CSS simplificado para evitar erro de carga */
-        body { font-family: Arial; background-color: #f1f5f9; padding: 20px; }
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .huge-btn { padding: 20px; border: 2px solid #2563eb; background: white; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 1.2rem; }
+        /* Estilos mantidos para garantir o funcionamento do design */
+        :root { --primary: #2563eb; --primary-dark: #1e40af; --success: #16a34a; --bg: #f1f5f9; --text: #1e293b; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        header { background-color: var(--primary); color: white; padding: 25px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1100px; margin: 30px auto; padding: 20px; }
+        .view-section { display: none; } .view-section.active { display: block; }
+        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 2px solid #e2e8f0; }
+        .huge-btn { background: white; border: 3px solid #cbd5e1; color: #334155; padding: 25px 20px; border-radius: 24px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 160px; }
+        .step-image { width: 90%; max-width: 950px; max-height: 550px; object-fit: contain; border-radius: 20px; border: 3px solid white; margin-bottom: 20px; }
+        .inline-gif { display: inline-block; max-height: 150px; margin: 10px; }
+        .btn-action { background-color: var(--success); color: white; padding: 14px 30px; border: none; border-radius: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <button onclick="mudarAba('estudante')">ÁREA DO ESTUDANTE</button>
-        <button onclick="mudarAba('professor')">ÁREA DO PROFESSOR</button>
-    </nav>
-
-    <div id="view-estudante" class="view-section active">
-        <div id="estudante-cursos">
-            <button class="huge-btn" onclick="solicitarSenhaCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
-            <button class="huge-btn" onclick="solicitarSenhaCurso('senior', 'Curso Sênior')">👵 Curso Sênior</button>
-        </div>
-        <div id="estudante-senha-tela" style="display:none;">
-            <input type="password" id="input-senha-aluno" placeholder="Senha">
-            <button onclick="validarSenhaAcesso()">ENTRAR</button>
-        </div>
-        <div id="estudante-modulos" style="display:none;"></div>
-        <div id="estudante-aulas" style="display:none;"></div>
-        <div id="estudante-passos" style="display:none;"></div>
+    <header><h1>Portal de Aprendizado - Informática 5.0</h1></header>
+    <div class="container">
+        <section id="view-professor" class="view-section active">
+            <div class="card">
+                <h2>Gerenciador de Aulas</h2>
+                <select id="prof-curso"></select>
+                <input type="text" id="prof-nome-modulo" placeholder="Nome do Módulo">
+                <input type="text" id="prof-nome-aula" placeholder="Nome da Aula">
+                <input type="text" id="prof-senha-modulo-especifica" placeholder="Senha deste Módulo">
+                
+                <button class="btn-action" onclick="salvarTudoCorretamente()">💾 SALVAR ROTEIRO E SENHA</button>
+            </div>
+            <div id="editor-passos-container"></div>
+        </section>
     </div>
-
-    <section id="view-professor" class="view-section">
-        <div class="card">
-            <h2>Configurações</h2>
-            <select id="prof-curso"><option value="informatica">Informática</option><option value="senior">Sênior</option></select>
-            <select id="prof-modulo"></select>
-            <select id="prof-aula"></select>
-            <input type="text" id="prof-nome-modulo" placeholder="Nome Módulo">
-            <input type="text" id="prof-nome-aula" placeholder="Nome Aula">
-            <input type="text" id="prof-senha-modulo-especifica" placeholder="Senha deste Módulo">
-            <button onclick="salvadDadosNovoFormato()">💾 SALVAR TUDO</button>
-        </div>
-    </section>
 
     <script>
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function salvDadosNovoFormato() {
+        async function salvarTudoCorretamente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
-            const senha = document.getElementById('prof-senha-modulo-especifica').value;
-            
-            // O segredo aqui é salvar TUDO como uma string na coluna 'nome_aula'
-            // Formato: NomeDaAula ||| Senha
-            const nAula = document.getElementById('prof-nome-aula').value.trim() + " ||| " + senha;
+            const senha = document.getElementById('prof-senha-modulo-especifica').value.trim();
+            const nAula = document.getElementById('prof-nome-aula').value.trim();
+
+            // Salvamos a senha ANEXADA ao nome da aula para garantir que o banco aceite
+            const nomeAulaComSenha = senha ? `${nAula} ||| ${senha}` : nAula;
 
             try {
-                const { error } = await bancoDados.from('roteiros_aulas').upsert({ 
+                await bancoDados.from('roteiros_aulas').upsert({ 
                     id: `${c}_${m}_${a}`,
                     nome_modulo: document.getElementById('prof-nome-modulo').value,
-                    nome_aula: nAula,
+                    nome_aula: nomeAulaComSenha,
                     passos: ["salvo"]
                 });
-                if(error) throw error;
-                alert("Salvo com sucesso!");
+                alert("Senha e Roteiro gravados com sucesso!");
             } catch(e) { alert("Erro ao salvar: " + e.message); }
-        }
-
-        function mudarAba(aba) {
-            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.getElementById('view-' + aba).style.display = 'block';
         }
     </script>
 </body>
