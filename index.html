@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Estudante - Informática 5.0</title>
+    <title>Portal do Estudante - Nuvem</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -29,7 +29,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        header h1 { margin: 0; font-size: 2.5rem; }
+        header h1 { margin: 0; font-size: 2.3rem; }
 
         nav {
             display: flex;
@@ -42,8 +42,8 @@
             background: none;
             border: none;
             color: white;
-            padding: 15px 30px;
-            font-size: 1.5rem;
+            padding: 12px 25px;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
             border-radius: 8px;
@@ -57,7 +57,7 @@
 
         .container {
             max-width: 1000px;
-            margin: 30px auto;
+            margin: 20px auto;
             padding: 20px;
         }
 
@@ -66,18 +66,18 @@
 
         .card {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             border: 2px solid #e2e8f0;
         }
 
-        h2 { font-size: 2rem; color: var(--primary); }
+        h2 { font-size: 1.8rem; color: var(--primary); margin-top: 0; }
         
         .grid-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
@@ -86,24 +86,32 @@
             background: white;
             border: 3px solid var(--primary);
             color: var(--primary);
-            padding: 30px 20px;
-            font-size: 1.6rem;
+            padding: 25px 15px;
+            font-size: 1.4rem;
             font-weight: bold;
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
+
+        .huge-btn span { font-size: 0.9rem; font-weight: normal; color: #64748b; }
 
         .huge-btn:hover {
             background: var(--primary);
             color: white;
         }
+        .huge-btn:hover span { color: #cbd5e1; }
 
-        label { display: block; font-size: 1.3rem; font-weight: bold; margin-top: 15px; }
+        label { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 15px; }
         input, select, textarea {
             width: 100%;
-            padding: 15px;
-            font-size: 1.2rem;
+            padding: 12px;
+            font-size: 1.1rem;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
             box-sizing: border-box;
@@ -113,27 +121,36 @@
         .btn-action {
             background-color: var(--success);
             color: white;
-            padding: 15px 30px;
-            font-size: 1.3rem;
+            padding: 12px 25px;
+            font-size: 1.1rem;
             font-weight: bold;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
-        .progress-container { width: 100%; background-color: #cbd5e1; border-radius: 20px; height: 25px; margin-bottom: 20px; overflow: hidden; }
+        .progress-container { width: 100%; background-color: #cbd5e1; border-radius: 20px; height: 20px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background-color: var(--success); transition: width 0.3s; }
-        .step-text { font-size: 2rem; line-height: 1.6; margin: 30px 0; font-weight: 500; }
-        .click-target { background-color: #fef08a; padding: 5px 15px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; }
+        
+        .step-text { font-size: 1.8rem; line-height: 1.5; margin: 20px 0; font-weight: 500; }
+        .click-target { background-color: #fef08a; padding: 3px 10px; border-radius: 6px; border: 2px dashed #ca8a04; font-weight: bold; }
+        
+        .step-image { max-width: 100%; max-height: 350px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
+        
         .nav-steps { display: flex; gap: 20px; }
-        .btn-step { flex: 1; padding: 20px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; }
-    </style>
+        .btn-step { flex: 1; padding: 15px; font-size: 1.3rem; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; }
+
+        /* Estilos do Editor do Professor */
+        .step-editor-item { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
+        .row-inputs { display: flex; gap: 10px; margin-top: 5px; }
+        .btn-remove { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </script>
 </head>
 <body>
 
     <header>
-        <h1>Portal Cloud - Informática 5.0</h1>
+        <h1 id="main-title">Portal de Aprendizado - Informática 5.0</h1>
     </header>
 
     <nav>
@@ -144,8 +161,18 @@
     <div class="container">
 
         <section id="view-estudante" class="view-section active">
-            <div id="estudante-modulos">
-                <h2>Selecione o seu Módulo:</h2>
+            
+            <div id="estudante-cursos">
+                <h2>Selecione o seu Curso:</h2>
+                <div class="grid-links">
+                    <button class="huge-btn" style="padding: 40px 20px;" onclick="selecionarCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
+                    <button class="huge-btn" style="padding: 40px 20px; border-color: #7c3aed; color: #7c3aed;" onclick="selecionarCurso('senior', 'Melhor Idade / Sênior')">👵👨‍🦳 Curso Sênior</button>
+                </div>
+            </div>
+
+            <div id="estudante-modulos" style="display:none;">
+                <button class="btn-action" style="background:#64748b;" onclick="voltarParaCursos()">< Mudar de Curso</button>
+                <h2 id="titulo-curso-escolhido">Módulos Disponíveis:</h2>
                 <div class="grid-links" id="lista-modulos-estudante"></div>
             </div>
 
@@ -160,7 +187,10 @@
                 <h2 id="titulo-aula-atual">Aula</h2>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 <div class="card" style="text-align:center;">
+                    <img id="img-passo-aluno" class="step-image" alt="Instração Visual">
                     <div id="conteudo-passo" class="step-text"></div>
+                    <div id="link-passo-container" style="margin-bottom: 20px;"></div>
+                    
                     <div class="nav-steps">
                         <button class="btn-step" style="background:#94a3b8; color:white;" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
                         <button class="btn-step" style="background:var(--success); color:white;" id="btnNext" onclick="mudarPasso(1)">AVANÇAR ▶</button>
@@ -171,191 +201,314 @@
 
         <section id="view-professor" class="view-section">
             <div class="card">
-                <h2>Gerenciador de Roteiros na Nuvem</h2>
-                <p>O que você salvar aqui atualizará instantaneamente o computador de todos os alunos.</p>
+                <h2>Gerenciador de Aulas Multimídia</h2>
+                <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos.</p>
                 <hr style="border:1px solid #e2e8f0; margin:20px 0;">
 
-                <label for="prof-modulo">1. Escolha o Módulo:</label>
-                <select id="prof-modulo" onchange="carregarTextoExistente()"></select>
+                <label for="prof-curso">1. Selecione o Curso:</label>
+                <select id="prof-curso" onchange="carregarTextoExistente()">
+                    <option value="informatica">Informática 5.0</option>
+                    <option value="senior">Curso Sênior</option>
+                </select>
 
-                <label for="prof-aula">2. Escolha a Aula:</label>
-                <select id="prof-aula" onchange="carregarTextoExistente()"></select>
+                <div class="row-inputs">
+                    <div style="flex:1;">
+                        <label for="prof-modulo">2. Identificador do Módulo:</label>
+                        <select id="prof-modulo" onchange="carregarTextoExistente()"></select>
+                    </div>
+                    <div style="flex:2;">
+                        <label for="prof-nome-modulo">Nome Visível do Módulo:</label>
+                        <input type="text" id="prof-nome-modulo" placeholder="Ex: Introdução ao Windows ou Landing Pages">
+                    </div>
+                </div>
 
-                <label for="prof-conteudo">3. Digite as Instruções Passo a Passo (Uma por linha):</label>
-                <textarea id="prof-conteudo" rows="10" placeholder="Passo 1: Clique em *Iniciar*&#10;Passo 2: Digite seu nome"></textarea>
+                <div class="row-inputs">
+                    <div style="flex:1;">
+                        <label for="prof-aula">3. Identificador da Aula:</label>
+                        <select id="prof-aula" onchange="carregarTextoExistente()"></select>
+                    </div>
+                    <div style="flex:2;">
+                        <label for="prof-nome-aula">Nome Visível da Aula:</label>
+                        <input type="text" id="prof-nome-aula" placeholder="Ex: Aula 01 - Criando Pastas">
+                    </div>
+                </div>
 
-                <button class="btn-action" onclick="salvarDadosProfessor()">💾 Salvar na Nuvem (Supabase)</button>
+                <hr style="border:1px solid #e2e8f0; margin:25px 0;">
+                <h3> Roteiro Passo a Passo Dinâmico</h3>
+                <div id="editor-passos-container"></div>
+                
+                <button class="btn-action" style="background:#2563eb;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo</button>
+                <br><br>
+                <button class="btn-action" onclick="salvarDadosProfessor()">💾 Salvar Tudo na Nuvem (Supabase)</button>
             </div>
         </section>
 
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         
-        // Ajustado o nome da variável de conexão para 'bancoDados' para resolver o travamento
         const bancoDados = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let cursoSelecionado = '';
         let modSelecionado = '';
         let aulaSelecionada = '';
         let passosAulaAtual = [];
         let passoAtual = 0;
+        
+        // Estrutura de nomes em cache local para agilizar visualização do aluno
+        let nomesCustomizados = {};
 
         function switchView(view) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            
             if(window.event && window.event.target && window.event.target.classList) {
                 window.event.target.classList.add('active');
             }
             document.getElementById(`view-${view}`).classList.add('active');
         }
 
-        // Inicializar os campos do Professor
         function inicializarPainel() {
-            try {
-                const selectMod = document.getElementById('prof-modulo');
-                selectMod.innerHTML = '';
-                for (let m = 1; m <= 10; m++) {
-                    let opt = document.createElement('option');
-                    opt.value = `modulo_${m}`;
-                    opt.innerText = `Módulo ${String(m).padStart(2, '0')}`;
-                    selectMod.appendChild(opt);
-                }
-
-                const selectAula = document.getElementById('prof-aula');
-                selectAula.innerHTML = '';
-                for (let a = 1; a <= 4; a++) {
-                    let opt = document.createElement('option');
-                    opt.value = `aula_${a}`;
-                    opt.innerText = `Aula 0${a}`;
-                    selectAula.appendChild(opt);
-                }
-                carregarTextoExistente();
-                renderizarModulosEstudante();
-            } catch (err) {
-                console.error("Erro na inicialização visual:", err.message);
+            const selectMod = document.getElementById('prof-modulo');
+            selectMod.innerHTML = '';
+            for (let m = 1; m <= 10; m++) {
+                let opt = document.createElement('option');
+                opt.value = `modulo_${m}`;
+                opt.innerText = `Módulo ${String(m).padStart(2, '0')}`;
+                selectMod.appendChild(opt);
             }
+
+            const selectAula = document.getElementById('prof-aula');
+            selectAula.innerHTML = '';
+            for (let a = 1; a <= 8; a++) { // Expandido para até 8 aulas por segurança
+                let opt = document.createElement('option');
+                opt.value = `aula_${a}`;
+                opt.innerText = `Aula ${String(a).padStart(2, '0')}`;
+                selectAula.appendChild(opt);
+            }
+            carregarTextoExistente();
+            baixarNomesCustomizados();
         }
 
-        // Carrega as instruções direto do banco de dados de forma segura
+        // Puxa do banco todos os títulos customizados salvos para montar a home certa
+        async function baixarNomesCustomizados() {
+            try {
+                const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
+                if (!error && data) {
+                    data.forEach(item => {
+                        nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function adicionarPassoAoEditor(texto = '', urlImg = '', urlLink = '') {
+            const container = document.getElementById('editor-passos-container');
+            const index = container.children.length + 1;
+
+            const div = document.createElement('div');
+            div.className = 'step-editor-item';
+            div.innerHTML = `
+                <strong>Passo ${index}</strong>
+                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno (Use *palavra* para destacar em amarelo)">${texto}</textarea>
+                <div class="row-inputs">
+                    <input type="text" class="edit-img" placeholder="URL da Imagem/Print (Opcional)" value="${urlImg}">
+                    <input type="text" class="edit-link" placeholder="Link de Apoio (Opcional)" value="${urlLink}">
+                    <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarNumeracaoEditor();">Excluir</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function reordenarNumeracaoEditor() {
+            const container = document.getElementById('editor-passos-container');
+            Array.from(container.children).forEach((div, idx) => {
+                div.querySelector('strong').innerText = `Passo ${idx + 1}`;
+            });
+        }
+
         async function carregarTextoExistente() {
+            const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
-            const idUnico = `${m}_${a}`;
+            const idUnico = `${c}_${m}_${a}`;
+
+            document.getElementById('editor-passos-container').innerHTML = '';
 
             try {
                 const { data, error } = await bancoDados
                     .from('roteiros_aulas')
-                    .select('passos')
+                    .select('nome_modulo, nome_aula, passos_midia')
                     .eq('id', idUnico)
                     .maybeSingle();
 
-                if (error) throw error;
-                document.getElementById('prof-conteudo').value = (data && data.passos) ? data.passos.join('\n') : '';
-            } catch (err) {
-                console.error("Erro ao buscar dados pedagógicos:", err.message);
-            }
+                if (data) {
+                    document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
+                    document.getElementById('prof-nome-aula').value = data.nome_aula || '';
+                    if (data.passos_midia && data.passos_midia.length > 0) {
+                        data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
+                    }
+                } else {
+                    document.getElementById('prof-nome-modulo').value = '';
+                    document.getElementById('prof-nome-aula').value = '';
+                    adicionarPassoAoEditor(); // Inicia com um em branco caso não exista
+                }
+            } catch (err) { console.error(err); }
         }
 
-        // Salva ou Atualiza o registro na nuvem
         async function salvarDadosProfessor() {
+            const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
-            const idUnico = `${m}_${a}`;
-            const texto = document.getElementById('prof-conteudo').value;
+            const idUnico = `${c}_${m}_${a}`;
+            
+            const nModulo = document.getElementById('prof-nome-modulo').value.trim();
+            const nAula = document.getElementById('prof-nome-aula').value.trim();
 
-            const listaPassos = texto.split('\n').filter(linha => linha.trim() !== '');
+            const itemsEditor = document.querySelectorAll('.step-editor-item');
+            let pacotePassos = [];
 
-            if(listaPassos.length === 0) {
-                alert("Roteiro vazio! Digite os passos antes de salvar.");
-                return;
+            itemsEditor.forEach(item => {
+                const txt = item.querySelector('.edit-texto').value.trim();
+                const img = item.querySelector('.edit-img').value.trim();
+                const lnk = item.querySelector('.edit-link').value.trim();
+                if(txt !== '') {
+                    pacotePassos.push({ texto: txt, imagem: img, link: lnk });
+                }
+            });
+
+            if(pacotePassos.length === 0) {
+                alert("Insira ao menos um passo válido!"); return;
             }
 
             try {
                 const { error } = await bancoDados
                     .from('roteiros_aulas')
-                    .upsert({ id: idUnico, modulo_id: m, aula_id: a, passos: listaPassos });
+                    .upsert({ 
+                        id: idUnico, 
+                        modulo_id: `${c}_${m}`, 
+                        aula_id: a, 
+                        nome_modulo: nModulo || `Módulo ${m.split('_')[1]}`,
+                        nome_aula: nAula || `Aula ${a.split('_')[1]}`,
+                        passos_midia: pacotePassos,
+                        passos: pacotePassos.map(p => p.texto) // Mantém compatibilidade com a coluna antiga
+                    });
 
                 if (error) throw error;
-                alert("Roteiro salvo na nuvem com sucesso! 🌐");
-            } catch (err) {
-                alert("Erro ao salvar no banco: " + err.message);
-            }
+                alert("Dados salvos e sincronizados com a nuvem com sucesso! 🌐");
+                await baixarNomesCustomizados();
+            } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
-        // --- ÁREA DO ALUNO ---
+        // --- INTERFACE DO ESTUDANTE ---
+        function selecionarCurso(idCurso, nomeExibicao) {
+            cursoSelecionado = idCurso;
+            document.getElementById('main-title').innerText = `Portal - ${nomeExibicao}`;
+            document.getElementById('estudante-cursos').style.display = 'none';
+            document.getElementById('estudante-modulos').style.display = 'block';
+            renderizarModulosEstudante();
+        }
+
+        function voltarCursos() {
+            document.getElementById('estudante-modulos').style.display = 'none';
+            document.getElementById('estudante-cursos').style.display = 'block';
+            document.getElementById('main-title').innerText = "Portal do Estudante - Nuvem";
+        }
+
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
+            
             for (let m = 1; m <= 10; m++) {
+                let cacheId = `${cursoSelecionado}_modulo_${m}_aula_1`;
+                let nomeExibir = (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo) 
+                    ? nomesCustomizados[cacheId].modulo 
+                    : `Módulo ${String(m).padStart(2, '0')}`;
+
                 let btn = document.createElement('button');
                 btn.className = 'huge-btn';
-                btn.innerText = `Módulo ${String(m).padStart(2, '0')}`;
-                btn.onclick = () => entrarNoModulo(`modulo_${m}`);
+                btn.innerHTML = `${nomeExibir} <span>Identificador: Mod ${m}</span>`;
+                btn.onclick = () => entrarNoModulo(`modulo_${m}`, nomeExibir);
                 container.appendChild(btn);
             }
         }
 
-        function entrarNoModulo(mId) {
+        function entrarNoModulo(mId, nomeModulo) {
             modSelecionado = mId;
             document.getElementById('estudante-modulos').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
-            document.getElementById('titulo-modulo-atual').innerText = `Módulo ${mId.split('_')[1]} - Escolha a Aula:`;
+            document.getElementById('titulo-modulo-atual').innerText = `${nomeModulo}:`;
 
             const container = document.getElementById('lista-aulas-estudante');
             container.innerHTML = '';
             
-            for (let a = 1; a <= 4; a++) {
+            for (let a = 1; a <= 8; a++) {
+                let cacheId = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
+                let nomeExibirAula = (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula)
+                    ? nomesCustomizados[cacheId].aula
+                    : `Aula 0${a}`;
+
                 let btn = document.createElement('button');
                 btn.className = 'huge-btn';
                 btn.style.borderColor = 'var(--success)';
                 btn.style.color = 'var(--success)';
-                btn.innerText = `Aula 0${a}`;
+                btn.innerText = nomeExibirAula;
                 btn.onclick = () => buscarAulaNuvem(`aula_${a}`);
                 container.appendChild(btn);
             }
         }
 
-        // Puxa em tempo real a aula escolhida do Supabase
         async function buscarAulaNuvem(aId) {
             aulaSelecionada = aId;
-            const idUnico = `${modSelecionado}_${aId}`;
+            const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
 
             try {
                 const { data, error } = await bancoDados
                     .from('roteiros_aulas')
-                    .select('passos')
+                    .select('passos_midia, nome_aula')
                     .eq('id', idUnico)
                     .maybeSingle();
 
-                if (error) throw error;
-
-                if (data && data.passos && data.passos.length > 0) {
-                    passosAulaAtual = data.passos;
+                if (data && data.passos_midia && data.passos_midia.length > 0) {
+                    passosAulaAtual = data.passos_midia;
                     passoAtual = 0;
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
-                    document.getElementById('titulo-aula-atual').innerText = `Módulo ${modSelecionado.split('_')[1]} / Aula 0${aId.split('_')[1]}`;
+                    document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
                     mostrarPasso();
                 } else {
-                    alert("Esta aula ainda não possui um roteiro cadastrado pelo professor na nuvem.");
+                    alert("Roteiro vázio ou não configurado para esta aula.");
                 }
-            } catch (err) {
-                alert("Erro ao conectar com a nuvem: " + err.message);
-            }
+            } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
         function mostrarPasso() {
             const containerTexto = document.getElementById('conteudo-passo');
+            const imgEl = document.getElementById('img-passo-aluno');
+            const linkContainer = document.getElementById('link-passo-container');
             const bar = document.getElementById('progressBar');
 
-            let textoLimpo = passosAulaAtual[passoAtual];
-            let textoFormatado = textoLimpo.replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>');
+            let estruturaPasso = passosAulaAtual[passoAtual];
             
+            // Renderiza texto com realce em asteriscos
+            let textoFormatado = estruturaPasso.texto.replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>');
             containerTexto.innerHTML = textoFormatado;
+
+            // Renderiza imagem se houver
+            if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
+                imgEl.src = estruturaPasso.imagem;
+                imgEl.style.display = 'inline-block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            // Renderiza link se houver
+            if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
+                linkContainer.innerHTML = `<a href="${estruturaPasso.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
+            } else {
+                linkContainer.innerHTML = '';
+            }
 
             const pct = ((passoAtual + 1) / passosAulaAtual.length) * 100;
             bar.style.width = `${pct}%`;
@@ -367,18 +520,22 @@
         function mudarPasso(direcao) {
             passoAtual += direcao;
             if (passoAtual >= passosAulaAtual.length) {
-                alert("Excelente! Você completou o roteiro desta aula! 🎓");
+                alert("Parabéns! Você concluiu todas as etapas da aula de hoje! 🎓");
                 voltarParaAulas();
                 return;
             }
             mostrarPasso();
         }
 
+        function voltarParaCursos() {
+            document.getElementById('estudante-modulos').style.display = 'none';
+            document.getElementById('estudante-cursos').style.display = 'block';
+            document.getElementById('main-title').innerText = "Portal de Aprendizado";
+        }
         function voltarParaModulos() {
             document.getElementById('estudante-aulas').style.display = 'none';
             document.getElementById('estudante-modulos').style.display = 'block';
         }
-
         function voltarParaAulas() {
             document.getElementById('estudante-passos').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
