@@ -12,6 +12,7 @@
             --success: #16a34a;
             --bg: #f1f5f9;
             --text: #1e293b;
+            --lock: #64748b;
         }
 
         body {
@@ -135,6 +136,24 @@
             box-shadow: 0 12px 20px rgba(37, 99, 235, 0.15);
         }
 
+        /* 🔒 ESTILO VISUAL DE MÓDULO BLOQUEADO */
+        .modulo-btn.bloqueado {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .modulo-btn.bloqueado .btn-header { color: #94a3b8; }
+        .modulo-btn.bloqueado:hover { transform: none; box-shadow: none; background: #f1f5f9; }
+
+        /* ⭐ ESTILO VISUAL DE MÓDULO JÁ CONCLUÍDO/LIBERADO */
+        .modulo-btn.liberado {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+        .modulo-btn.liberado .btn-header { color: var(--success); }
+
         .aula-btn { border-color: #86efac; }
         .aula-btn:hover {
             border-color: var(--success);
@@ -177,37 +196,46 @@
         .text-danger-huge { color: #dc2626; font-size: 2.5rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: #16a34a; font-size: 1.7rem; font-weight: bold; display: block; margin: 10px 0; }
 
-        /* 🎨 DESIGN ADICIONADO PARA GIFS EM LINHA */
+        /* 🎨 MELHORIA: GIFS DENTRO DO TEXTO AGORA FICAM MAIS VISÍVEIS (MÉDIO/GRANDE) */
         .inline-gif {
             display: inline-block;
             vertical-align: middle;
-            max-height: 80px;
-            border-radius: 8px;
-            margin: 0 8px;
+            max-height: 150px;
+            border-radius: 12px;
+            margin: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* 🖼️ DESIGN ADICIONADO PARA GALERIA MULTIMÍDIA */
+        /* 🖼️ MELHORIA EXTRAORDINÁRIA: GALERIA DE PRINTS FICOU GIGANTE (90% DA TELA) */
         .images-gallery {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            width: 100%;
         }
-        .step-image { max-width: 45%; max-height: 280px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: none; }
+        .step-image { 
+            width: 90%; 
+            max-width: 950px; 
+            max-height: 550px; 
+            object-fit: contain;
+            border-radius: 20px; 
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12); 
+            border: 3px solid white; 
+            background: white;
+        }
         
         .nav-steps { display: flex; gap: 20px; }
         .btn-step { flex: 1; padding: 18px; font-size: 1.4rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; }
 
-        /* ESTILOS DO EDITOR DO PROFESSOR (COM CONTROLES DE POSIÇÃO) */
-        .step-editor-item { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.02); border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        .step-editor-item { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
         .step-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .step-move-buttons { display: flex; gap: 5px; }
-        .btn-move { background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.2s; }
+        .btn-move { background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
         .btn-move:hover { background: #cbd5e1; }
         .row-inputs { display: flex; gap: 12px; margin-top: 5px; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto; }
-        .btn-remove:hover { background: #dc2626; }
     </style>
 </head>
 <body>
@@ -242,7 +270,8 @@
             <div id="estudante-senha-tela" style="display:none; text-align: center;">
                 <button class="btn-action" style="background:#64748b;" onclick="voltarParaCursos()">< Voltar</button>
                 <div class="card" style="max-width: 500px; margin: 30px auto;">
-                    <h2 id="titulo-senha-curso">Digite a senha do curso:</h2>
+                    <h2 id="titulo-senha-curso">Digite a senha de acesso:</h2>
+                    <p style="color:#64748b;" id="subtitulo-senha-contexto">Insira a senha do dia ou a chave secreta de revisão.</p>
                     <input type="password" id="input-senha-aluno" style="text-align: center; font-size: 2rem; padding: 15px;" placeholder="***">
                     <br><br>
                     <button class="btn-action" style="width: 100%; padding: 15px; font-size: 1.4rem;" onclick="validarSenhaAcesso()">ENTRAR NA SALA 🚪</button>
@@ -307,12 +336,32 @@
                         <input type="text" id="senha-prof-admin" style="border-color:#ef4444;">
                     </div>
                 </div>
-                <button class="btn-action" style="background:#7c3aed;" onclick="salvarSenhasNuvem()">Sincronizar Todas as Senhas</button>
+                <hr style="border:1px solid #cbd5e1; margin:15px 0;">
+                
+                <h3 style="color:var(--primary)">🎯 Controle de Módulo Ativo</h3>
+                <div class="row-inputs">
+                    <div style="flex:1;">
+                        <label for="prof-modulo-ativo">Qual Módulo está sendo ensinado hoje?</label>
+                        <select id="prof-modulo-ativo">
+                            <option value="1">Módulo 01</option><option value="2">Módulo 02</option>
+                            <option value="3">Módulo 03</option><option value="4">Módulo 04</option>
+                            <option value="5">Módulo 05</option><option value="6">Módulo 06</option>
+                            <option value="7">Módulo 07</option><option value="8">Módulo 08</option>
+                            <option value="9">Módulo 09</option><option value="10">Módulo 10</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label for="prof-chave-revisao">Chave Secreta para rever Módulos Antigos:</label>
+                        <input type="text" id="prof-chave-revisao" placeholder="Ex: revisao50">
+                    </div>
+                </div>
+                <br>
+                <button class="btn-action" style="background:#7c3aed;" onclick="salvarSenhasNuvem()">Sincronizar Parâmetros de Segurança</button>
             </div>
 
             <div class="card">
                 <h2>Gerenciador de Aulas Multimídia</h2>
-                <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos. Use chaves `{link_do_gif}` no texto para colocar gifs animados flutuando no meio das palavras.</p>
+                <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos.</p>
                 <hr style="border:1px solid #e2e8f0; margin:20px 0;">
 
                 <label for="prof-curso">1. Selecione o Curso:</label>
@@ -366,12 +415,11 @@
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
 
-        // Roteiro padrão atualizado contendo o exemplo do GIF animado {link} nas revisões finais
         const ROTEIRO_PADRAO_INF_M9_A3 = [
-            { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
+            { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organized para você em uma tabelinha eletrônica!", imagem: "", link: "" },
             { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
             { texto: "Passo 1: Conversando com o seu Ajudante de Inteligência Artificial. Na página inicial do Canva, vamos procurar e clicar no botão chamado *Canva IA* e depois escolher a opção *Programação*. Vai abrir uma caixinha de conversa bem parecida com o WhatsApp.", imagem: "", link: "" },
-            { texto: "Passo 2: Pedindo o seu Aplicativo. Nessa caixa de mensagem de texto, digite exatamente as palavras: *'Por favor, crie uma lojinha simples de roupas com botão de fazer pedido que salve o nome do cliente'*. Aperte a tecla *Enter* e veja a IA desenhando o aplicativo sozinho!", imagem: "", link: "" },
+            { texto: "Passo 2: Pedindo o seu Aplicativo. Nessa caixa de mensagem de texto, digite exatamente as palavras: *'Por favor, crie uma lojinha simples de roupas com botão de fazer pedido que salve o nome del cliente'*. Aperte a tecla *Enter* e veja a IA desenhando o aplicativo sozinho!", imagem: "", link: "" },
             { texto: "Passo 3: Modo de Edição de Textos. Quando o desenho da sua lojinha aparecer, clique no botão azul no topo escrito *Usar em um design* e depois em *Código*. Agora você tem superpoderes: clique duas vezes em cima do texto *Nossa Loja* e mude para o nome do seu negócio (ex: *Bazar da Maria*).", imagem: "", link: "" },
             { texto: "Passo 4: Trocando as fotos dos produtos por fotos suas. No menu do lado esquerdo da tela, clique em *Upload* e traga a foto do seu produto real que está salva no computador. Depois, é só clicar e arrastar a sua foto nova para cima da foto velha que a IA tinha colocado.", imagem: "", link: "" },
             { texto: "Passo 5: Mudando a cor dos Botões de Ação. Clique em cima do botão *Fazer Pedido*. Na barra de ferramentas superior, vai aparecer um quadradinho de cor. Clique nele e escolha uma cor bem bonita e chamativa, como um |verde bem alegre|, para o seu cliente saber onde clicar.", imagem: "", link: "" },
@@ -389,8 +437,11 @@
         let passoAtual = 0;
         
         let nomesCustomizados = {};
-        let senhasCursos = { informatica: "123", senior: "456", admin: "admin123" };
+        
+        // Parâmetros estendidos para controle de bloqueio dinâmico na nuvem
+        let senhasCursos = { informatica: "123", senior: "456", admin: "admin123", moduloAtivo: "9", chaveRevisao: "revisao50" };
         let professorAutenticado = false;
+        let modAlvoClicado = 0; // Guarda provisoriamente qual card o aluno tentou abrir
 
         function mudarAba(aba) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -451,6 +502,8 @@
                         if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
                         if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
                         if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
+                        if(c.id === 'moduloAtivo') document.getElementById('prof-modulo-ativo').value = c.senha;
+                        if(c.id === 'chaveRevisao') document.getElementById('prof-chave-revisao').value = c.senha;
                     });
                 }
             } catch (e) { console.error(e); }
@@ -461,6 +514,8 @@
             const infS = document.getElementById('senha-prof-inf').value.trim();
             const senS = document.getElementById('senha-prof-sen').value.trim();
             const admS = document.getElementById('senha-prof-admin').value.trim();
+            const modA = document.getElementById('prof-modulo-ativo').value;
+            const chvR = document.getElementById('prof-chave-revisao').value.trim();
 
             if(admS === '') { alert("A senha do administrador não pode ficar em branco!"); return; }
 
@@ -468,9 +523,11 @@
                 await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS });
                 await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
                 await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS });
-                alert("Todas as senhas foram sincronizadas com sucesso!");
+                await bancoDados.from('config_cursos').upsert({ id: 'moduloAtivo', senha: modA });
+                await bancoDados.from('config_cursos').upsert({ id: 'chaveRevisao', senha: chvR });
+                alert("Parâmetros de controle e senhas sincronizados com o Supabase!");
                 baixarSenhasNuvem();
-            } catch (e) { alert("Erro ao atualizar senhas: " + e.message); }
+            } catch (e) { alert("Erro ao sincronizar parâmetros: " + e.message); }
         }
 
         function validarAcessoProfessor() {
@@ -496,7 +553,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // 🛠️ INJETOR DE ITENS NO EDITOR COM REORDENAÇÃO COMPLETA ▲ E ▼ MANTIDO
         function adicionarPassoAoEditor(texto = '', urlImg = '', urlLink = '') {
             const container = document.getElementById('editor-passos-container');
 
@@ -623,28 +679,86 @@
             } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
-        // --- INTERFACE DO ESTUDANTE ---
+        // --- INTERFACE DO ESTUDANTE CONTROLE PORTARIA PORTAL ---
         function solicitarSenhaCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
             cursoNomeTemp = nomeExibicao;
-            document.getElementById('input-senha-aluno').value = '';
+            
+            // Pula a portaria inicial do curso para ir direto ao Sumário de Módulos Bloqueados/Liberados
+            document.getElementById('main-title').innerText = `Portal - ${cursoNomeTemp}`;
             document.getElementById('estudante-cursos').style.display = 'none';
-            document.getElementById('estudante-senha-tela').style.display = 'block';
-            document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeExibicao}. Digite a senha:`;
+            document.getElementById('estudante-modulos').style.display = 'block';
+            renderizarModulosEstudante();
         }
 
-        function __test_set_view_curso(idCurso, nomeExibicao) { solicitarSenhaCurso(idCurso, nomeExibicao); }
+        // 🔒 LÓGICA DE VALIDAÇÃO DE PORTARIA PARA ENTRAR NO MÓDULO ALVO
+        function tentarAcessarModulo(mNum, nomeModulo) {
+            const mAtivo = parseInt(senhasCursos.moduloAtivo || "9");
+            
+            // Verifica se o computador já possui esse módulo destravado na memória local (localStorage)
+            const chaveMemoria = `modulo_liberado_${cursoSelecionado}_mod_${mNum}`;
+            const jaLiberadoAnteriormente = localStorage.getItem(chaveMemoria) === "sim";
+
+            modAlvoClicado = mNum;
+
+            if (mNum === mAtivo) {
+                // É O MÓDULO DE HOJE: Pede a senha do curso comum
+                document.getElementById('estudante-modulos').style.display = 'none';
+                document.getElementById('estudante-senha-tela').style.display = 'block';
+                document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeModulo}`;
+                document.getElementById('subtitulo-senha-contexto').innerText = "Digite a senha comum do curso informada pela professora.";
+            } else if (jaLiberadoAnteriormente || mNum < mAtivo) {
+                // MÓDULO ANTIGO: Se já usou a chave uma vez, entra direto. Senão, abre portaria de revisão
+                if (jaLiberadoAnteriormente) {
+                    modSelecionado = `modulo_${mNum}`;
+                    document.getElementById('estudante-modulos').style.display = 'none';
+                    document.getElementById('estudante-aulas').style.display = 'block';
+                    document.getElementById('titulo-modulo-atual').innerText = `${nomeModulo}:`;
+                    entrarNoModuloDireto(`modulo_${mNum}`, nomeModulo);
+                } else {
+                    document.getElementById('estudante-modulos').style.display = 'none';
+                    document.getElementById('estudante-senha-tela').style.display = 'block';
+                    document.getElementById('titulo-senha-curso').innerText = `Revisar: ${nomeModulo}`;
+                    document.getElementById('subtitulo-senha-contexto').innerText = "Módulo de revisão! Digite a Chave Secreta de Liberação dada pela professora.";
+                }
+            } else {
+                // MÓDULO FUTURO: Bloqueado completo
+                alert("🔒 Módulo trancado! Nós vamos aprender essa matéria nas próximas aulas.");
+            }
+        }
 
         function validarSenhaAcesso() {
             const senhaDigitada = document.getElementById('input-senha-aluno').value.trim();
-            const senhaCorreta = senhasCursos[cursoSelecionado];
+            const mAtivo = parseInt(senhasCursos.moduloAtivo || "9");
+            
+            if (modAlvoClicado === mAtivo) {
+                // Validando módulo do dia (Senha Comum)
+                const senhaCorreta = senhasCursos[cursoSelecionado];
+                if (senhaDigitada === senhaCorreta) {
+                    avancarParaAulasModulo();
+                } else { alert("Senha incorreta para a sala de aula de hoje! 👩‍🏫"); }
+            } else {
+                // Validando módulo antigo (Chave Secreta)
+                if (senhaDigitada === senhasCursos.chaveRevisao) {
+                    // Grava na memória desta máquina que o módulo está livre para revisões futuras sem re-digitação
+                    localStorage.setItem(`modulo_liberado_${cursoSelecionado}_mod_${modAlvoClicado}`, "sim");
+                    avancarParaAulasModulo();
+                } else { alert("Chave secreta de revisão incorreta! Peça a chave antiga para a professora."); }
+            }
+        }
 
-            if (senhaDigitada === senhaCorreta) {
-                document.getElementById('main-title').innerText = `Portal - ${cursoNomeTemp}`;
-                document.getElementById('estudante-senha-tela').style.display = 'none';
-                document.getElementById('estudante-modulos').style.display = 'block';
-                renderizarModulosEstudante();
-            } else { alert("Senha errada! Peça ajuda para a Professora Analice. 👩‍🏫"); }
+        function avancarParaAulasModulo() {
+            modSelecionado = `modulo_${modAlvoClicado}`;
+            let nomeModuloTemp = `Módulo ${String(modAlvoClicado).padStart(2, '0')}`;
+            let cacheId = `${cursoSelecionado}_modulo_${modAlvoClicado}_aula_1`;
+            if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo) {
+                nomeModuloTemp = nomesCustomizados[cacheId].modulo;
+            }
+
+            document.getElementById('estudante-senha-tela').style.display = 'none';
+            document.getElementById('estudante-aulas').style.display = 'block';
+            document.getElementById('titulo-modulo-atual').innerText = `${nomeModuloTemp}:`;
+            entrarNoModuloDireto(modSelecionado, nomeModuloTemp);
         }
 
         function voltarParaCursos() {
@@ -658,6 +772,8 @@
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
             
+            const mAtivo = parseInt(senhasCursos.moduloAtivo || "9");
+
             for (let m = 1; m <= 10; m++) {
                 let nomeExibir = `Módulo ${String(m).padStart(2, '0')}`;
                 
@@ -674,21 +790,32 @@
                 }
 
                 let emoji = iconesModulos[`modulo_${m}`] || "📁";
+                let classeBloqueio = "";
+                let cadeadoIcone = "";
+
+                // Aplica inteligência de portaria visual nos cards
+                const chaveMemoria = `modulo_liberado_${cursoSelecionado}_mod_${m}`;
+                const jaLiberado = localStorage.getItem(chaveMemoria) === "sim";
+
+                if (m === mAtivo) {
+                    cadeadoIcone = " ⚡ (Hoje)";
+                } else if (jaLiberado || m < mAtivo) {
+                    classeBloqueio = " liberado";
+                    cadeadoIcone = " ⭐ (Revendo)";
+                } else {
+                    classeBloqueio = " bloqueado";
+                    cadeadoIcone = " 🔒";
+                }
 
                 let btn = document.createElement('button');
-                btn.className = 'huge-btn modulo-btn';
-                btn.innerHTML = `<div class="btn-icon">${emoji}</div><div class="btn-header">${nomeExibir}</div>`;
-                btn.onclick = () => entrarNoModulo(`modulo_${m}`, nomeExibir);
+                btn.className = `huge-btn modulo-btn` + classeBloqueio;
+                btn.innerHTML = `<div class="btn-icon">${emoji}</div><div class="btn-header">${nomeExibir}${cadeadoIcone}</div>`;
+                btn.onclick = () => tentarAcessarModulo(m, nomeExibir);
                 container.appendChild(btn);
             }
         }
 
-        function entrarNoModulo(mId, nomeModulo) {
-            modSelecionado = mId;
-            document.getElementById('estudante-modulos').style.display = 'none';
-            document.getElementById('estudante-aulas').style.display = 'block';
-            document.getElementById('titulo-modulo-atual').innerText = `${nomeModulo}:`;
-
+        function entrarNoModuloDireto(mId, nomeModulo) {
             const container = document.getElementById('lista-aulas-estudante');
             container.innerHTML = '';
             
@@ -714,6 +841,12 @@
                 btn.onclick = () => buscarAulaNuvem(`aula_${a}`);
                 container.appendChild(btn);
             }
+        }
+
+        function voltarParaModulos() {
+            document.getElementById('estudante-aulas').style.display = 'none';
+            document.getElementById('estudante-modulos').style.display = 'block';
+            renderizarModulosEstudante();
         }
 
         async function buscarAulaNuvem(aId) {
@@ -751,7 +884,6 @@
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
-        // INTERPRETADOR EXPANDIDO CONTENDO A GALERIA E OS GIFS INTERNOS
         function mostrarPasso() {
             const containerTexto = document.getElementById('conteudo-passo');
             const galeriaImagens = document.getElementById('galeria-imagens-aluno');
@@ -761,7 +893,6 @@
             let estruturaPasso = passosAulaAtual[passoAtual];
             let rawText = estruturaPasso.texto;
 
-            // 1. Limpa e reconstrói a galeria de imagens inferiores (suporta links múltiplos com vírgula)
             galeriaImagens.innerHTML = '';
             if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
                 let listaUrls = estruturaPasso.imagem.split(',');
@@ -776,7 +907,6 @@
                 });
             }
 
-            // 2. Aplica as substituições de formatação e os GIFs flutuantes com chaves {}
             let textoFormatado = rawText
                 .replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>')
                 .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')
@@ -807,10 +937,6 @@
             mostrarPasso();
         }
 
-        function voltarParaModulos() {
-            document.getElementById('estudante-aulas').style.display = 'none';
-            document.getElementById('estudante-modulos').style.display = 'block';
-        }
         function voltarParaAulas() {
             document.getElementById('estudante-passos').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
