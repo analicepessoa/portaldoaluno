@@ -1024,7 +1024,7 @@
                 .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>')
                 .replace(/=(.*?)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
                 .replace(/\{([\s\S]*?)\}/g, '<img src="$1" class="inline-gif">');
-            
+                
             containerTexto.innerHTML = textoFormatado;
 
             if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
