@@ -2,85 +2,82 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estudante - Informática 5.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
     <style>
-        /* ... (Mantenha o mesmo CSS anterior para garantir o design) ... */
-        :root { --primary: #2563eb; --primary-dark: #1e40af; --success: #16a34a; --bg: #f1f5f9; --text: #1e293b; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 2px solid #e2e8f0; }
-        .huge-btn { background: white; border: 3px solid #cbd5e1; color: #334155; padding: 25px 20px; font-size: 1.4rem; font-weight: bold; border-radius: 24px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .step-image { width: 90%; max-width: 950px; max-height: 550px; object-fit: contain; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); border: 3px solid white; background: white; }
-        .inline-gif { display: inline-block; vertical-align: middle; max-height: 150px; border-radius: 12px; margin: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .view-section { display: none; } .view-section.active { display: block; }
-        .btn-action { background-color: var(--success); color: white; padding: 14px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
+        /* CSS simplificado para evitar erro de carga */
+        body { font-family: Arial; background-color: #f1f5f9; padding: 20px; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .huge-btn { padding: 20px; border: 2px solid #2563eb; background: white; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <header><h1 id="main-title">Portal de Aprendizado</h1></header>
+
     <nav>
-        <button class="nav-btn active" id="nav-estudante-btn" onclick="mudarAba('estudante')">👨‍🎓 ÁREA DO ESTUDANTE</button>
-        <button class="nav-btn" id="nav-professor-btn" onclick="mudarAba('professor')">👩‍🏫 ÁREA DO PROFESSOR</button>
+        <button onclick="mudarAba('estudante')">ÁREA DO ESTUDANTE</button>
+        <button onclick="mudarAba('professor')">ÁREA DO PROFESSOR</button>
     </nav>
-    <div class="container">
-        <section id="view-estudante" class="view-section active">
-            <div id="estudante-cursos">
-                <h2>Selecione o seu Curso:</h2>
-                <div class="grid-links">
-                    <button class="huge-btn" onclick="solicitarSenhaCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
-                    <button class="huge-btn" style="border-color: #7c3aed; color: #7c3aed;" onclick="solicitarSenhaCurso('senior', 'Curso Sênior')">👵👨‍🦳 Curso Sênior</button>
-                </div>
-            </div>
-            </section>
-        
-        <section id="view-professor" class="view-section">
-            </section>
+
+    <div id="view-estudante" class="view-section active">
+        <div id="estudante-cursos">
+            <button class="huge-btn" onclick="solicitarSenhaCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
+            <button class="huge-btn" onclick="solicitarSenhaCurso('senior', 'Curso Sênior')">👵 Curso Sênior</button>
+        </div>
+        <div id="estudante-senha-tela" style="display:none;">
+            <input type="password" id="input-senha-aluno" placeholder="Senha">
+            <button onclick="validarSenhaAcesso()">ENTRAR</button>
+        </div>
+        <div id="estudante-modulos" style="display:none;"></div>
+        <div id="estudante-aulas" style="display:none;"></div>
+        <div id="estudante-passos" style="display:none;"></div>
     </div>
 
+    <section id="view-professor" class="view-section">
+        <div class="card">
+            <h2>Configurações</h2>
+            <select id="prof-curso"><option value="informatica">Informática</option><option value="senior">Sênior</option></select>
+            <select id="prof-modulo"></select>
+            <select id="prof-aula"></select>
+            <input type="text" id="prof-nome-modulo" placeholder="Nome Módulo">
+            <input type="text" id="prof-nome-aula" placeholder="Nome Aula">
+            <input type="text" id="prof-senha-modulo-especifica" placeholder="Senha deste Módulo">
+            <button onclick="salvadDadosNovoFormato()">💾 SALVAR TUDO</button>
+        </div>
+    </section>
+
     <script>
-        // ... (Configurações Supabase e Globais) ...
+        const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
+        const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 🛠️ MÁGICA DA CORREÇÃO: Função que busca de forma limpa no Supabase
-        async function buscarAulaNuvem(aId) {
-            aulaSelecionada = aId;
-            const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
+        async function salvDadosNovoFormato() {
+            const c = document.getElementById('prof-curso').value;
+            const m = document.getElementById('prof-modulo').value;
+            const a = document.getElementById('prof-aula').value;
+            const senha = document.getElementById('prof-senha-modulo-especifica').value;
+            
+            // O segredo aqui é salvar TUDO como uma string na coluna 'nome_aula'
+            // Formato: NomeDaAula ||| Senha
+            const nAula = document.getElementById('prof-nome-aula').value.trim() + " ||| " + senha;
 
-            if (!bancoDados) return;
             try {
-                // 1. Busca primeiro no banco de dados
-                const { data } = await bancoDados
-                    .from('roteiros_aulas')
-                    .select('passos_midia, nome_aula')
-                    .eq('id', idUnico)
-                    .maybeSingle();
-
-                // 2. Se encontrou algo no banco, exibe e para aqui
-                if (data && data.passos_midia && data.passos_midia.length > 0) {
-                    passosAulaAtual = data.passos_midia;
-                    passoAtual = 0;
-                    document.getElementById('estudante-aulas').style.display = 'none';
-                    document.getElementById('estudante-passos').style.display = 'block';
-                    document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
-                    mostrarPasso();
-                    return;
-                } 
-
-                // 3. Fallback apenas se for a aula modelo e não houver NADA salvo no banco
-                if (idUnico === "informatica_modulo_9_aula_3") {
-                    passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
-                    passoAtual = 0;
-                    document.getElementById('estudante-aulas').style.display = 'none';
-                    document.getElementById('estudante-passos').style.display = 'block';
-                    document.getElementById('titulo-aula-atual').innerText = "Aula 03 - Meu Aplicativo de Mensagens";
-                    mostrarPasso();
-                } else { 
-                    alert("Ainda não configurei o conteúdo desta aula. Peça para a professora!"); 
-                }
-            } catch (err) { alert("Erro de conexão: " + err.message); }
+                const { error } = await bancoDados.from('roteiros_aulas').upsert({ 
+                    id: `${c}_${m}_${a}`,
+                    nome_modulo: document.getElementById('prof-nome-modulo').value,
+                    nome_aula: nAula,
+                    passos: ["salvo"]
+                });
+                if(error) throw error;
+                alert("Salvo com sucesso!");
+            } catch(e) { alert("Erro ao salvar: " + e.message); }
         }
 
-        // ... (Restante do script) ...
+        function mudarAba(aba) {
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            document.getElementById('view-' + aba).style.display = 'block';
+        }
     </script>
 </body>
 </html>
