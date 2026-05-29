@@ -182,9 +182,15 @@
         .nav-steps { display: flex; gap: 20px; }
         .btn-step { flex: 1; padding: 18px; font-size: 1.4rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; }
 
-        .step-editor-item { background: #f1f5f9; padding: 18px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid var(--primary); }
+        /* ESTILOS DO EDITOR DO PROFESSOR (COM CONTROLES DE POSIÇÃO) */
+        .step-editor-item { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.02); border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        .step-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .step-move-buttons { display: flex; gap: 5px; }
+        .btn-move { background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.2s; }
+        .btn-move:hover { background: #cbd5e1; }
         .row-inputs { display: flex; gap: 12px; margin-top: 5px; }
-        .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: auto; }
+        .btn-remove:hover { background: #dc2626; }
     </style>
 </head>
 <body>
@@ -341,7 +347,6 @@
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
 
-        // Roteiro padrão inicial do Canva (pode ser completamente modificado e renomeado pelo painel)
         const ROTEIRO_PADRAO_INF_M9_A3 = [
             { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
             { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
@@ -471,15 +476,21 @@
             } catch (e) { console.error(e); }
         }
 
+        // 🛠️ NOVO INJETOR DE ITENS NO EDITOR COM REORDENAÇÃO COMPLETA ▲ E ▼
         function adicionarPassoAoEditor(texto = '', urlImg = '', urlLink = '') {
             const container = document.getElementById('editor-passos-container');
-            const index = container.children.length + 1;
 
             const div = document.createElement('div');
             div.className = 'step-editor-item';
             div.innerHTML = `
-                <strong>Passo ${index}</strong>
-                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno">${texto}</textarea>
+                <div class="step-editor-header">
+                    <strong class="step-label">Passo</strong>
+                    <div class="step-move-buttons">
+                        <button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button>
+                        <button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button>
+                    </div>
+                </div>
+                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno (Use *palavra* para destacar em amarelo)">${texto}</textarea>
                 <div class="row-inputs">
                     <input type="text" class="edit-img" placeholder="URL da Imagem/Print (Opcional)" value="${urlImg}">
                     <input type="text" class="edit-link" placeholder="Link de Apoio (Opcional)" value="${urlLink}">
@@ -487,12 +498,34 @@
                 </div>
             `;
             container.appendChild(div);
+            reordenarNumeracaoEditor();
+        }
+
+        // FUNÇÃO DE TROCA DE POSIÇÃO DINÂMICA NO DOM
+        function moverPassoElemento(botao, direcao) {
+            const itemItem = botao.parentElement.parentElement.parentElement;
+            const container = document.getElementById('editor-passos-container');
+            
+            if (direcao === -1) {
+                // Subir elemento
+                const vizinhoCima = itemItem.previousElementSibling;
+                if (vizinhoCima) {
+                    container.insertBefore(itemItem, vizinhoCima);
+                }
+            } else if (direcao === 1) {
+                // Descer elemento
+                const vizinhoBaixo = itemItem.nextElementSibling;
+                if (vizinhoBaixo) {
+                    container.insertBefore(vizinhoBaixo, itemItem);
+                }
+            }
+            reordenarNumeracaoEditor();
         }
 
         function reordenarNumeracaoEditor() {
             const container = document.getElementById('editor-passos-container');
             Array.from(container.children).forEach((div, idx) => {
-                div.querySelector('strong').innerText = `Passo ${idx + 1}`;
+                div.querySelector('.step-label').innerText = `Passo ${idx + 1}`;
             });
         }
 
@@ -504,7 +537,6 @@
 
             document.getElementById('editor-passos-container').innerHTML = '';
 
-            if (!bancoDados) return;
             try {
                 const { data } = await bancoDados
                     .from('roteiros_aulas')
@@ -519,7 +551,6 @@
                         data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
                     }
                 } else {
-                    // Fallback inicial limpo para criação amigável
                     if (idUnico === "informatica_modulo_9_aula_3") {
                         document.getElementById('prof-nome-modulo').value = "Módulo 09 - Criando Aplicativos";
                         document.getElementById('prof-nome-aula').value = "Aula 03 - Meu Aplicativo de Mensagens";
@@ -557,7 +588,6 @@
 
             if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
 
-            // Garante nomes legíveis se forem salvos em branco
             const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
             const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
 
@@ -616,7 +646,6 @@
             for (let m = 1; m <= 10; m++) {
                 let nomeExibir = `Módulo ${String(m).padStart(2, '0')}`;
                 
-                // Procura se existe algum nome customizado salvo em qualquer aula desse módulo
                 for(let a=1; a<=8; a++){
                     let cacheId = `${cursoSelecionado}_modulo_${m}_aula_${a}`;
                     if(nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo){
@@ -625,7 +654,6 @@
                     }
                 }
 
-                // Fallback amigável padrão se for Informática 9 e não tiver nada na nuvem ainda
                 if (cursoSelecionado === "informatica" && m === 9 && nomeExibir === "Módulo 09") {
                     nomeExibir = "Módulo 09 - Criando Aplicativos";
                 }
@@ -695,7 +723,6 @@
                     return;
                 } 
                 
-                // Se for M9 A3 e não tiver alteração salva na nuvem, carrega o roteiro padrão do Canva
                 if (idUnico === "informatica_modulo_9_aula_3") {
                     passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
                     passoAtual = 0;
