@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Estudante - Nuvem</title>
+    <title>Portal do Estudante - Informática 5.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -145,7 +145,7 @@
         .step-editor-item { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
         .row-inputs { display: flex; gap: 10px; margin-top: 5px; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-    </script>
+    </style>
 </head>
 <body>
 
@@ -187,7 +187,7 @@
                 <h2 id="titulo-aula-atual">Aula</h2>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 <div class="card" style="text-align:center;">
-                    <img id="img-passo-aluno" class="step-image" alt="Instração Visual">
+                    <img id="img-passo-aluno" class="step-image" alt="Instrução Visual">
                     <div id="conteudo-passo" class="step-text"></div>
                     <div id="link-passo-container" style="margin-bottom: 20px;"></div>
                     
@@ -246,18 +246,18 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         
-        const bancoDados = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // CORREÇÃO: Chamada direta usando a função global exposta pela biblioteca sem gerar conflito de nomes
+        const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let cursoSelecionado = '';
         let modSelecionado = '';
         let aulaSelecionada = '';
         let passosAulaAtual = [];
         let passoAtual = 0;
         
-        // Estrutura de nomes em cache local para agilizar visualização do aluno
         let nomesCustomizados = {};
 
         function switchView(view) {
@@ -270,28 +270,31 @@
         }
 
         function inicializarPainel() {
-            const selectMod = document.getElementById('prof-modulo');
-            selectMod.innerHTML = '';
-            for (let m = 1; m <= 10; m++) {
-                let opt = document.createElement('option');
-                opt.value = `modulo_${m}`;
-                opt.innerText = `Módulo ${String(m).padStart(2, '0')}`;
-                selectMod.appendChild(opt);
-            }
+            try {
+                const selectMod = document.getElementById('prof-modulo');
+                selectMod.innerHTML = '';
+                for (let m = 1; m <= 10; m++) {
+                    let opt = document.createElement('option');
+                    opt.value = `modulo_${m}`;
+                    opt.innerText = `Módulo ${String(m).padStart(2, '0')}`;
+                    selectMod.appendChild(opt);
+                }
 
-            const selectAula = document.getElementById('prof-aula');
-            selectAula.innerHTML = '';
-            for (let a = 1; a <= 8; a++) { // Expandido para até 8 aulas por segurança
-                let opt = document.createElement('option');
-                opt.value = `aula_${a}`;
-                opt.innerText = `Aula ${String(a).padStart(2, '0')}`;
-                selectAula.appendChild(opt);
+                const selectAula = document.getElementById('prof-aula');
+                selectAula.innerHTML = '';
+                for (let a = 1; a <= 8; a++) {
+                    let opt = document.createElement('option');
+                    opt.value = `aula_${a}`;
+                    opt.innerText = `Aula ${String(a).padStart(2, '0')}`;
+                    selectAula.appendChild(opt);
+                }
+                carregarTextoExistente();
+                baixarNomesCustomizados();
+            } catch (err) {
+                console.error("Erro na inicialização visual:", err.message);
             }
-            carregarTextoExistente();
-            baixarNomesCustomizados();
         }
 
-        // Puxa do banco todos os títulos customizados salvos para montar a home certa
         async function baixarNomesCustomizados() {
             try {
                 const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
@@ -352,7 +355,7 @@
                 } else {
                     document.getElementById('prof-nome-modulo').value = '';
                     document.getElementById('prof-nome-aula').value = '';
-                    adicionarPassoAoEditor(); // Inicia com um em branco caso não exista
+                    adicionarPassoAoEditor();
                 }
             } catch (err) { console.error(err); }
         }
@@ -392,7 +395,7 @@
                         nome_modulo: nModulo || `Módulo ${m.split('_')[1]}`,
                         nome_aula: nAula || `Aula ${a.split('_')[1]}`,
                         passos_midia: pacotePassos,
-                        passos: pacotePassos.map(p => p.texto) // Mantém compatibilidade com a coluna antiga
+                        passos: pacotePassos.map(p => p.texto)
                     });
 
                 if (error) throw error;
@@ -401,7 +404,6 @@
             } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
-        // --- INTERFACE DO ESTUDANTE ---
         function selecionarCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
             document.getElementById('main-title').innerText = `Portal - ${nomeExibicao}`;
@@ -410,10 +412,10 @@
             renderizarModulosEstudante();
         }
 
-        function voltarCursos() {
+        function voltarParaCursos() {
             document.getElementById('estudante-modulos').style.display = 'none';
             document.getElementById('estudante-cursos').style.display = 'block';
-            document.getElementById('main-title').innerText = "Portal do Estudante - Nuvem";
+            document.getElementById('main-title').innerText = "Portal de Aprendizado";
         }
 
         function renderizarModulosEstudante() {
@@ -478,7 +480,7 @@
                     document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
                     mostrarPasso();
                 } else {
-                    alert("Roteiro vázio ou não configurado para esta aula.");
+                    alert("Roteiro vazio ou não configurado para esta aula.");
                 }
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
@@ -491,11 +493,9 @@
 
             let estruturaPasso = passosAulaAtual[passoAtual];
             
-            // Renderiza texto com realce em asteriscos
             let textoFormatado = estruturaPasso.texto.replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>');
             containerTexto.innerHTML = textoFormatado;
 
-            // Renderiza imagem se houver
             if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
                 imgEl.src = estruturaPasso.imagem;
                 imgEl.style.display = 'inline-block';
@@ -503,7 +503,6 @@
                 imgEl.style.display = 'none';
             }
 
-            // Renderiza link se houver
             if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
                 linkContainer.innerHTML = `<a href="${estruturaPasso.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
             } else {
@@ -527,11 +526,6 @@
             mostrarPasso();
         }
 
-        function voltarParaCursos() {
-            document.getElementById('estudante-modulos').style.display = 'none';
-            document.getElementById('estudante-cursos').style.display = 'block';
-            document.getElementById('main-title').innerText = "Portal de Aprendizado";
-        }
         function voltarParaModulos() {
             document.getElementById('estudante-aulas').style.display = 'none';
             document.getElementById('estudante-modulos').style.display = 'block';
