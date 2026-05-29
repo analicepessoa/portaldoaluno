@@ -334,7 +334,6 @@
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         
-        // Chamada adaptada e protegida para evitar rejeições de compilação estática
         const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         const iconesModulos = {
@@ -342,6 +341,7 @@
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
 
+        // Roteiro padrão inicial do Canva (pode ser completamente modificado e renomeado pelo painel)
         const ROTEIRO_PADRAO_INF_M9_A3 = [
             { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
             { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
@@ -383,7 +383,7 @@
                 }
             } else {
                 document.getElementById('view-estudante').style.display = 'block';
-                renderizarModulosEstudante();
+                if (bancoDados) baixarNomesCustomizados();
             }
         }
 
@@ -462,9 +462,11 @@
             try {
                 const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
                 if (!error && data) {
+                    nomesCustomizados = {};
                     data.forEach(item => {
                         nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
                     });
+                    if (cursoSelecionado) renderizarModulosEstudante();
                 }
             } catch (e) { console.error(e); }
         }
@@ -502,13 +504,6 @@
 
             document.getElementById('editor-passos-container').innerHTML = '';
 
-            if (idUnico === "informatica_modulo_9_aula_3") {
-                document.getElementById('prof-nome-modulo').value = "Módulo 09 - Criando Aplicativos";
-                document.getElementById('prof-nome-aula').value = "Aula 03 - Meu Aplicativo de Mensagens";
-                ROTEIRO_PADRAO_INF_M9_A3.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
-                return;
-            }
-
             if (!bancoDados) return;
             try {
                 const { data } = await bancoDados
@@ -524,9 +519,16 @@
                         data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
                     }
                 } else {
-                    document.getElementById('prof-nome-modulo').value = '';
-                    document.getElementById('prof-nome-aula').value = '';
-                    adicionarPassoAoEditor();
+                    // Fallback inicial limpo para criação amigável
+                    if (idUnico === "informatica_modulo_9_aula_3") {
+                        document.getElementById('prof-nome-modulo').value = "Módulo 09 - Criando Aplicativos";
+                        document.getElementById('prof-nome-aula').value = "Aula 03 - Meu Aplicativo de Mensagens";
+                        ROTEIRO_PADRAO_INF_M9_A3.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
+                    } else {
+                        document.getElementById('prof-nome-modulo').value = '';
+                        document.getElementById('prof-nome-aula').value = '';
+                        adicionarPassoAoEditor();
+                    }
                 }
             } catch (err) { console.error(err); }
         }
@@ -555,6 +557,10 @@
 
             if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
 
+            // Garante nomes legíveis se forem salvos em branco
+            const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
+            const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
+
             try {
                 const { error } = await bancoDados
                     .from('roteiros_aulas')
@@ -562,8 +568,8 @@
                         id: idUnico, 
                         modulo_id: `${c}_${m}`, 
                         aula_id: a,
-                        nome_modulo: nModulo || `Módulo ${m.split('_')[1]}`,
-                        nome_aula: nAula || `Aula ${a.split('_')[1]}`,
+                        nome_modulo: moduloFinal,
+                        nome_aula: aulaFinal,
                         passos_midia: pacotePassos,
                         passos: pacotePassos.map(p => p.texto)
                     });
@@ -608,13 +614,20 @@
             container.innerHTML = '';
             
             for (let m = 1; m <= 10; m++) {
-                let cacheId = `${cursoSelecionado}_modulo_${m}_aula_1`;
-                
                 let nomeExibir = `Módulo ${String(m).padStart(2, '0')}`;
-                if (cursoSelecionado === "informatica" && m === 9) {
+                
+                // Procura se existe algum nome customizado salvo em qualquer aula desse módulo
+                for(let a=1; a<=8; a++){
+                    let cacheId = `${cursoSelecionado}_modulo_${m}_aula_${a}`;
+                    if(nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo){
+                        nomeExibir = nomesCustomizados[cacheId].modulo;
+                        break; 
+                    }
+                }
+
+                // Fallback amigável padrão se for Informática 9 e não tiver nada na nuvem ainda
+                if (cursoSelecionado === "informatica" && m === 9 && nomeExibir === "Módulo 09") {
                     nomeExibir = "Módulo 09 - Criando Aplicativos";
-                } else if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].modulo) {
-                    nomeExibir = nomesCustomizados[cacheId].modulo;
                 }
 
                 let emoji = iconesModulos[`modulo_${m}`] || "📁";
@@ -638,12 +651,12 @@
             
             for (let a = 1; a <= 8; a++) {
                 let cacheId = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
-                
                 let nomeExibirAula = `Aula 0${a}`;
-                if (cursoSelecionado === "informatica" && modSelecionado === "modulo_9" && a === 3) {
-                    nomeExibirAula = "Aula 03 - Meu Aplicativo de Mensagens";
-                } else if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula) {
+
+                if (nomesCustomizados[cacheId] && nomesCustomizados[cacheId].aula) {
                     nomeExibirAula = nomesCustomizados[cacheId].aula;
+                } else if (cursoSelecionado === "informatica" && modSelecionado === "modulo_9" && a === 3) {
+                    nomeExibirAula = "Aula 03 - Meu Aplicativo de Mensagens";
                 }
 
                 let btn = document.createElement('button');
@@ -664,16 +677,6 @@
             aulaSelecionada = aId;
             const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
 
-            if (idUnico === "informatica_modulo_9_aula_3") {
-                passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
-                passoAtual = 0;
-                document.getElementById('estudante-aulas').style.display = 'none';
-                document.getElementById('estudante-passos').style.display = 'block';
-                document.getElementById('titulo-aula-atual').innerText = "Aula 03 - Meu Aplicativo de Mensagens";
-                mostrarPasso();
-                return;
-            }
-
             if (!bancoDados) return;
             try {
                 const { data } = await bancoDados
@@ -689,7 +692,20 @@
                     document.getElementById('estudante-passos').style.display = 'block';
                     document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
                     mostrarPasso();
-                } else { alert("Roteiro vazio ou não configurado para esta aula."); }
+                    return;
+                } 
+                
+                // Se for M9 A3 e não tiver alteração salva na nuvem, carrega o roteiro padrão do Canva
+                if (idUnico === "informatica_modulo_9_aula_3") {
+                    passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
+                    passoAtual = 0;
+                    document.getElementById('estudante-aulas').style.display = 'none';
+                    document.getElementById('estudante-passos').style.display = 'block';
+                    document.getElementById('titulo-aula-atual').innerText = "Aula 03 - Meu Aplicativo de Mensagens";
+                    mostrarPasso();
+                } else { 
+                    alert("Roteiro vazio ou não configurado para esta aula."); 
+                }
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
