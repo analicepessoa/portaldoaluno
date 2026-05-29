@@ -12,16 +12,16 @@
         .container { max-width: 1100px; margin: 30px auto; padding: 20px; }
         .view-section { display: none; } .view-section.active { display: block; }
         .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 2px solid #e2e8f0; }
-        .huge-btn { background: white; border: 3px solid #cbd5e1; color: #334155; padding: 25px; border-radius: 24px; cursor: pointer; width: 100%; font-size: 1.4
-                   rem; font-weight: bold; margin-bottom: 10px; }
+        .huge-btn { background: white; border: 3px solid #cbd5e1; color: #334155; padding: 25px; border-radius: 24px; cursor: pointer; width: 100%; font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; }
         .step-image { width: 90%; max-width: 950px; border-radius: 20px; border: 3px solid white; margin-bottom: 20px; }
         .inline-gif { display: inline-block; max-height: 150px; margin: 10px; }
         .btn-action { background-color: var(--success); color: white; padding: 14px 30px; border: none; border-radius: 12px; cursor: pointer; }
+        .step-editor-item { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 6px solid var(--primary); border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
-    <header><h1>Portal de Aprendizado - Informática 5.0</h1></header>
-    <div class="container" id="app-container">
+    <header><h1>Portal de Aprendizado</h1></header>
+    <div class="container">
         <section id="view-estudante" class="view-section active">
             <div id="estudante-cursos">
                 <h2>Selecione o seu Curso:</h2>
@@ -29,13 +29,18 @@
                 <button class="huge-btn" onclick="solicitarSenhaCurso('senior', 'Curso Sênior')">👵 Curso Sênior</button>
             </div>
             <div id="estudante-modulos" style="display:none;"></div>
+            <div id="estudante-senha-tela" style="display:none;">
+                <input type="password" id="input-senha-aluno" placeholder="Senha">
+                <button onclick="validarSenhaAcesso()">ENTRAR</button>
+            </div>
         </section>
         <section id="view-professor" class="view-section">
             <div class="card">
-                <h2>Gerenciador do Professor</h2>
+                <h2>Gerenciador</h2>
                 <input type="text" id="prof-nome-aula" placeholder="Nome da Aula">
-                <input type="text" id="prof-senha-modulo-especifica" placeholder="Senha deste Módulo">
+                <input type="text" id="prof-senha-modulo-especifica" placeholder="Senha do Módulo">
                 <button class="btn-action" onclick="salvarTudoComSenha()">💾 SALVAR</button>
+                <div id="editor-passos-container"></div>
             </div>
         </section>
     </div>
@@ -45,13 +50,22 @@
         const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function salvarTudoComSenha() {
+            const c = 'informatica'; const m = 'modulo_1'; const a = 'aula_1';
             const senha = document.getElementById('prof-senha-modulo-especifica').value.trim();
             const nAula = document.getElementById('prof-nome-aula').value.trim();
             const nomeComSenha = `${nAula} ||| ${senha}`;
             try {
-                await bancoDados.from('roteiros_aulas').upsert({ id: 'aula_teste', nome_aula: nomeComSenha, passos: ["salvo"] });
-                alert("Senha e Aula salvas!");
+                await bancoDados.from('roteiros_aulas').upsert({ 
+                    id: `${c}_${m}_${a}`, 
+                    nome_aula: nomeComSenha, 
+                    passos: ["conteudo_salvo"] 
+                });
+                alert("Salvo com sucesso!");
             } catch(e) { alert("Erro: " + e.message); }
+        }
+        function mudarAba(aba) {
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            document.getElementById('view-' + aba).style.display = 'block';
         }
     </script>
 </body>
