@@ -177,7 +177,24 @@
         .text-danger-huge { color: #dc2626; font-size: 2.5rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: #16a34a; font-size: 1.7rem; font-weight: bold; display: block; margin: 10px 0; }
 
-        .step-image { max-width: 100%; max-height: 380px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); display: none; border: none; }
+        /* 🎨 DESIGN ADICIONADO PARA GIFS EM LINHA */
+        .inline-gif {
+            display: inline-block;
+            vertical-align: middle;
+            max-height: 80px;
+            border-radius: 8px;
+            margin: 0 8px;
+        }
+
+        /* 🖼️ DESIGN ADICIONADO PARA GALERIA MULTIMÍDIA */
+        .images-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .step-image { max-width: 45%; max-height: 280px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: none; }
         
         .nav-steps { display: flex; gap: 20px; }
         .btn-step { flex: 1; padding: 18px; font-size: 1.4rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; }
@@ -249,7 +266,9 @@
                 <h2 id="titulo-aula-atual">Aula</h2>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 <div class="card" style="text-align:center;">
-                    <img id="img-passo-aluno" class="step-image" alt="Instrução Visual">
+                    
+                    <div id="galeria-imagens-aluno" class="images-gallery"></div>
+
                     <div id="conteudo-passo" class="step-text"></div>
                     <div id="link-passo-container" style="margin-bottom: 20px;"></div>
                     
@@ -293,7 +312,7 @@
 
             <div class="card">
                 <h2>Gerenciador de Aulas Multimídia</h2>
-                <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos.</p>
+                <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos. Use chaves `{link_do_gif}` no texto para colocar gifs animados flutuando no meio das palavras.</p>
                 <hr style="border:1px solid #e2e8f0; margin:20px 0;">
 
                 <label for="prof-curso">1. Selecione o Curso:</label>
@@ -347,6 +366,7 @@
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
 
+        // Roteiro padrão atualizado contendo o exemplo do GIF animado {link} nas revisões finais
         const ROTEIRO_PADRAO_INF_M9_A3 = [
             { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
             { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
@@ -358,7 +378,7 @@
             { texto: "Passo 6: Conhecendo o seu Caderno de Pedidos Digital. Clique na palavra *Dados* nas propriedades do lado da tela. O Canva vai abrir uma folha de planilha (que parece uma folha quadriculada de matemática). Esse é o seu banco de dados onde tudo fica guardado sozinho!", imagem: "", link: "" },
             { texto: "Passo 7: Colocando o Aplicativo para funcionar na internet. Clique no botão *Publish* (Publicar site) no canto superior direito. Marque a opção para o site ficar bonito no celular e clique no botão final de publicar. O computador vai te dar o seu link de internet!", imagem: "", link: "" },
             { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome. Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
-            { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
+            { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. {https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Zic3VnbXhtdWZjcGhrMXF6bTJ3ZWlwaXN6dzZ2ZTR3MmsyeXBtZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/v8Y9CId8pXisCAnid6/giphy.gif} +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
         ];
 
         let cursoSelecionado = '';
@@ -476,7 +496,7 @@
             } catch (e) { console.error(e); }
         }
 
-        // 🛠️ NOVO INJETOR DE ITENS NO EDITOR COM REORDENAÇÃO COMPLETA ▲ E ▼
+        // 🛠️ INJETOR DE ITENS NO EDITOR COM REORDENAÇÃO COMPLETA ▲ E ▼ MANTIDO
         function adicionarPassoAoEditor(texto = '', urlImg = '', urlLink = '') {
             const container = document.getElementById('editor-passos-container');
 
@@ -490,9 +510,9 @@
                         <button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button>
                     </div>
                 </div>
-                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno (Use *palavra* para destacar em amarelo)">${texto}</textarea>
+                <textarea class="edit-texto" rows="3" placeholder="Instrução do Aluno (Use chaves para GIF flutuante: {link_do_gif})">${texto}</textarea>
                 <div class="row-inputs">
-                    <input type="text" class="edit-img" placeholder="URL da Imagem/Print (Opcional)" value="${urlImg}">
+                    <input type="text" class="edit-img" placeholder="URL das Imagens/Prints (Separe por vírgula se quiser várias)" value="${urlImg}">
                     <input type="text" class="edit-link" placeholder="Link de Apoio (Opcional)" value="${urlLink}">
                     <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarNumeracaoEditor();">Excluir</button>
                 </div>
@@ -501,23 +521,16 @@
             reordenarNumeracaoEditor();
         }
 
-        // FUNÇÃO DE TROCA DE POSIÇÃO DINÂMICA NO DOM
         function moverPassoElemento(botao, direcao) {
             const itemItem = botao.parentElement.parentElement.parentElement;
             const container = document.getElementById('editor-passos-container');
             
             if (direcao === -1) {
-                // Subir elemento
                 const vizinhoCima = itemItem.previousElementSibling;
-                if (vizinhoCima) {
-                    container.insertBefore(itemItem, vizinhoCima);
-                }
+                if (vizinhoCima) container.insertBefore(itemItem, vizinhoCima);
             } else if (direcao === 1) {
-                // Descer elemento
                 const vizinhoBaixo = itemItem.nextElementSibling;
-                if (vizinhoBaixo) {
-                    container.insertBefore(vizinhoBaixo, itemItem);
-                }
+                if (vizinhoBaixo) container.insertBefore(vizinhoBaixo, itemItem);
             }
             reordenarNumeracaoEditor();
         }
@@ -619,6 +632,8 @@
             document.getElementById('estudante-senha-tela').style.display = 'block';
             document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeExibicao}. Digite a senha:`;
         }
+
+        function __test_set_view_curso(idCurso, nomeExibicao) { solicitarSenhaCurso(idCurso, nomeExibicao); }
 
         function validarSenhaAcesso() {
             const senhaDigitada = document.getElementById('input-senha-aluno').value.trim();
@@ -736,30 +751,40 @@
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
+        // INTERPRETADOR EXPANDIDO CONTENDO A GALERIA E OS GIFS INTERNOS
         function mostrarPasso() {
             const containerTexto = document.getElementById('conteudo-passo');
-            const imgEl = document.getElementById('img-passo-aluno');
+            const galeriaImagens = document.getElementById('galeria-imagens-aluno');
             const linkContainer = document.getElementById('link-passo-container');
             const bar = document.getElementById('progressBar');
 
             let estruturaPasso = passosAulaAtual[passoAtual];
             let rawText = estruturaPasso.texto;
 
+            // 1. Limpa e reconstrói a galeria de imagens inferiores (suporta links múltiplos com vírgula)
+            galeriaImagens.innerHTML = '';
+            if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
+                let listaUrls = estruturaPasso.imagem.split(',');
+                listaUrls.forEach(url => {
+                    let urlLimpa = url.trim();
+                    if(urlLimpa !== '') {
+                        let imgNode = document.createElement('img');
+                        imgNode.src = urlLimpa;
+                        imgNode.className = 'step-image';
+                        galeriaImagens.appendChild(imgNode);
+                    }
+                });
+            }
+
+            // 2. Aplica as substituições de formatação e os GIFs flutuantes com chaves {}
             let textoFormatado = rawText
                 .replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>')
                 .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')
                 .replace(/!(.*?)!/g, '<span class="text-danger-huge">$1</span>')
-                .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>');
+                .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>')
+                .replace(/\{(.*?)\}/g, '<img src="$1" class="inline-gif">'); 
             
             containerTexto.innerHTML = textoFormatado;
-
-            if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
-                imgEl.src = estruturaPasso.imagem;
-                imgEl.style.display = 'inline-block';
-            } else { 
-                imgEl.removeAttribute('src');
-                imgEl.style.display = 'none'; 
-            }
 
             if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
                 linkContainer.innerHTML = `<a href="${estruturaPasso.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
