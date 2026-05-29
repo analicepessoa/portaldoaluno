@@ -187,6 +187,7 @@
         .progress-container { width: 100%; background-color: #cbd5e1; border-radius: 20px; height: 22px; margin-bottom: 25px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background-color: var(--success); transition: width 0.3s; }
         
+        /* O segredo da quebra de linha está no white-space: pre-wrap; adicionado abaixo */
         .step-text { font-size: 2rem; line-height: 1.6; margin: 25px 0; font-weight: 500; white-space: pre-wrap; }
         
         .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; display: inline-block; margin: 2px; }
@@ -286,7 +287,7 @@
             </div>
 
             <div id="estudante-aulas" style="display:none;">
-                <button class="btn-action" style="background:#64748b;" onclick="voltarParaModulos()">< Voltar</button>
+                <button class="btn-action" style="background:#64748b;" onclick="voltarParaModulos()">< Voltar para Módulos</button>
                 <h2 id="titulo-modulo-atual">Aulas Disponíveis:</h2>
                 <div class="grid-links" id="lista-aulas-estudante"></div>
             </div>
@@ -485,7 +486,6 @@
             }
         }
 
-        // 🔄 EDITOR INTELIGENTE: Muda os rótulos dependendo do curso selecionado (Reposição vs Normal)
         function atualizarLabelsEditor() {
             const c = document.getElementById('prof-curso').value;
             const selectMod = document.getElementById('prof-modulo');
@@ -1017,14 +1017,15 @@
                 });
             }
 
+            // O SEGREDINHO DA SUBSTITUIÇÃO ESTÁ AQUI (COM A EXPRESSÃO REGULAR CORRIGIDA PARA O =TITULO=)
             let textoFormatado = rawText
                 .replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>')
                 .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')
                 .replace(/!(.*?)!/g, '<span class="text-danger-huge">$1</span>')
                 .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>')
                 .replace(/=(.*?)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
-                .replace(/\{([\s\S]*?)\}/g, '<img src="$1" class="inline-gif">');
-                
+                .replace(/\{([\s\S]*?)\}/g, '<img src="$1" class="inline-gif">'); 
+            
             containerTexto.innerHTML = textoFormatado;
 
             if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
