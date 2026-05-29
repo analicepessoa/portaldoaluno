@@ -115,7 +115,7 @@
             font-size: 1.4rem;
             font-weight: 800;
             color: var(--primary);
-            text-align: center;
+text-align: center;
         }
 
         .huge-btn .btn-desc {
@@ -384,9 +384,12 @@
                     </div>
                 </div>
 
-                <div style="background: #f0fdf4; padding: 15px; border-radius: 12px; border: 2px solid #bbf7d0; margin-top: 15px;">
+                <div style="background: #f0fdf4; padding: 20px; border-radius: 16px; border: 2px solid #bbf7d0; margin-top: 15px;">
                     <label for="prof-senha-modulo-especifica" style="color: var(--success); margin-top:0;">🔑 Senha de Revisão Exclusiva para este Módulo:</label>
-                    <input type="text" id="prof-senha-modulo-especifica" placeholder="Crie uma senha única para travar este módulo para revisões">
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <input type="text" id="prof-senha-modulo-especifica" style="margin-top:0;" placeholder="Crie uma senha única para este módulo">
+                        <button type="button" class="btn-action" style="margin-top:0; background:var(--primary); white-space:nowrap;" onclick="salvarSenhaModuloExclusivaBotao()">🔒 Gravar Senha deste Módulo</button>
+                    </div>
                 </div>
 
                 <hr style="border:1px solid #e2e8f0; margin:25px 0;">
@@ -395,7 +398,7 @@
                 
                 <button class="btn-action" style="background:#2563eb;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo</button>
                 <br><br>
-                <button class="btn-action" onclick="salvadDadosNovoFormato()">💾 Salvar Tudo na Nuvem (Supabase)</button>
+                <button class="btn-action" onclick="salvadDadosNovoFormato()">💾 Salvar Apenas o Roteiro da Aula</button>
             </div>
         </section>
 
@@ -422,7 +425,7 @@
             { texto: "Passo 5: Mudando a cor dos Botões de Ação. Clique em cima do botão *Fazer Pedido*. Na barra de ferramentas superior, vai aparecer um quadradinho de cor. Clique nele e escolha uma cor bem bonita e chamativa, como um |verde bem alegre|, para o seu cliente saber onde clicar.", imagem: "", link: "" },
             { texto: "Passo 6: Conhecendo o seu Caderno de Pedidos Digital. Clique na palavra *Dados* nas propriedades do lado da tela. O Canva vai abrir uma folha de planilha (que parece uma folha quadriculada de matemática). Esse é o seu banco de dados onde tudo fica guardado sozinho!", imagem: "", link: "" },
             { texto: "Passo 7: Colocando o Aplicativo para funcionar na internet. Clique no botão *Publish* (Publicar site) no canto superior direito. Marque a opção para o site ficar bonito no celular e clique no botão final de publicar. O computador vai te dar o seu link de internet!", imagem: "", link: "" },
-            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome.  Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
+            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome.  Depois, volte para do Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
             { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. {https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Zic3VnbXhtdWZjcGhrMXF6bTJ3ZWlwaXN6dzZ2ZTR3MmsyeXBtZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/v8Y9CId8pXisCAnid6/giphy.gif} +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
         ];
 
@@ -509,6 +512,26 @@
             } catch (e) { console.error(e); }
         }
 
+        async function baixarSenhasModulosIndependente() {
+            if (!bancoDados) return;
+            try {
+                // Puxa as senhas salvas com o prefixo secreto da tabela estável de roteiros
+                const { data } = await bancoDados.from('roteiros_aulas').select('id, nome_aula').like('id', 'secretpass_%');
+                if (data) {
+                    senhasModulosGerais = {};
+                    data.forEach(item => {
+                        let chaveReal = item.id.replace('secretpass_', '');
+                        senhasModulosGerais[chaveReal] = item.nome_aula;
+                    });
+                }
+            } catch(e) {}
+        }
+
+        async function baixarSenhasNuvemCompletas() {
+            await baixarSenhasNuvem();
+            await baixarSenhasModulosIndependente();
+        }
+
         async function salvarSenhasNuvem() {
             if (!bancoDados) return;
             const infS = document.getElementById('senha-prof-inf').value.trim();
@@ -526,7 +549,7 @@
                 await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf });
                 await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen });
                 alert("Parâmetros de controle coletivos salvos!");
-                baixarSenhasNuvem();
+                await baixarSenhasNuvemCompletas();
             } catch (e) { alert("Erro: " + e.message); }
         }
 
@@ -542,26 +565,13 @@
         async function baixarNomesCustomizados() {
             if (!bancoDados) return;
             try {
-                // ⚡ INTERPRETADOR DE SENHAS ENGENHARIZADO: Separa o nome real da aula e a senha do módulo
-                const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
+                const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula').not('id', 'like', 'secretpass_%');
                 if (!error && data) {
                     nomesCustomizados = {};
-                    senhasModulosGerais = {};
                     data.forEach(item => {
-                        let nomeAulaLimpo = item.nome_aula || '';
-                        
-                        // Se o texto possuir o separador |||, desmembra a senha e guarda na memória
-                        if (nomeAulaLimpo.includes('|||')) {
-                            let partes = nomeAulaLimpo.split('|||');
-                            nomeAulaLimpo = partes[0].trim();
-                            let senhaExtraida = partes[1].trim();
-                            
-                            // Cria uma chave única por módulo (ex: informatica_modulo_9)
-                            let modIdChave = item.id.split('_aula_')[0];
-                            senhasModulosGerais[modIdChave] = senhaExtraida;
-                        }
-                        nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: nomeAulaLimpo };
+                        nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
                     });
+                    await baixarSenhasModulosIndependente();
                     if (cursoSelecionado) renderizarModulosEstudante();
                 }
             } catch (e) { console.error(e); }
@@ -610,7 +620,34 @@
             });
         }
 
-        // ⚡ CARREGAMENTO CORE CORRIGIDO: Lê a senha da linha e preenche o input verde na hora
+        // 🛠️ BOTÃO EXCLUSIVO DE SALVAMENTO PROPOSTO POR VOCÊ: Roda de forma limpa e isolada
+        async function salvarSenhaModuloExclusivaBotao() {
+            if (!bancoDados) return;
+            const c = document.getElementById('prof-curso').value;
+            const m = document.getElementById('prof-modulo').value;
+            const senhaDigitada = document.getElementById('prof-senha-modulo-especifica').value.trim();
+
+            if (senhaDigitada === '') { alert("Por favor, digite uma senha antes de salvar!"); return; }
+
+            // Cria uma linha independente blindada usando uma chave primária limpa
+            let idFicticioSeguro = `secretpass_${c}_${m}`;
+            try {
+                const { error } = await bancoDados.from('roteiros_aulas').upsert({
+                    id: idFicticioSeguro,
+                    modulo_id: `${c}_${m}`,
+                    aula_id: 'config_senha',
+                    nome_modulo: 'Configuração de Senha',
+                    nome_aula: senhaDigitada, // Guarda a senha limpa na coluna de texto sem barreiras
+                    passos: ["SENHA_TRAVADA"],
+                    passos_midia: []
+                });
+
+                if (error) throw error;
+                alert(`🔑 Senha do módulo gravada com sucesso na nuvem!`);
+                await baixarSenhasModulosIndependente();
+            } catch (err) { alert("Erro ao gravar senha: " + err.message); }
+        }
+
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
@@ -620,19 +657,26 @@
             document.getElementById('editor-passos-container').innerHTML = '';
             document.getElementById('prof-senha-modulo-especifica').value = '';
 
+            // Tenta puxar a senha salva da memória
+            let chaveConfigSenha = `${c}_${m}`;
+            if (senhasModulosGerais[chaveConfigSenha]) {
+                document.getElementById('prof-senha-modulo-especifica').value = senhasModulosGerais[chaveConfigSenha];
+            } else {
+                // Se não estiver em cache, faz uma busca rápida no banco
+                try {
+                    const { data: dataSenha } = await bancoDados.from('roteiros_aulas').select('nome_aula').eq('id', `secretpass_${c}_${m}`).maybeSingle();
+                    if(dataSenha && dataSenha.nome_aula) {
+                        document.getElementById('prof-senha-modulo-especifica').value = dataSenha.nome_aula.trim();
+                        senhasModulosGerais[chaveConfigSenha] = dataSenha.nome_aula.trim();
+                    }
+                } catch(e) {}
+            }
+
             try {
                 const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', idUnico).maybeSingle();
                 if (data) {
-                    let tituloAulaCompleto = data.nome_aula || '';
-                    if (tituloAulaCompleto.includes('|||')) {
-                        let partes = tituloAulaCompleto.split('|||');
-                        document.getElementById('prof-nome-aula').value = partes[0].trim();
-                        document.getElementById('prof-senha-modulo-especifica').value = partes[1].trim();
-                    } else {
-                        document.getElementById('prof-nome-aula').value = tituloAulaCompleto;
-                    }
-                    
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
+                    document.getElementById('prof-nome-aula').value = data.nome_aula || '';
                     if (data.passos_midia && data.passos_midia.length > 0) {
                         data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
                     }
@@ -650,7 +694,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // 💾 SALVAMENTO CORE BLINDADO: Salva o nome da aula e a senha do módulo em uma rota unificada e 100% liberada
         async function salvDadosNovoFormato() {
             if (!bancoDados) return;
             const c = document.getElementById('prof-curso').value;
@@ -660,7 +703,6 @@
             
             const nModulo = document.getElementById('prof-nome-modulo').value.trim();
             const nAula = document.getElementById('prof-nome-aula').value.trim();
-            const senhaModuloDigitada = document.getElementById('prof-senha-modulo-especifica').value.trim();
 
             const itemsEditor = document.querySelectorAll('.step-editor-item');
             let pacotePassos = [];
@@ -674,19 +716,16 @@
             if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
 
             const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
-            let aulaPrevia = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
-            
-            // Empacota a senha do módulo junta com o título usando o divisor triplo
-            const aulaFinalComSenha = senhaModuloDigitada !== '' ? `${aulaPrevia} ||| ${senhaModuloDigitada}` : aulaPrevia;
+            const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
 
             try {
                 await bancoDados.from('roteiros_aulas').upsert({ 
                     id: idUnico, modulo_id: `${c}_${m}`, aula_id: a,
-                    nome_modulo: moduloFinal, nome_aula: aulaFinalComSenha,
+                    nome_modulo: moduloFinal, nome_aula: aulaFinal,
                     passos_midia: pacotePassos, passos: pacotePassos.map(p => p.texto)
                 });
 
-                alert("Roteiro de aula e senha do módulo gravados com sucesso! 🌐");
+                alert("Roteiro da aula gravado com sucesso! 🌐");
                 await baixarNomesCustomizados();
             } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
@@ -740,7 +779,7 @@
             if (modAlvoClicado === mAtivo) {
                 if (senhaDigitada === senhasCursos[cursoSelecionado]) {
                     avancarParaAulasModulo();
-                } else { alert("Senha incorreta para a sala de aula de hoje! 👩‍🏫"); }
+                } else { alert("Senha incorrecta para a sala de aula de hoje! 👩‍🏫"); }
             } else {
                 const senhaModuloExclusiva = senhasModulosGerais[`${cursoSelecionado}_modulo_${modAlvoClicado}`];
                 if (senhaModuloExclusiva && senhaDigitada === senhaModuloExclusiva) {
@@ -812,7 +851,7 @@
                 let btn = document.createElement('button');
                 btn.className = `huge-btn modulo-btn` + classeBloqueio;
                 btn.innerHTML = `<div class="btn-icon">${emoji}</div><div class="btn-header">${nomeExibir}${cadeadoIcone}</div>`;
-                btn.onclick = () => tentarAcessarModulo(m, nomeExibir);
+                btn.onclick = () => tentarAcessarModulo(m, emoji);
                 container.appendChild(btn);
             }
         }
@@ -862,10 +901,7 @@
                     passoAtual = 0;
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
-                    
-                    let tituloCru = data.nome_aula || "Aula";
-                    document.getElementById('titulo-aula-atual').innerText = tituloCru.includes('|||') ? tituloCru.split('|||')[0].trim() : tituloCru;
-                    
+                    document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
                     mostrarPasso();
                     return;
                 } 
@@ -921,16 +957,6 @@
 
             document.getElementById('btnPrev').disabled = passoAtual === 0;
             document.getElementById('btnNext').innerText = (passoAtual === passosAulaAtual.length - 1) ? "FINALIZAR AULA 🏁" : "AVANÇAR ▶";
-        }
-
-        function mudarPasso(direcao) {
-            passoAtual += direcao;
-            if (passoAtual >= passosAulaAtual.length) {
-                alert("Parabéns! Você concluiu todas as etapas da aula de hoje! 🎓");
-                voltarParaAulas();
-                return;
-            }
-            mostrarPasso();
         }
 
         window.onload = inicializarPainel;
