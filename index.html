@@ -386,7 +386,7 @@
 
                 <div style="background: #f0fdf4; padding: 15px; border-radius: 12px; border: 2px solid #bbf7d0; margin-top: 15px;">
                     <label for="prof-senha-modulo-especifica" style="color: var(--success); margin-top:0;">🔑 Senha de Revisão Exclusiva para este Módulo:</label>
-                    <input type="text" id="prof-senha-modulo-especifica" placeholder="Deixe em branco para usar o padrão ou crie uma senha única para este módulo">
+                    <input type="text" id="prof-senha-modulo-especifica" placeholder="Crie uma senha única para travar este módulo para revisões">
                 </div>
 
                 <hr style="border:1px solid #e2e8f0; margin:25px 0;">
@@ -422,7 +422,7 @@
             { texto: "Passo 5: Mudando a cor dos Botões de Ação. Clique em cima do botão *Fazer Pedido*. Na barra de ferramentas superior, vai aparecer um quadradinho de cor. Clique nele e escolha uma cor bem bonita e chamativa, como um |verde bem alegre|, para o seu cliente saber onde clicar.", imagem: "", link: "" },
             { texto: "Passo 6: Conhecendo o seu Caderno de Pedidos Digital. Clique na palavra *Dados* nas propriedades do lado da tela. O Canva vai abrir uma folha de planilha (que parece uma folha quadriculada de matemática). Esse é o seu banco de dados onde tudo fica guardado sozinho!", imagem: "", link: "" },
             { texto: "Passo 7: Colocando o Aplicativo para funcionar na internet. Clique no botão *Publish* (Publicar site) no canto superior direito. Marque a opção para o site ficar bonito no celular e clique no botão final de publicar. O computador vai te dar o seu link de internet!", imagem: "", link: "" },
-            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome. Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
+            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome.  Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
             { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. {https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Zic3VnbXhtdWZjcGhrMXF6bTJ3ZWlwaXN6dzZ2ZTR3MmsyeXBtZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/v8Y9CId8pXisCAnid6/giphy.gif} +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
         ];
 
@@ -434,7 +434,7 @@
         let passoAtual = 0;
         
         let nomesCustomizados = {};
-        let senhasModulosGerais = {}; // Guarda na memória do app as senhas de cada módulo puxadas da nuvem
+        let senhasModulosGerais = {}; 
         
         let senhasCursos = { 
             informatica: "123", senior: "456", admin: "admin123", 
@@ -542,14 +542,12 @@
         async function baixarNomesCustomizados() {
             if (!bancoDados) return;
             try {
-                // Modificado para trazer também a coluna opcional de texto onde salvaremos a senha do módulo
                 const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula, passos');
                 if (!error && data) {
                     nomesCustomizados = {};
                     senhasModulosGerais = {};
                     data.forEach(item => {
                         nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
-                        // Se houver uma senha guardada na coluna 'passos' na linha da Aula 1 daquele módulo, mapeia ela
                         if(item.id.includes('aula_1') && item.passos && item.passos.length > 0 && item.passos[0].startsWith('KEY_SENHA:')) {
                             let senhaLimpa = item.passos[0].replace('KEY_SENHA:', '').trim();
                             senhasModulosGerais[item.id.replace('_aula_1', '')] = senhaLimpa;
@@ -603,6 +601,7 @@
             });
         }
 
+        // 🛠️ FIX CARREGAMENTO COMPLETO: Agora força a leitura da coluna 'passos' para exibir as senhas salvas
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
@@ -612,22 +611,28 @@
             document.getElementById('editor-passos-container').innerHTML = '';
             document.getElementById('prof-senha-modulo-especifica').value = '';
 
-            // Tenta carregar a senha guardada na Aula 01 desse módulo
             let idModuloAula1 = `${c}_${m}_aula_1`;
             try {
                 const { data: dataAula1 } = await bancoDados.from('roteiros_aulas').select('passos').eq('id', idModuloAula1).maybeSingle();
                 if(dataAula1 && dataAula1.passos && dataAula1.passos.length > 0 && dataAula1.passos[0].startsWith('KEY_SENHA:')) {
                     document.getElementById('prof-senha-modulo-especifica').value = dataAula1.passos[0].replace('KEY_SENHA:', '').trim();
                 }
-            } catch (e) {}
+            } catch (e) { console.error(e); }
 
             try {
-                const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', idUnico).maybeSingle();
+                const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia, passos').eq('id', idUnico).maybeSingle();
                 if (data) {
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
                     document.getElementById('prof-nome-aula').value = data.nome_aula || '';
+                    
+                    // Se houver passos cadastrados no banco de dados, renderiza no editor
                     if (data.passos_midia && data.passos_midia.length > 0) {
                         data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
+                    } else if (data.passos && data.passos.length > 0) {
+                        // Trata fallback legado se houver texto simples purinho salvo
+                        data.passos.forEach(txt => {
+                            if(!txt.startsWith('KEY_SENHA:')) adicionarPassoAoEditor(txt, '', '');
+                        });
                     }
                 } else {
                     if (idUnico === "informatica_modulo_9_aula_3") {
@@ -643,7 +648,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // SALVA NA NUVEM INCLUINDO AS CHAVES INDIVIDUAIS POR MÓDULO
         async function salvDadosNovoFormato() {
             if (!bancoDados) return;
             const c = document.getElementById('prof-curso').value;
@@ -669,10 +673,8 @@
             const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
             const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
 
-            // Salva a senha individual do módulo injetando um marcador na coluna legada 'passos' do banco
             let arrayPassosTexto = pacotePassos.map(p => p.texto);
             if (senhaModuloDigitada !== '') {
-                // Adiciona o cabeçalho técnico de senha na primeira posição do array
                 arrayPassosTexto.unshift(`KEY_SENHA:${senhaModuloDigitada}`);
             }
 
@@ -683,7 +685,6 @@
                     passos_midia: pacotePassos, passos: arrayPassosTexto
                 });
 
-                // Se o professor criou uma senha, mas está salvando outra aula (ex: aula 2), força o espelhamento na aula 1 para a portaria ler com precisão
                 if(senhaModuloDigitada !== '' && a !== 'aula_1') {
                     await bancoDados.from('roteiros_aulas').upsert({
                         id: `${c}_${m}_aula_1`, modulo_id: `${c}_${m}`, aula_id: 'aula_1',
@@ -708,7 +709,6 @@
             renderizarModulosEstudante();
         }
 
-        // 🔒 NOVA LÓGICA DE VALIDAÇÃO DE SENHA UNITÁRIA POR MÓDULO INDEPENDENTE
         function tentarAcessarModulo(mNum, nomeModulo) {
             const mAtivo = cursoSelecionado === 'informatica' ? parseInt(senhasCursos.modAtivoInf || "9") : parseInt(senhasCursos.modAtivoSen || "1");
             const chaveMemoria = `modulo_liberado_${cursoSelecionado}_mod_${mNum}`;
@@ -717,7 +717,6 @@
             modAlvoClicado = mNum;
 
             if (mNum === mAtivo) {
-                // Módulo de Hoje: Pede a senha comum do curso
                 document.getElementById('estudante-modulos').style.display = 'none';
                 document.getElementById('estudante-senha-tela').style.display = 'block';
                 document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeModulo}`;
@@ -726,13 +725,12 @@
                 if (jaLiberadoAnteriormente) {
                     avancarParaAulasModulo();
                 } else {
-                    // Módulo Antigo: Pede a senha exclusiva gerada para ESTE módulo
                     document.getElementById('estudante-modulos').style.display = 'none';
                     document.getElementById('estudante-senha-tela').style.display = 'block';
                     document.getElementById('titulo-senha-curso').innerText = `Revisar: ${nomeModulo}`;
                     
-                    let senhaDefinidaPeloProf = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`];
-                    if(!senhaDefinidaPeloProf) {
+                    let senhaModuloExclusiva = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`];
+                    if(!senhaModuloExclusiva) {
                         document.getElementById('subtitulo-senha-contexto').innerText = "Este módulo antigo está trancado para revisões. Peça a chave para a professora.";
                     } else {
                         document.getElementById('subtitulo-senha-contexto').innerText = "Digite a chave secreta exclusiva que a Professora Analice deu para este módulo.";
@@ -752,14 +750,12 @@
                     avancarParaAulasModulo();
                 } else { alert("Senha incorreta para a sala de aula de hoje! 👩‍🏫"); }
             } else {
-                // Puxa a senha individual guardada na nuvem daquele módulo alvo específico
                 const senhaModuloExclusiva = senhasModulosGerais[`${cursoSelecionado}_modulo_${modAlvoClicado}`];
-                
                 if (senhaModuloExclusiva && senhaDigitada === senhaModuloExclusiva) {
                     localStorage.setItem(`modulo_liberado_${cursoSelecionado}_mod_${modAlvoClicado}`, "sim");
                     avancarParaAulasModulo();
                 } else { 
-                    alert("Chave de revisão incorreta para este módulo! Cada módulo possui uma chave diferente. Peça ajuda à professora."); 
+                    alert("Chave de revisão incorreta para este módulo! Peça ajuda à professora."); 
                 }
             }
         }
@@ -889,6 +885,7 @@
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
+        // 🎨 FIX DA LEITURA DE MÍDIAS: Corrigido o nome interno do loop para evitar travamentos nos GIFs flutuantes
         function mostrarPasso() {
             const containerTexto = document.getElementById('conteudo-passo');
             const galeriaImagens = document.getElementById('galeria-imagens-aluno');
@@ -917,7 +914,7 @@
                 .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')
                 .replace(/!(.*?)!/g, '<span class="text-danger-huge">$1</span>')
                 .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>')
-                .replace(/\{(.*?)\}/g, '<img src="$1" class="inline-gif">'); 
+                .replace(/\{([\s\S]*?)\}/g, '<img src="$1" class="inline-gif">'); 
             
             containerTexto.innerHTML = textoFormatado;
 
@@ -930,6 +927,16 @@
 
             document.getElementById('btnPrev').disabled = passoAtual === 0;
             document.getElementById('btnNext').innerText = (passoAtual === passosAulaAtual.length - 1) ? "FINALIZAR AULA 🏁" : "AVANÇAR ▶";
+        }
+
+        function mudarPasso(direcao) {
+            passoAtual += direcao;
+            if (passoAtual >= passosAulaAtual.length) {
+                alert("Parabéns! Você concluiu todas as etapas da aula de hoje! 🎓");
+                voltarParaAulas();
+                return;
+            }
+            mostrarPasso();
         }
 
         window.onload = inicializarPainel;
