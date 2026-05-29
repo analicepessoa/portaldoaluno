@@ -141,7 +141,6 @@
         .nav-steps { display: flex; gap: 20px; }
         .btn-step { flex: 1; padding: 15px; font-size: 1.3rem; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; }
 
-        /* Estilos do Editor do Professor */
         .step-editor-item { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
         .row-inputs { display: flex; gap: 10px; margin-top: 5px; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -165,8 +164,18 @@
             <div id="estudante-cursos">
                 <h2>Selecione o seu Curso:</h2>
                 <div class="grid-links">
-                    <button class="huge-btn" style="padding: 40px 20px;" onclick="selecionarCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
-                    <button class="huge-btn" style="padding: 40px 20px; border-color: #7c3aed; color: #7c3aed;" onclick="selecionarCurso('senior', 'Melhor Idade / Sênior')">👵👨‍🦳 Curso Sênior</button>
+                    <button class="huge-btn" style="padding: 40px 20px;" onclick="solicitarSenhaCurso('informatica', 'Informática 5.0')">💻 Informática 5.0</button>
+                    <button class="huge-btn" style="padding: 40px 20px; border-color: #7c3aed; color: #7c3aed;" onclick="solicitarSenhaCurso('senior', 'Melhor Idade / Sênior')">👵👨‍🦳 Curso Sênior</button>
+                </div>
+            </div>
+
+            <div id="estudante-senha-tela" style="display:none; text-align: center;">
+                <button class="btn-action" style="background:#64748b;" onclick="voltarParaCursos()">< Voltar</button>
+                <div class="card" style="max-width: 500px; margin: 30px auto;">
+                    <h2 id="titulo-senha-curso">Digite a senha do curso:</h2>
+                    <input type="password" id="input-senha-aluno" style="text-align: center; font-size: 2rem; padding: 15px;" placeholder="***">
+                    <br><br>
+                    <button class="btn-action" style="width: 100%; padding: 15px; font-size: 1.4rem;" onclick="validarSenhaAcesso()">ENTRAR NA SALA 🚪</button>
                 </div>
             </div>
 
@@ -200,6 +209,21 @@
         </section>
 
         <section id="view-professor" class="view-section">
+            <div class="card" style="background: #f8fafc; border-color: #cbd5e1;">
+                <h3>🔐 Configuração de Senhas dos Cursos</h3>
+                <div class="row-inputs">
+                    <div style="flex:1;">
+                        <label for="senha-prof-inf">Senha de Informática 5.0:</label>
+                        <input type="text" id="senha-prof-inf" placeholder="Ex: 123">
+                    </div>
+                    <div style="flex:1;">
+                        <label for="senha-prof-sen">Senha do Curso Sênior:</label>
+                        <input type="text" id="senha-prof-sen" placeholder="Ex: 456">
+                    </div>
+                </div>
+                <button class="btn-action" style="background:#7c3aed;" onclick="salvarSenhasNuvem()">Sincronizar Novas Senhas</button>
+            </div>
+
             <div class="card">
                 <h2>Gerenciador de Aulas Multimídia</h2>
                 <p>Configure os cursos, nomeie módulos/aulas e adicione prints explicativos.</p>
@@ -246,19 +270,20 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         
-        // CORREÇÃO: Chamada direta usando a função global exposta pela biblioteca sem gerar conflito de nomes
         const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let cursoSelecionado = '';
+        let cursoNomeTemp = '';
         let modSelecionado = '';
         let aulaSelecionada = '';
         let passosAulaAtual = [];
         let passoAtual = 0;
         
         let nomesCustomizados = {};
+        let senhasCursos = { informatica: "123", senior: "456" };
 
         function switchView(view) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -290,9 +315,35 @@
                 }
                 carregarTextoExistente();
                 baixarNomesCustomizados();
-            } catch (err) {
-                console.error("Erro na inicialização visual:", err.message);
-            }
+                baixarSenhasNuvem();
+            } catch (err) { console.error(err); }
+        }
+
+        // Puxa as senhas configuradas do banco
+        async function baixarSenhasNuvem() {
+            try {
+                const { data } = await bancoDados.from('config_cursos').select('*');
+                if (data) {
+                    data.forEach(c => {
+                        senhasCursos[c.id] = c.senha;
+                        if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
+                        if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // Professor altera e sincroniza senhas na nuvem
+        async function salvarSenhasNuvem() {
+            const infS = document.getElementById('senha-prof-inf').value.trim();
+            const senS = document.getElementById('senha-prof-sen').value.trim();
+
+            try {
+                await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS });
+                await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
+                alert("Senhas dos cursos atualizadas com sucesso!");
+                baixarSenhasNuvem();
+            } catch (e) { alert("Erro ao atualizar senhas: " + e.message); }
         }
 
         async function baixarNomesCustomizados() {
@@ -314,7 +365,7 @@
             div.className = 'step-editor-item';
             div.innerHTML = `
                 <strong>Passo ${index}</strong>
-                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno (Use *palavra* para destacar em amarelo)">${texto}</textarea>
+                <textarea class="edit-texto" rows="2" placeholder="Instrução do Aluno">${texto}</textarea>
                 <div class="row-inputs">
                     <input type="text" class="edit-img" placeholder="URL da Imagem/Print (Opcional)" value="${urlImg}">
                     <input type="text" class="edit-link" placeholder="Link de Apoio (Opcional)" value="${urlLink}">
@@ -340,7 +391,7 @@
             document.getElementById('editor-passos-container').innerHTML = '';
 
             try {
-                const { data, error } = await bancoDados
+                const { data } = await bancoDados
                     .from('roteiros_aulas')
                     .select('nome_modulo, nome_aula, passos_midia')
                     .eq('id', idUnico)
@@ -381,9 +432,7 @@
                 }
             });
 
-            if(pacotePassos.length === 0) {
-                alert("Insira ao menos um passo válido!"); return;
-            }
+            if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
 
             try {
                 const { error } = await bancoDados
@@ -404,16 +453,38 @@
             } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
-        function selecionarCurso(idCurso, nomeExibicao) {
+        // --- INTERFACE DO ESTUDANTE COM VALIDOR DE PORTARIA ---
+        function solicitarSenhaCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
-            document.getElementById('main-title').innerText = `Portal - ${nomeExibicao}`;
+            cursoNomeTemp = nomeExibicao;
+            document.getElementById('input-senha-aluno').value = ''; // limpa anterior
             document.getElementById('estudante-cursos').style.display = 'none';
-            document.getElementById('estudante-modulos').style.display = 'block';
-            renderizarModulosEstudante();
+            document.getElementById('estudante-senha-tela').style.display = 'block';
+            document.getElementById('titulo-senha-curso').innerText = `Entrar em: ${nomeExibicao}. Digite a senha:`;
+        }
+
+        function validarSenhaAcesso() {
+            const senhaDigitada = document.getElementById('input-senha-aluno').value.trim();
+            const senhaCorreta = senhasCursos[cursoSelecionado];
+
+            if (senhaDigitada === senhaCorreta) {
+                document.getElementById('main-title').innerText = `Portal - ${cursoNomeTemp}`;
+                document.getElementById('estudante-senha-tela').style.display = 'none';
+                document.getElementById('estudante-modulos').style.display = 'block';
+                renderizarModulosEstudante();
+            } else {
+                alert("Senha errada! Peça ajuda para a Professora Analice. 👩‍🏫");
+            }
+        }
+
+        function selecionarCurso(idCurso, nomeExibicao) {
+            // Mantido apenas por compatibilidade interna estrutural rápida
+            solicitarSenhaCurso(idCurso, nomeExibicao);
         }
 
         function voltarParaCursos() {
             document.getElementById('estudante-modulos').style.display = 'none';
+            document.getElementById('estudante-senha-tela').style.display = 'none';
             document.getElementById('estudante-cursos').style.display = 'block';
             document.getElementById('main-title').innerText = "Portal de Aprendizado";
         }
@@ -466,7 +537,7 @@
             const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
 
             try {
-                const { data, error } = await bancoDados
+                const { data } = await bancoDados
                     .from('roteiros_aulas')
                     .select('passos_midia, nome_aula')
                     .eq('id', idUnico)
@@ -492,7 +563,6 @@
             const bar = document.getElementById('progressBar');
 
             let estruturaPasso = passosAulaAtual[passoAtual];
-            
             let textoFormatado = estruturaPasso.texto.replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>');
             containerTexto.innerHTML = textoFormatado;
 
