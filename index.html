@@ -422,7 +422,7 @@
             { texto: "Passo 5: Mudando a cor dos Botões de Ação. Clique em cima do botão *Fazer Pedido*. Na barra de ferramentas superior, vai aparecer um quadradinho de cor. Clique nele e escolha uma cor bem bonita e chamativa, como um |verde bem alegre|, para o seu cliente saber onde clicar.", imagem: "", link: "" },
             { texto: "Passo 6: Conhecendo o seu Caderno de Pedidos Digital. Clique na palavra *Dados* nas propriedades do lado da tela. O Canva vai abrir uma folha de planilha (que parece uma folha quadriculada de matemática). Esse é o seu banco de dados onde tudo fica guardado sozinho!", imagem: "", link: "" },
             { texto: "Passo 7: Colocando o Aplicativo para funcionar na internet. Clique no botão *Publish* (Publicar site) no canto superior direito. Marque a opção para o site ficar bonito no celular e clique no botão final de publicar. O computador vai te dar o seu link de internet!", imagem: "", link: "" },
-            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome.  Depois, volte para do Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
+            { texto: "🎯 *Desafio Prático:* Abra o link do seu site no navegador, finja ser um cliente e faça um pedido de teste colocando o seu próprio nome.  Depois, volte para o Canva, abra a aba de *Dados* e veja se o seu nome apareceu anotado sozinho na tabela!", imagem: "", link: "" },
             { texto: "🏁 *Revisão:* Hoje você criou um sistema completo: montou a lojinha, alterou fotos e aprendeu como o computador anota os pedidos para você. {https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Zic3VnbXhtdWZjcGhrMXF6bTJ3ZWlwaXN6dzZ2ZTR3MmsyeXBtZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/v8Y9CId8pXisCAnid6/giphy.gif} +Parabéns pelo excelente trabalho!+ Na próxima aula vamos praticar o que fazer quando o cliente chamar.", imagem: "", link: "" }
         ];
 
@@ -492,19 +492,16 @@
             } catch (err) { console.error(err); }
         }
 
-        // ⚡ CARREGAMENTO CORE CORRIGIDO: Puxa senhas de cursos e senhas de módulos da tabela de configurações
         async function baixarSenhasNuvem() {
             if (!bancoDados) return;
             try {
                 const { data } = await bancoDados.from('config_cursos').select('*');
                 if (data) {
-                    senhasModulosGerais = {}; // Reseta chaves de módulos
+                    senhasModulosGerais = {}; 
                     data.forEach(c => {
                         if (c.id.startsWith('modkey_')) {
-                            // Se o ID começar com modkey_, é a senha de um módulo específico
                             senhasModulosGerais[c.id.replace('modkey_', '')] = c.senha;
                         } else {
-                            // Se não, são as senhas globais dos cursos
                             senhasCursos[c.id] = c.senha;
                             if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
                             if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
@@ -528,11 +525,12 @@
             if(admS === '') { alert("A senha do administrador não pode ficar em branco!"); return; }
 
             try {
-                await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS });
-                await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
-                await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS });
-                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf });
-                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen });
+                // 🛠️ BLINDAGEM DO UPSERT: Especificando a chave primária 'id' de forma explícita para evitar bloqueios silenciosos
+                await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS }, { on: 'id' });
+                await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS }, { on: 'id' });
+                await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS }, { on: 'id' });
+                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf }, { on: 'id' });
+                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen }, { on: 'id' });
                 alert("Parâmetros de controle coletivos salvos!");
                 baixarSenhasNuvem();
             } catch (e) { alert("Erro: " + e.message); }
@@ -604,7 +602,6 @@
             });
         }
 
-        // ⚡ CARREGAMENTO DE TEXTOS ATUALIZADO: Puxa a senha estável da tabela config_cursos direto
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
@@ -614,7 +611,6 @@
             document.getElementById('editor-passos-container').innerHTML = '';
             document.getElementById('prof-senha-modulo-especifica').value = '';
 
-            // Resgata a senha correspondente de forma direta da memória
             let chaveConfigSenha = `${c}_${m}`;
             if (senhasModulosGerais[chaveConfigSenha]) {
                 document.getElementById('prof-senha-modulo-especifica').value = senhasModulosGerais[chaveConfigSenha];
@@ -642,7 +638,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // 💾 SALVAMENTO ATUALIZADO: Grava a senha de forma isolada e limpa na tabela config_cursos
         async function salvDadosNovoFormato() {
             if (!bancoDados) return;
             const c = document.getElementById('prof-curso').value;
@@ -669,19 +664,18 @@
             const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
 
             try {
-                // 1. Salva o roteiro da aula limpo de interferências
                 await bancoDados.from('roteiros_aulas').upsert({ 
                     id: idUnico, modulo_id: `${c}_${m}`, aula_id: a,
                     nome_modulo: moduloFinal, nome_aula: aulaFinal,
                     passos_midia: pacotePassos, passos: pacotePassos.map(p => p.texto)
                 });
 
-                // 2. Salva a senha do módulo de forma isolada e blindada na tabela config_cursos
+                // 🛠️ BLINDAGEM ADICIONADA: Força o parâmetro 'on: id' para destravar o salvamento da senha do módulo no Supabase!
                 if (senhaModuloDigitada !== '') {
                     await bancoDados.from('config_cursos').upsert({
                         id: `modkey_${c}_${m}`,
                         senha: senhaModuloDigitada
-                    });
+                    }, { on: 'id' });
                 }
 
                 alert("Roteiro e senha salvos com sucesso na nuvem! 🌐");
@@ -690,7 +684,7 @@
             } catch (err) { alert("Erro: " + err.message); }
         }
 
-        // --- INTERFACE DO ESTUDANTE CONTROLE PORTAL ---
+        // --- INTERFACE DO ESTUDANTE CONTROLE PORTARIA PORTAL ---
         function solicitarSenhaCurso(idCurso, nomeExibicao) {
             cursoSelecionado = idCurso;
             cursoNomeTemp = nomeExibicao;
