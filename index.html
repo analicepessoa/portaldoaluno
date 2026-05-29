@@ -497,18 +497,13 @@
             try {
                 const { data } = await bancoDados.from('config_cursos').select('*');
                 if (data) {
-                    senhasModulosGerais = {}; 
                     data.forEach(c => {
-                        if (c.id.startsWith('modkey_')) {
-                            senhasModulosGerais[c.id.replace('modkey_', '')] = c.senha;
-                        } else {
-                            senhasCursos[c.id] = c.senha;
-                            if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
-                            if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
-                            if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
-                            if(c.id === 'modAtivoInf') document.getElementById('prof-modulo-ativo-inf').value = c.senha;
-                            if(c.id === 'modAtivoSen') document.getElementById('prof-modulo-ativo-sen').value = c.senha;
-                        }
+                        senhasCursos[c.id] = c.senha;
+                        if(c.id === 'informatica') document.getElementById('senha-prof-inf').value = c.senha;
+                        if(c.id === 'senior') document.getElementById('senha-prof-sen').value = c.senha;
+                        if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
+                        if(c.id === 'modAtivoInf') document.getElementById('prof-modulo-ativo-inf').value = c.senha;
+                        if(c.id === 'modAtivoSen') document.getElementById('prof-modulo-ativo-sen').value = c.senha;
                     });
                 }
             } catch (e) { console.error(e); }
@@ -525,12 +520,11 @@
             if(admS === '') { alert("A senha do administrador não pode ficar em branco!"); return; }
 
             try {
-                // 🛠️ BLINDAGEM DO UPSERT: Especificando a chave primária 'id' de forma explícita para evitar bloqueios silenciosos
-                await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS }, { on: 'id' });
-                await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS }, { on: 'id' });
-                await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS }, { on: 'id' });
-                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf }, { on: 'id' });
-                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen }, { on: 'id' });
+                await bancoDados.from('config_cursos').upsert({ id: 'informatica', senha: infS });
+                await bancoDados.from('config_cursos').upsert({ id: 'senior', senha: senS });
+                await bancoDados.from('config_cursos').upsert({ id: 'admin', senha: admS });
+                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoInf', senha: mInf });
+                await bancoDados.from('config_cursos').upsert({ id: 'modAtivoSen', senha: mSen });
                 alert("Parâmetros de controle coletivos salvos!");
                 baixarSenhasNuvem();
             } catch (e) { alert("Erro: " + e.message); }
@@ -548,11 +542,25 @@
         async function baixarNomesCustomizados() {
             if (!bancoDados) return;
             try {
+                // ⚡ INTERPRETADOR DE SENHAS ENGENHARIZADO: Separa o nome real da aula e a senha do módulo
                 const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
                 if (!error && data) {
                     nomesCustomizados = {};
+                    senhasModulosGerais = {};
                     data.forEach(item => {
-                        nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: item.nome_aula };
+                        let nomeAulaLimpo = item.nome_aula || '';
+                        
+                        // Se o texto possuir o separador |||, desmembra a senha e guarda na memória
+                        if (nomeAulaLimpo.includes('|||')) {
+                            let partes = nomeAulaLimpo.split('|||');
+                            nomeAulaLimpo = partes[0].trim();
+                            let senhaExtraida = partes[1].trim();
+                            
+                            // Cria uma chave única por módulo (ex: informatica_modulo_9)
+                            let modIdChave = item.id.split('_aula_')[0];
+                            senhasModulosGerais[modIdChave] = senhaExtraida;
+                        }
+                        nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: nomeAulaLimpo };
                     });
                     if (cursoSelecionado) renderizarModulosEstudante();
                 }
@@ -602,6 +610,7 @@
             });
         }
 
+        // ⚡ CARREGAMENTO CORE CORRIGIDO: Lê a senha da linha e preenche o input verde na hora
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
@@ -611,16 +620,19 @@
             document.getElementById('editor-passos-container').innerHTML = '';
             document.getElementById('prof-senha-modulo-especifica').value = '';
 
-            let chaveConfigSenha = `${c}_${m}`;
-            if (senhasModulosGerais[chaveConfigSenha]) {
-                document.getElementById('prof-senha-modulo-especifica').value = senhasModulosGerais[chaveConfigSenha];
-            }
-
             try {
                 const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', idUnico).maybeSingle();
                 if (data) {
+                    let tituloAulaCompleto = data.nome_aula || '';
+                    if (tituloAulaCompleto.includes('|||')) {
+                        let partes = tituloAulaCompleto.split('|||');
+                        document.getElementById('prof-nome-aula').value = partes[0].trim();
+                        document.getElementById('prof-senha-modulo-especifica').value = partes[1].trim();
+                    } else {
+                        document.getElementById('prof-nome-aula').value = tituloAulaCompleto;
+                    }
+                    
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
-                    document.getElementById('prof-nome-aula').value = data.nome_aula || '';
                     if (data.passos_midia && data.passos_midia.length > 0) {
                         data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
                     }
@@ -638,6 +650,7 @@
             } catch (err) { console.error(err); }
         }
 
+        // 💾 SALVAMENTO CORE BLINDADO: Salva o nome da aula e a senha do módulo em uma rota unificada e 100% liberada
         async function salvDadosNovoFormato() {
             if (!bancoDados) return;
             const c = document.getElementById('prof-curso').value;
@@ -661,27 +674,21 @@
             if(pacotePassos.length === 0) { alert("Insira ao menos um passo válido!"); return; }
 
             const moduloFinal = nModulo || `Módulo ${String(m.split('_')[1]).padStart(2, '0')}`;
-            const aulaFinal = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
+            let aulaPrevia = nAula || `Aula ${String(a.split('_')[1]).padStart(2, '0')}`;
+            
+            // Empacota a senha do módulo junta com o título usando o divisor triplo
+            const aulaFinalComSenha = senhaModuloDigitada !== '' ? `${aulaPrevia} ||| ${senhaModuloDigitada}` : aulaPrevia;
 
             try {
                 await bancoDados.from('roteiros_aulas').upsert({ 
                     id: idUnico, modulo_id: `${c}_${m}`, aula_id: a,
-                    nome_modulo: moduloFinal, nome_aula: aulaFinal,
+                    nome_modulo: moduloFinal, nome_aula: aulaFinalComSenha,
                     passos_midia: pacotePassos, passos: pacotePassos.map(p => p.texto)
                 });
 
-                // 🛠️ BLINDAGEM ADICIONADA: Força o parâmetro 'on: id' para destravar o salvamento da senha do módulo no Supabase!
-                if (senhaModuloDigitada !== '') {
-                    await bancoDados.from('config_cursos').upsert({
-                        id: `modkey_${c}_${m}`,
-                        senha: senhaModuloDigitada
-                    }, { on: 'id' });
-                }
-
-                alert("Roteiro e senha salvos com sucesso na nuvem! 🌐");
-                await baixarSenhasNuvem();
+                alert("Roteiro de aula e senha do módulo gravados com sucesso! 🌐");
                 await baixarNomesCustomizados();
-            } catch (err) { alert("Erro: " + err.message); }
+            } catch (err) { alert("Erro ao salvar: " + err.message); }
         }
 
         // --- INTERFACE DO ESTUDANTE CONTROLE PORTARIA PORTAL ---
@@ -855,7 +862,10 @@
                     passoAtual = 0;
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
-                    document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
+                    
+                    let tituloCru = data.nome_aula || "Aula";
+                    document.getElementById('titulo-aula-atual').innerText = tituloCru.includes('|||') ? tituloCru.split('|||')[0].trim() : tituloCru;
+                    
                     mostrarPasso();
                     return;
                 } 
