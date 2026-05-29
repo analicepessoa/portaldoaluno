@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estudante - Informática 5.0</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -334,14 +334,14 @@
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         
-        const bancoDados = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Chamada adaptada e protegida para evitar rejeições de compilação estática
+        const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         const iconesModulos = {
             modulo_1: "📁", modulo_2: "📊", modulo_3: "⚙️", modulo_4: "🖥️", modulo_5: "🚀",
             modulo_6: "🔍", modulo_7: "💼", modulo_8: "🌐", modulo_9: "📝", modulo_10: "🏆"
         };
 
-        // 📚 CORREÇÃO: CONTEÚDO ALOCADO PERFEITAMENTE PARA O CURSO DE INFORMÁTICA 5.0 (M9_A3)
         const ROTEIRO_PADRAO_INF_M9_A3 = [
             { texto: "💡 *Introdução Prática:* Antigamente, criar um sistema de pedidos em computador era muito caro e difícil. Hoje, nós conseguimos criar uma página interativa onde o cliente faz pedidos de bolos, artesanatos ou costuras, e tudo chega organizado para você em uma tabelinha eletrônica!", imagem: "", link: "" },
             { texto: "🛠️ *Preparação:* Vamos abrir o site do *Canva* na página inicial. Deixem ao lado um papel anotado com o nome dos produtos ou serviços que vocês querem vender na tela.", imagem: "", link: "https://www.canva.com" },
@@ -371,7 +371,8 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
             
-            document.getElementById(`nav-${aba}-btn`).classList.add('active');
+            const botaoAtivo = document.getElementById(`nav-${aba}-btn`);
+            if (botaoAtivo) botaoAtivo.classList.add('active');
 
             if (aba === 'professor') {
                 if (professorAutenticado) {
@@ -408,12 +409,15 @@
                     selectAula.appendChild(opt);
                 }
                 carregarTextoExistente();
-                baixarNomesCustomizados();
-                baixarSenhasNuvem();
+                if (bancoDados) {
+                    baixarNomesCustomizados();
+                    baixarSenhasNuvem();
+                }
             } catch (err) { console.error(err); }
         }
 
         async function baixarSenhasNuvem() {
+            if (!bancoDados) return;
             try {
                 const { data } = await bancoDados.from('config_cursos').select('*');
                 if (data) {
@@ -428,6 +432,7 @@
         }
 
         async function salvarSenhasNuvem() {
+            if (!bancoDados) return;
             const infS = document.getElementById('senha-prof-inf').value.trim();
             const senS = document.getElementById('senha-prof-sen').value.trim();
             const admS = document.getElementById('senha-prof-admin').value.trim();
@@ -453,6 +458,7 @@
         }
 
         async function baixarNomesCustomizados() {
+            if (!bancoDados) return;
             try {
                 const { data, error } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
                 if (!error && data) {
@@ -496,7 +502,6 @@
 
             document.getElementById('editor-passos-container').innerHTML = '';
 
-            // Se o professor for carregar Informática M9 A3, preenche automaticamente para visualização rápida
             if (idUnico === "informatica_modulo_9_aula_3") {
                 document.getElementById('prof-nome-modulo').value = "Módulo 09 - Criando Aplicativos";
                 document.getElementById('prof-nome-aula').value = "Aula 03 - Meu Aplicativo de Mensagens";
@@ -504,6 +509,7 @@
                 return;
             }
 
+            if (!bancoDados) return;
             try {
                 const { data } = await bancoDados
                     .from('roteiros_aulas')
@@ -526,6 +532,7 @@
         }
 
         async function salvarDadosProfessor() {
+            if (!bancoDados) { alert("Erro: Conexão com a nuvem indisponível."); return; }
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
@@ -657,7 +664,6 @@
             aulaSelecionada = aId;
             const idUnico = `${cursoSelecionado}_${modSelecionado}_${aId}`;
 
-            // Intercepta e serve o roteiro injetado caso seja Informática 5.0 -> Mod 09 -> Aula 03
             if (idUnico === "informatica_modulo_9_aula_3") {
                 passosAulaAtual = ROTEIRO_PADRAO_INF_M9_A3;
                 passoAtual = 0;
@@ -668,6 +674,7 @@
                 return;
             }
 
+            if (!bancoDados) return;
             try {
                 const { data } = await bancoDados
                     .from('roteiros_aulas')
