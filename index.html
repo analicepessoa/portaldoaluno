@@ -133,9 +133,14 @@
         .progress-container { width: 100%; background-color: #cbd5e1; border-radius: 20px; height: 20px; margin-bottom: 20px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background-color: var(--success); transition: width 0.3s; }
         
-        .step-text { font-size: 1.8rem; line-height: 1.5; margin: 20px 0; font-weight: 500; }
-        .click-target { background-color: #fef08a; padding: 3px 10px; border-radius: 6px; border: 2px dashed #ca8a04; font-weight: bold; }
+        .step-text { font-size: 1.8rem; line-height: 1.6; margin: 20px 0; font-weight: 500; }
         
+        /* 🎨 SEUS NOVOS COMPONENTES VISUAIS ACESSÍVEIS */
+        .click-target { background-color: #fef08a; padding: 3px 12px; border-radius: 6px; border: 2px dashed #ca8a04; font-weight: bold; display: inline-block; margin: 2px; }
+        .click-blue { background-color: #dbeafe; color: #1e40af; padding: 3px 12px; border-radius: 6px; border: 2px solid #3b82f6; font-weight: bold; display: inline-block; margin: 2px; }
+        .text-danger-huge { color: #dc2626; font-size: 2.3rem; font-weight: 800; display: block; margin: 15px 0; }
+        .text-success-medium { color: #16a34a; font-size: 1.5rem; font-weight: bold; display: block; margin: 10px 0; }
+
         .step-image { max-width: 100%; max-height: 350px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
         
         .nav-steps { display: flex; gap: 20px; }
@@ -319,10 +324,7 @@
             }
         }
 
-        function switchView(view) {
-            // Mantido para compatibilidade com assinaturas antigas de clique interno
-            mudarAba(view);
-        }
+        function switchView(view) { mudarAba(view); }
 
         function inicializarPainel() {
             try {
@@ -385,9 +387,7 @@
                 professorAutenticado = true;
                 document.getElementById('view-professor-bloqueado').style.display = 'none';
                 document.getElementById('view-professor').style.display = 'block';
-            } else {
-                alert("Senha administrativa incorreta!");
-            }
+            } else { alert("Senha administrativa incorreta!"); }
         }
 
         async function baixarNomesCustomizados() {
@@ -516,13 +516,7 @@
                 document.getElementById('estudante-senha-tela').style.display = 'none';
                 document.getElementById('estudante-modulos').style.display = 'block';
                 renderizarModulosEstudante();
-            } else {
-                alert("Senha errada! Peça ajuda para a Professora Analice. 👩‍🏫");
-            }
-        }
-
-        function selecionarCurso(idCurso, nomeExibicao) {
-            solicitarSenhaCurso(idCurso, nomeExibicao);
+            } else { alert("Senha errada! Peça ajuda para a Professora Analice. 👩‍🏫"); }
         }
 
         function voltarParaCursos() {
@@ -593,12 +587,11 @@
                     document.getElementById('estudante-passos').style.display = 'block';
                     document.getElementById('titulo-aula-atual').innerText = data.nome_aula || "Aula";
                     mostrarPasso();
-                } else {
-                    alert("Roteiro vazio ou não configurado para esta aula.");
-                }
+                } else { alert("Roteiro vazio ou não configurado para esta aula."); }
             } catch (err) { alert("Erro de conexão: " + err.message); }
         }
 
+        // INTERPRETADOR VISUAL EXPANDIDO (Processa os novos gatilhos visuais)
         function mostrarPasso() {
             const containerTexto = document.getElementById('conteudo-passo');
             const imgEl = document.getElementById('img-passo-aluno');
@@ -606,21 +599,25 @@
             const bar = document.getElementById('progressBar');
 
             let estruturaPasso = passosAulaAtual[passoAtual];
-            let textoFormatado = estruturaPasso.texto.replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>');
+            let rawText = estruturaPasso.texto;
+
+            // Aplica os novos gatilhos visuais em cascata
+            let textoFormatado = rawText
+                .replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>')      // *Botão Amarelo*
+                .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')        // |Botão Azul|
+                .replace(/!(.*?)!/g, '<span class="text-danger-huge">$1</span>')     // !Alerta Vermelho Grande!
+                .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>');// +Sucesso Verde Médio+
+            
             containerTexto.innerHTML = textoFormatado;
 
             if (estruturaPasso.imagem && estruturaPasso.imagem.trim() !== '') {
                 imgEl.src = estruturaPasso.imagem;
                 imgEl.style.display = 'inline-block';
-            } else {
-                imgEl.style.display = 'none';
-            }
+            } else { imgEl.style.display = 'none'; }
 
             if (estruturaPasso.link && estruturaPasso.link.trim() !== '') {
                 linkContainer.innerHTML = `<a href="${estruturaPasso.link}" target="_blank" style="color:var(--primary); font-weight:bold; font-size:1.2rem;">🔗 Clique aqui para abrir o site de apoio</a>`;
-            } else {
-                linkContainer.innerHTML = '';
-            }
+            } else { linkContainer.innerHTML = ''; }
 
             const pct = ((passoAtual + 1) / passosAulaAtual.length) * 100;
             bar.style.width = `${pct}%`;
