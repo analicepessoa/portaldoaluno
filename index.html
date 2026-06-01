@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Estudante - Informática 5.0</title>
+    <title>Portal do Estudante - Informática & Idiomas</title>
     
     <!-- Bibliotecas: Supabase e o Novo Editor Visual (Quill.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
@@ -22,6 +22,8 @@
             --text-light: #64748b;
             --warning: #f59e0b;
             --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
             --gray-light: #e2e8f0;
         }
 
@@ -38,7 +40,7 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; color: var(--text); padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; font-weight: bold; animation: slideIn 0.3s ease-out forwards; border-left: 6px solid var(--primary); font-size: 1.1rem; }
         .toast.success { border-left-color: var(--success); }
-        .toast.error { border-left-color: #ef4444; }
+        .toast.error { border-left-color: var(--danger); }
         .toast.warning { border-left-color: var(--warning); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
@@ -62,9 +64,12 @@
         .course-card { display: flex; align-items: center; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
         .course-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.1); }
         .course-card .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-right: 20px; flex-shrink: 0; }
+        
         .course-card.inf .icon-box { background: var(--primary-light); color: var(--primary); }
         .course-card.sen .icon-box { background: #f3e8ff; color: #7c3aed; }
+        .course-card.ing .icon-box { background: var(--danger-light); color: var(--danger); }
         .course-card.rep .icon-box { background: var(--warning-light); color: var(--warning); }
+        
         .course-card-content { flex-grow: 1; }
         .course-card h3 { margin: 0 0 5px 0; font-size: 1.4rem; color: var(--text); }
         .course-card p { margin: 0 0 12px 0; color: var(--text-light); font-size: 1rem; }
@@ -73,7 +78,7 @@
         .module-list { display: flex; flex-direction: column; gap: 12px; }
         .mod-item { display: flex; align-items: center; background: white; padding: 16px 20px; border-radius: 16px; border: 2px solid var(--gray-light); cursor: pointer; transition: all 0.2s; }
         .mod-item:hover { border-color: var(--primary); background: var(--primary-light); }
-        .mod-number { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-right: 15px; flex-shrink: 0; }
+        .mod-number { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-right: 15px; flex-shrink: 0; text-align: center; }
         .mod-info { flex-grow: 1; }
         .mod-info h4 { margin: 0 0 4px 0; font-size: 1.2rem; color: var(--text); }
         .mod-info p { margin: 0; color: var(--text-light); font-size: 0.95rem; }
@@ -119,7 +124,7 @@
         
         .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; display: inline-block; margin: 2px; }
         .click-blue { background-color: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 8px; border: 2px solid #3b82f6; font-weight: bold; display: inline-block; margin: 2px; }
-        .text-danger-huge { color: #dc2626; font-size: 2.2rem; font-weight: 800; display: block; margin: 15px 0; }
+        .text-danger-huge { color: var(--danger); font-size: 2.2rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
         .inline-gif { display: inline-block; vertical-align: middle; max-height: 150px; border-radius: 12px; margin: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
@@ -149,7 +154,7 @@
         .btn-move:hover { background: #cbd5e1; }
         .row-inputs { display: flex; gap: 15px; padding: 15px 20px; background: white; border-radius: 0 0 16px 16px; border-top: 1px solid var(--gray-light); flex-wrap: wrap; align-items: center; }
         .row-inputs > input { flex: 1; margin: 0; min-width: 200px; }
-        .btn-remove { background: #ef4444; color: white; border: none; padding: 16px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+        .btn-remove { background: var(--danger); color: white; border: none; padding: 16px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
         .btn-remove:hover { opacity: 0.8; }
     </style>
 </head>
@@ -197,6 +202,15 @@
                     <div class="course-card-content">
                         <h3>Curso Sênior</h3>
                         <p>Inclusão digital sem complicação</p>
+                    </div>
+                </div>
+
+                <!-- NOVO CURSO DE INGLÊS -->
+                <div class="course-card ing" onclick="solicitarSenhaCurso('ingles', 'Inglês')">
+                    <div class="icon-box">🌎</div>
+                    <div class="course-card-content">
+                        <h3>Inglês</h3>
+                        <p>Preparation, Basic & Intermediate</p>
                     </div>
                 </div>
 
@@ -261,12 +275,12 @@
 
         <!-- ==================== BLOQUEIO DO PROFESSOR ==================== -->
         <section id="view-professor-bloqueado" class="view-section" style="text-align: center;">
-            <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid #ef4444;">
+            <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--danger);">
                 <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
-                <h2 style="color:#ef4444; margin-top:0;">Acesso Restrito</h2>
+                <h2 style="color:var(--danger); margin-top:0;">Acesso Restrito</h2>
                 <p>Painel de gestão pedagógica.</p>
                 <input type="password" id="input-senha-admin" style="text-align: center; font-size: 2rem; padding: 12px;" placeholder="***">
-                <button class="btn-action" style="background:#ef4444; width:100%; margin-top: 20px;" onclick="validarAcessoProfessor()">DESBLOQUEAR</button>
+                <button class="btn-action" style="background:var(--danger); width:100%; margin-top: 20px;" onclick="validarAcessoProfessor()">DESBLOQUEAR</button>
             </div>
         </section>
 
@@ -277,14 +291,16 @@
                 <div class="row-inputs" style="padding:0; background:transparent; border:none;">
                     <div style="flex:1"><label>Senha Informática:</label><input type="text" id="senha-prof-inf"></div>
                     <div style="flex:1"><label>Senha Sênior:</label><input type="text" id="senha-prof-sen"></div>
+                    <div style="flex:1"><label style="color:var(--danger);">Senha Inglês:</label><input type="text" id="senha-prof-ing" style="border-color:var(--danger);"></div>
                     <div style="flex:1"><label style="color:var(--warning);">Senha Reposição:</label><input type="text" id="senha-prof-rep" style="border-color:var(--warning);"></div>
-                    <div style="flex:1"><label style="color:#ef4444;">Senha Admin:</label><input type="text" id="senha-prof-admin" style="border-color:#ef4444;"></div>
+                    <div style="flex:1"><label style="color:var(--danger);">Senha Admin:</label><input type="text" id="senha-prof-admin" style="border-color:var(--danger);"></div>
                 </div>
                 <hr style="border:1px solid #bfdbfe; margin:20px 0;">
                 <div class="row-inputs" style="padding:0; background:transparent; border:none;">
-                    <div style="flex:1"><label>Módulo Ativo - Informática:</label><select id="prof-modulo-ativo-inf"></select></div>
-                    <div style="flex:1"><label>Módulo Ativo - Sênior:</label><select id="prof-modulo-ativo-sen"></select></div>
-                    <div style="flex:1"><label style="color:var(--warning);">Ficha Ativa - Reposição:</label><select id="prof-modulo-ativo-rep"></select></div>
+                    <div style="flex:1"><label>Ativo - Informática:</label><select id="prof-modulo-ativo-inf"></select></div>
+                    <div style="flex:1"><label>Ativo - Sênior:</label><select id="prof-modulo-ativo-sen"></select></div>
+                    <div style="flex:1"><label style="color:var(--danger);">Ativo - Inglês:</label><select id="prof-modulo-ativo-ing"></select></div>
+                    <div style="flex:1"><label style="color:var(--warning);">Ativo - Reposição:</label><select id="prof-modulo-ativo-rep"></select></div>
                 </div>
                 <button class="btn-action" onclick="salvarSenhasNuvem()">Salvar Permissões Globais</button>
             </div>
@@ -298,16 +314,17 @@
                 <select id="prof-curso" onchange="atualizarLabelsEditor()">
                     <option value="informatica">Informática 5.0</option>
                     <option value="senior">Curso Sênior</option>
+                    <option value="ingles">Inglês 🌎</option>
                     <option value="reposicao">Sessão de Reposição 🔄</option>
                 </select>
 
                 <div class="row-inputs" style="padding:0; background:transparent; border:none;">
-                    <div style="flex:1;"><label id="label-identificador-modulo">2. Posição:</label><select id="prof-modulo" onchange="carregarTextoExistente()"></select></div>
+                    <div style="flex:1;"><label id="label-identificador-modulo">2. Posição:</label><select id="prof-modulo" onchange="atualizarSelectAulasProf(); carregarTextoExistente();"></select></div>
                     <div style="flex:2;"><label id="label-nome-modulo">Nome Visível do Módulo:</label><input type="text" id="prof-nome-modulo"></div>
                 </div>
 
                 <div class="row-inputs" style="padding:0; background:transparent; border:none;">
-                    <div style="flex:1;"><label>3. Etapa / Aula:</label><select id="prof-aula" onchange="carregarTextoExistente()"></select></div>
+                    <div style="flex:1;"><label id="label-identificador-aula">3. Etapa / Aula:</label><select id="prof-aula" onchange="carregarTextoExistente()"></select></div>
                     <div style="flex:2;"><label id="label-nome-aula">Nome Visível da Aula:</label><input type="text" id="prof-nome-aula"></div>
                 </div>
 
@@ -363,9 +380,9 @@
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-        let alunoLogado = ''; // Novo: Guarda quem está acessando
-        let modulosLiberadosAluno = []; // Novo: Matriz da nuvem
-        let aulasConcluidasAluno = []; // Novo: Matriz da nuvem
+        let alunoLogado = ''; 
+        let modulosLiberadosAluno = []; 
+        let aulasConcluidasAluno = []; 
 
         let cursoSelecionado = '';
         let modSelecionado = '';
@@ -374,11 +391,20 @@
         let passoAtual = 0;
         let nomesCustomizados = {};
         let senhasModulosGerais = {}; 
-        let senhasCursos = { informatica: "123", senior: "456", reposicao: "789", admin: "admin123", modAtivoInf: "9", modAtivoSen: "1", modAtivoRep: "1" };
+        
+        // Estrutura Dinâmica dos Nomes do Curso de Inglês
+        const nomesModulosIngles = [
+            "Preparation", 
+            "Basic 01 - Mid Term", "Basic 01 - End Term", 
+            "Basic 02 - Mid Term", "Basic 02 - End Term", 
+            "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", 
+            "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"
+        ];
+
+        let senhasCursos = { informatica: "123", senior: "456", ingles: "english123", reposicao: "789", admin: "admin123", modAtivoInf: "9", modAtivoSen: "1", modAtivoIng: "1", modAtivoRep: "1" };
         let professorAutenticado = false;
         let modAlvoClicado = 0;
 
-        // --- SISTEMA DE LOGIN SIMPLES ---
         function entrarComoAluno() {
             const nomeDigitado = document.getElementById('input-nome-aluno').value.trim().toLowerCase();
             if (!nomeDigitado) { showToast("Por favor, digite seu nome!", "warning"); return; }
@@ -387,12 +413,10 @@
             const nomeVisivel = nomeDigitado.charAt(0).toUpperCase() + nomeDigitado.slice(1);
             
             document.getElementById('nome-aluno-display').innerText = `Olá, ${nomeVisivel}!`;
-            document.getElementById('nav-container').style.display = 'flex'; // Mostra menu após login
-            
+            document.getElementById('nav-container').style.display = 'flex'; 
             mudarAba('estudante');
         }
 
-        // --- SISTEMA DE NUVEM PARA O PROGRESSO DO ALUNO ---
         async function carregarProgressoAluno() {
             if(!bancoDados || !alunoLogado || !cursoSelecionado) return;
             const idUnico = `${alunoLogado}_${cursoSelecionado}`;
@@ -453,39 +477,76 @@
         }
 
         function preencherSelectsProf() {
-            const selectMod = document.getElementById('prof-modulo');
             const selectModInf = document.getElementById('prof-modulo-ativo-inf');
             const selectModSen = document.getElementById('prof-modulo-ativo-sen');
+            const selectModIng = document.getElementById('prof-modulo-ativo-ing');
             const selectModRep = document.getElementById('prof-modulo-ativo-rep');
-            selectMod.innerHTML = ''; selectModInf.innerHTML = ''; selectModSen.innerHTML = ''; selectModRep.innerHTML = '';
+            
+            selectModInf.innerHTML = ''; selectModSen.innerHTML = ''; selectModIng.innerHTML = ''; selectModRep.innerHTML = '';
             
             for (let m = 1; m <= 10; m++) {
                 let optStr = `<option value="${m}">Módulo ${String(m).padStart(2, '0')}</option>`;
-                selectModInf.innerHTML += optStr; selectModSen.innerHTML += optStr; selectModRep.innerHTML += `<option value="${m}">Ficha ${String(m).padStart(2, '0')}</option>`;
-                selectMod.innerHTML += `<option value="modulo_${m}">Posição ${String(m).padStart(2, '0')}</option>`;
-            }
-
-            const selectAula = document.getElementById('prof-aula');
-            selectAula.innerHTML = '';
-            for (let a = 1; a <= 8; a++) {
-                selectAula.innerHTML += `<option value="aula_${a}">Etapa ${String(a).padStart(2, '0')}</option>`;
+                selectModInf.innerHTML += optStr; 
+                selectModSen.innerHTML += optStr; 
+                selectModRep.innerHTML += `<option value="${m}">Ficha ${String(m).padStart(2, '0')}</option>`;
+                if(m <= 9) selectModIng.innerHTML += `<option value="${m}">${nomesModulosIngles[m-1]}</option>`;
             }
         }
 
         function atualizarLabelsEditor() {
             const c = document.getElementById('prof-curso').value;
+            const selectMod = document.getElementById('prof-modulo');
+            selectMod.innerHTML = '';
+
+            let maxMod = c === 'ingles' ? 9 : 10;
+            
+            for (let m = 1; m <= maxMod; m++) {
+                let nomeOpt = `Módulo ${String(m).padStart(2, '0')}`;
+                if (c === 'reposicao') nomeOpt = `Ficha ${String(m).padStart(2, '0')}`;
+                if (c === 'ingles') nomeOpt = nomesModulosIngles[m-1];
+                selectMod.innerHTML += `<option value="modulo_${m}">${nomeOpt}</option>`;
+            }
+
             if (c === 'reposicao') {
                 document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno e Matéria:';
                 document.getElementById('prof-nome-modulo').placeholder = 'Ex: Gustavo - Informática Mód 04';
-                document.getElementById('label-nome-aula').innerText = 'Título da Atividade:';
+                document.getElementById('label-identificador-aula').innerText = 'Título da Atividade:';
                 document.getElementById('prof-nome-aula').placeholder = 'Ex: Prática de Word';
+            } else if (c === 'ingles') {
+                document.getElementById('label-nome-modulo').innerText = 'Nome Visível do Nível:';
+                document.getElementById('prof-nome-modulo').placeholder = 'Ex: Preparation - Part 1';
+                document.getElementById('label-identificador-aula').innerText = 'Lesson / Aula:';
+                document.getElementById('prof-nome-aula').placeholder = 'Ex: Lesson 01 - Greetings';
             } else {
                 document.getElementById('label-nome-modulo').innerText = 'Nome Visível do Módulo:';
                 document.getElementById('prof-nome-modulo').placeholder = 'Ex: Introdução ao Windows';
-                document.getElementById('label-nome-aula').innerText = 'Nome Visível da Aula:';
+                document.getElementById('label-identificador-aula').innerText = 'Nome Visível da Aula:';
                 document.getElementById('prof-nome-aula').placeholder = 'Ex: Aula 01 - Criando Pastas';
             }
+            
+            atualizarSelectAulasProf();
             carregarTextoExistente();
+        }
+
+        // Inteligência para controlar 5 vs 15 aulas no Inglês
+        function atualizarSelectAulasProf() {
+            const c = document.getElementById('prof-curso').value;
+            const mStr = document.getElementById('prof-modulo').value;
+            const mNum = parseInt(mStr.replace('modulo_', '')) || 1;
+            const selectAula = document.getElementById('prof-aula');
+            selectAula.innerHTML = '';
+            
+            let maxAulas = 8;
+            let labelPref = "Etapa";
+            
+            if (c === 'ingles') {
+                maxAulas = (mNum === 1) ? 5 : 15; // 5 aulas pro Preparation, 15 pro resto
+                labelPref = "Lesson";
+            }
+            
+            for (let a = 1; a <= maxAulas; a++) {
+                selectAula.innerHTML += `<option value="aula_${a}">${labelPref} ${String(a).padStart(2, '0')}</option>`;
+            }
         }
 
         function inicializarPainel() {
@@ -505,6 +566,7 @@
                         if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
                         if(c.id === 'modAtivoInf') document.getElementById('prof-modulo-ativo-inf').value = c.senha;
                         if(c.id === 'modAtivoSen') document.getElementById('prof-modulo-ativo-sen').value = c.senha;
+                        if(c.id === 'modAtivoIng') document.getElementById('prof-modulo-ativo-ing').value = c.senha;
                         if(c.id === 'modAtivoRep') document.getElementById('prof-modulo-ativo-rep').value = c.senha;
                     });
                 }
@@ -528,8 +590,8 @@
             if(admS === '') { showToast("A senha do administrador não pode ficar em branco!", "error"); return; }
 
             try {
-                const ids = ['informatica', 'senior', 'reposicao', 'admin', 'modAtivoInf', 'modAtivoSen', 'modAtivoRep'];
-                const vals = ['inf', 'sen', 'rep', 'admin', 'ativo-inf', 'ativo-sen', 'ativo-rep'].map(x => document.getElementById(x.includes('ativo') ? `prof-modulo-${x}` : `senha-prof-${x}`).value.trim());
+                const ids = ['informatica', 'senior', 'ingles', 'reposicao', 'admin', 'modAtivoInf', 'modAtivoSen', 'modAtivoIng', 'modAtivoRep'];
+                const vals = ['inf', 'sen', 'ing', 'rep', 'admin', 'ativo-inf', 'ativo-sen', 'ativo-ing', 'ativo-rep'].map(x => document.getElementById(x.includes('ativo') ? `prof-modulo-${x}` : `senha-prof-${x}`).value.trim());
                 
                 for(let i=0; i<ids.length; i++){
                     await bancoDados.from('config_cursos').upsert({ id: ids[i], senha: vals[i] }, { on: 'id' });
@@ -542,7 +604,7 @@
         function validarAcessoProfessor() {
             if (document.getElementById('input-senha-admin').value.trim() === senhasCursos.admin) {
                 professorAutenticado = true;
-                showToast("Bem-vinda de volta, Professora!", "success");
+                showToast("Bem-vinda de volta, Professora Analice!", "success");
                 mudarAba('professor');
             } else { showToast("Senha administrativa incorreta!", "error"); }
         }
@@ -589,7 +651,7 @@
             
             const quill = new Quill(`#${editorId}`, {
                 theme: 'snow',
-                placeholder: 'Escreva a instrução para o aluno...',
+                placeholder: 'Escreva a instrução visual para o aluno...',
                 modules: {
                     toolbar: [
                         [{ 'size': ['small', false, 'large', 'huge'] }],
@@ -679,8 +741,10 @@
 
             if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo!", "warning"); return; }
 
-            const dMod = c === 'reposicao' ? `Ficha ${m.split('_')[1].padStart(2, '0')}` : `Módulo ${m.split('_')[1].padStart(2, '0')}`;
-            const dAula = `Aula ${a.split('_')[1].padStart(2, '0')}`;
+            let dMod = c === 'reposicao' ? `Ficha ${m.split('_')[1].padStart(2, '0')}` : `Módulo ${m.split('_')[1].padStart(2, '0')}`;
+            if(c === 'ingles') dMod = nomesModulosIngles[parseInt(m.split('_')[1])-1];
+            
+            let dAula = c === 'ingles' ? `Lesson ${a.split('_')[1].padStart(2, '0')}` : `Aula ${a.split('_')[1].padStart(2, '0')}`;
 
             try {
                 await bancoDados.from('roteiros_aulas').upsert({ id: `${c}_${m}_${a}`, modulo_id: `${c}_${m}`, aula_id: a, nome_modulo: nModulo || dMod, nome_aula: nAula || dAula, passos_midia: pacotePassos, passos: ["html_rich_text"] });
@@ -693,7 +757,6 @@
         async function solicitarSenhaCurso(idCurso, titulo) {
             cursoSelecionado = idCurso;
             document.getElementById('estudante-cursos').style.display = 'none';
-            // Baixa o progresso do aluno da nuvem antes de mostrar os módulos
             await carregarProgressoAluno();
             document.getElementById('estudante-modulos').style.display = 'block';
             renderizarModulosEstudante();
@@ -703,16 +766,24 @@
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
             
-            let mAtivo = parseInt(senhasCursos[cursoSelecionado === 'informatica' ? 'modAtivoInf' : (cursoSelecionado === 'senior' ? 'modAtivoSen' : 'modAtivoRep')] || "1");
+            let mAtivoStr = '1';
+            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
+            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
+            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
+            else mAtivoStr = senhasCursos.modAtivoRep;
+            
+            let mAtivo = parseInt(mAtivoStr || "1");
+            let maxMod = cursoSelecionado === 'ingles' ? 9 : 10;
 
-            for (let m = 1; m <= 10; m++) {
+            for (let m = 1; m <= maxMod; m++) {
                 let nExibir = cursoSelecionado === 'reposicao' ? `Ficha ${String(m).padStart(2, '0')}` : `Módulo ${String(m).padStart(2, '0')}`;
-                let desc = "Acesse o material";
+                if(cursoSelecionado === 'ingles') nExibir = nomesModulosIngles[m-1];
+                
+                let desc = cursoSelecionado === 'ingles' ? "Acesse o nível" : "Acesse o material";
                 
                 let cache = nomesCustomizados[`${cursoSelecionado}_modulo_${m}_aula_1`];
                 if(cache && cache.modulo) { nExibir = cache.modulo; desc = "Roteiro personalizado"; }
 
-                // AGORA LÊ DA NUVEM (modulosLiberadosAluno)
                 const jaLiberado = modulosLiberadosAluno.includes(String(m));
                 let classes = "mod-item", badge = "", numBg = String(m).padStart(2, '0');
 
@@ -730,8 +801,14 @@
         }
 
         function tentarAcessarModulo(mNum, nome) {
-            let mAtivo = parseInt(senhasCursos[cursoSelecionado === 'informatica' ? 'modAtivoInf' : (cursoSelecionado === 'senior' ? 'modAtivoSen' : 'modAtivoRep')] || "1");
-            const jaLib = modulosLiberadosAluno.includes(String(mNum)); // Nuvem
+            let mAtivoStr = '1';
+            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
+            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
+            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
+            else mAtivoStr = senhasCursos.modAtivoRep;
+
+            let mAtivo = parseInt(mAtivoStr || "1");
+            const jaLib = modulosLiberadosAluno.includes(String(mNum));
             modAlvoClicado = mNum;
 
             if (mNum === mAtivo) {
@@ -743,7 +820,7 @@
                 else {
                     document.getElementById('estudante-modulos').style.display = 'none';
                     document.getElementById('estudante-senha-tela').style.display = 'block';
-                    document.getElementById('subtitulo-senha-contexto').innerText = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`] ? "Digite a chave de revisão desta aula." : "Conteúdo antigo. Peça a chave para a professora.";
+                    document.getElementById('subtitulo-senha-contexto').innerText = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`] ? "Digite a chave de revisão deste conteúdo." : "Conteúdo antigo. Peça a chave para a professora.";
                 }
             } else { showToast("Ainda não chegamos neste tópico! ⏳", "warning"); }
         }
@@ -751,20 +828,24 @@
         function validarSenhaAcesso() {
             const digitada = document.getElementById('input-senha-aluno').value.trim();
             document.getElementById('input-senha-aluno').value = ''; 
-            let mAtivo = parseInt(senhasCursos[cursoSelecionado === 'informatica' ? 'modAtivoInf' : (cursoSelecionado === 'senior' ? 'modAtivoSen' : 'modAtivoRep')] || "1");
+            
+            let mAtivoStr = '1';
+            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
+            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
+            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
+            else mAtivoStr = senhasCursos.modAtivoRep;
+
+            let mAtivo = parseInt(mAtivoStr || "1");
             
             if (modAlvoClicado === mAtivo) {
                 if (digitada === senhasCursos[cursoSelecionado]) avancarParaAulasModulo();
                 else showToast("Senha incorreta!", "error");
             } else {
                 if (senhasModulosGerais[`${cursoSelecionado}_modulo_${modAlvoClicado}`] === digitada) {
-                    
-                    // AGORA GRAVA NA NUVEM AO DESTRANCAR
                     if (!modulosLiberadosAluno.includes(String(modAlvoClicado))) {
                         modulosLiberadosAluno.push(String(modAlvoClicado));
                         salvarProgressoAluno();
                     }
-                    
                     avancarParaAulasModulo();
                 } else showToast("Chave de revisão incorreta!", "error");
             }
@@ -773,6 +854,8 @@
         function avancarParaAulasModulo() {
             modSelecionado = `modulo_${modAlvoClicado}`;
             let nTemp = cursoSelecionado === 'reposicao' ? `Ficha ${String(modAlvoClicado).padStart(2, '0')}` : `Módulo ${String(modAlvoClicado).padStart(2, '0')}`;
+            if(cursoSelecionado === 'ingles') nTemp = nomesModulosIngles[modAlvoClicado-1];
+            
             if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`]) nTemp = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`].modulo;
 
             document.getElementById('estudante-senha-tela').style.display = 'none';
@@ -780,19 +863,21 @@
             document.getElementById('estudante-aulas').style.display = 'block';
             document.getElementById('titulo-modulo-atual').innerText = nTemp;
             
+            let maxAulas = 8;
+            if(cursoSelecionado === 'ingles') maxAulas = (modAlvoClicado === 1) ? 5 : 15;
+
             const cont = document.getElementById('lista-aulas-estudante');
             cont.innerHTML = '';
-            for (let a = 1; a <= 8; a++) {
-                let nAula = `Atividade 0${a}`;
+            for (let a = 1; a <= maxAulas; a++) {
+                let nAula = cursoSelecionado === 'ingles' ? `Lesson ${String(a).padStart(2, '0')}` : `Atividade 0${a}`;
                 if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`]) nAula = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`].aula;
                 
-                // Mimo visual: Checkmark de concluído!
                 const aulaIdCompleto = `${modSelecionado}_aula_${a}`;
                 const jaConcluida = aulasConcluidasAluno.includes(aulaIdCompleto);
                 const badgeExtra = jaConcluida ? `<div class="mod-badge" style="background:var(--success-light); color:var(--success);">✅ Concluída</div>` : `<div class="mod-badge" style="background:transparent;">▶</div>`;
                 
                 cont.innerHTML += `<div class="mod-item ativo" onclick="buscarAulaNuvem('aula_${a}')">
-                                      <div class="mod-number" style="background:var(--primary-light); color:var(--primary);">0${a}</div>
+                                      <div class="mod-number" style="background:var(--primary-light); color:var(--primary); font-size: 1rem;">0${a}</div>
                                       <div class="mod-info"><h4>${nAula}</h4></div>
                                       ${badgeExtra}
                                    </div>`;
@@ -858,7 +943,6 @@
             passoAtual += direcao;
             if (passoAtual >= passosAulaAtual.length) {
                 
-                // AGORA GRAVA A AULA CONCLUÍDA NA NUVEM!
                 const aulaIdCompleto = `${modSelecionado}_${aulaSelecionada}`;
                 if (!aulasConcluidasAluno.includes(aulaIdCompleto)) {
                     aulasConcluidasAluno.push(aulaIdCompleto);
@@ -866,8 +950,6 @@
                 }
 
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
-                
-                // Recarrega a lista para mostrar o botão ✅ Concluída
                 avancarParaAulasModulo(); 
                 
                 document.getElementById('estudante-passos').style.display = 'none';
