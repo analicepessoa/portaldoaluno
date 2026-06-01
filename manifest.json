@@ -1,0 +1,21 @@
+{
+  "name": "Portal Educacional 5.0",
+  "short_name": "Portal 5.0",
+  "description": "Aprenda Informática e Inglês de forma simples e direta.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
