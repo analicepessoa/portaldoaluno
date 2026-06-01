@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Estudante - Informática & Idiomas</title>
+    <title>Portal Educacional</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -29,6 +29,18 @@
             --gray-light: #e2e8f0;
         }
 
+        /* === INTELIGÊNCIA DO MODO ESCURO === */
+        body.dark-mode {
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --gray-light: #334155;
+            --primary-light: #1e293b;
+            --success-light: #14532d;
+            --warning-light: #78350f;
+            --danger-light: #7f1d1d;
+        }
+
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
 
         .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
@@ -39,11 +51,11 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        #loading-screen { position:fixed; inset:0; background:white; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.4s; }
-        .loader { width:70px; height:70px; border:6px solid #ddd; border-top:6px solid var(--primary); border-radius:50%; animation:girar 1s linear infinite; margin-bottom: 20px; }
+        #loading-screen { position:fixed; inset:0; background:var(--bg); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.4s; }
+        .loader { width:70px; height:70px; border:6px solid var(--gray-light); border-top:6px solid var(--primary); border-radius:50%; animation:girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 100%{ transform:rotate(360deg); } }
 
-        header { background-color: white; color: var(--primary); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; transition: background 0.3s, color 0.3s; }
+        header { background-color: var(--primary-light); color: var(--primary); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; transition: background 0.3s, color 0.3s; }
         header h1 { margin: 0; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
         .container { max-width: 900px; margin: 20px auto; padding: 0 20px; }
@@ -51,47 +63,53 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: white; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--gray-light); margin-bottom: 25px; padding: 30px; transition: background 0.3s, border-color 0.3s; }
+        .card { background: var(--bg); border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--gray-light); margin-bottom: 25px; padding: 30px; transition: background 0.3s, border-color 0.3s; }
+        body:not(.dark-mode) .card { background: white; } /* Mantém cartões brancos no modo claro */
+        
         .btn-action { background-color: var(--primary); color: white; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
         .btn-action:hover { opacity: 0.9; }
-        .btn-action.secondary { background-color: #64748b; box-shadow: none; }
-        input, select, textarea { width: 100%; padding: 16px; font-size: 1.1rem; border: 2px solid var(--gray-light); border-radius: 14px; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; transition: all 0.3s; }
+        .btn-action.secondary { background-color: var(--gray-light); color: var(--text); box-shadow: none; }
+        
+        input, select, textarea { width: 100%; padding: 16px; font-size: 1.1rem; border: 2px solid var(--gray-light); border-radius: 14px; box-sizing: border-box; margin-top: 5px; margin-bottom: 15px; transition: all 0.3s; background: var(--bg); color: var(--text); }
         input:focus, select:focus { border-color: var(--primary); outline: none; }
         h2 { font-size: 2rem; color: var(--primary); margin-top: 0; font-weight: 700; transition: color 0.3s; }
 
         .hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 24px; padding: 40px 30px; color: white; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2); }
         .hero .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(5px); }
         .hero h2 { margin: 0 0 10px 0; font-size: 2.2rem; font-weight: 800; text-transform: capitalize; color: white; }
-        .hero p { margin: 0; font-size: 1.2rem; opacity: 0.9; line-height: 1.5; }
+        .hero p { margin: 0; font-size: 1.2rem; opacity: 0.9; line-height: 1.5; color: white; }
 
         .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-top:20px; }
-        .stat-card { background:white; border:1px solid var(--gray-light); border-radius:18px; padding:20px; display:flex; align-items:center; gap:15px; transition:.2s; }
+        .stat-card { background: var(--bg); border:1px solid var(--gray-light); border-radius:18px; padding:20px; display:flex; align-items:center; gap:15px; transition:.2s; }
+        body:not(.dark-mode) .stat-card { background: white; }
         .stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
         .stat-icon { font-size:2.2rem; }
         .stat-value { font-size:1.8rem; font-weight:800; color:var(--primary); }
         .stat-label { color:var(--text-light); font-size:.95rem; font-weight: bold; }
 
         #lista-favoritos, #lista-conquistas { display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
-        .favorito-item { background:var(--warning-light); color:#92400e; padding:10px 14px; border-radius:12px; font-weight:bold; }
-        .badge-conquista { background:#fef3c7; color:#92400e; padding:12px 18px; border-radius:14px; font-weight:bold; border:2px solid #f59e0b; }
+        .favorito-item { background:var(--warning-light); color:var(--text); padding:10px 14px; border-radius:12px; font-weight:bold; border: 1px solid var(--warning); }
+        .badge-conquista { background:var(--warning-light); color:var(--text); padding:12px 18px; border-radius:14px; font-weight:bold; border:2px solid var(--warning); }
         
-        .historico-item { padding:16px; border:1px solid var(--gray-light); border-radius:12px; margin-bottom:10px; background:white; }
+        .historico-item { padding:16px; border:1px solid var(--gray-light); border-radius:12px; margin-bottom:10px; background:var(--bg); }
+        body:not(.dark-mode) .historico-item { background: white; }
         .historico-item strong { color:var(--primary); font-size: 1.1rem; }
-        .resultado-busca { padding:15px; border:1px solid var(--primary); border-radius:12px; margin-top:10px; background: var(--primary-light); font-weight: bold; color: var(--primary-dark); }
 
         #lista-cursos-principal { margin-top: 20px; margin-bottom: 30px; }
-        .course-card { display: flex; align-items: center; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-        .course-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.1); }
+        .course-card { display: flex; align-items: center; background: var(--bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid var(--gray-light); transition: all 0.2s; }
+        body:not(.dark-mode) .course-card { background: white; border-color: transparent; }
+        .course-card:hover { border-color: var(--primary); transform: translateY(-3px); }
         .course-card .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-right: 20px; flex-shrink: 0; }
         .course-card.inf .icon-box { background: var(--primary-light); color: var(--primary); }
-        .course-card.sen .icon-box { background: #f3e8ff; color: #7c3aed; }
+        .course-card.sen .icon-box { background: var(--primary-light); color: var(--primary); }
         .course-card.ing .icon-box { background: var(--danger-light); color: var(--danger); }
         .course-card.rep .icon-box { background: var(--warning-light); color: var(--warning); }
         .course-card h3 { margin: 0 0 5px 0; font-size: 1.4rem; color: var(--text); }
         .course-card p { margin: 0; color: var(--text-light); font-size: 1rem; }
 
         .module-list { display: flex; flex-direction: column; gap: 12px; }
-        .mod-item { display: flex; align-items: center; background: white; padding: 16px 20px; border-radius: 16px; border: 2px solid var(--gray-light); cursor: pointer; transition: all 0.2s; }
+        .mod-item { display: flex; align-items: center; background: var(--bg); padding: 16px 20px; border-radius: 16px; border: 2px solid var(--gray-light); cursor: pointer; transition: all 0.2s; }
+        body:not(.dark-mode) .mod-item { background: white; }
         .mod-item:hover { border-color: var(--primary); background: var(--primary-light); }
         .mod-number { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin-right: 15px; flex-shrink: 0; text-align: center; }
         .mod-info { flex-grow: 1; }
@@ -105,11 +123,12 @@
         .mod-item.revendo .mod-number { background: var(--success-light); color: var(--success); }
         .mod-item.revendo .mod-badge { background: var(--success-light); color: var(--success); }
         .mod-item.bloqueado { opacity: 0.6; cursor: not-allowed; }
-        .mod-item.bloqueado:hover { border-color: var(--gray-light); background: white; }
+        .mod-item.bloqueado:hover { border-color: var(--gray-light); }
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
         .mod-item.bloqueado .mod-badge { background: var(--gray-light); color: var(--text-light); }
 
-        .progress-wrapper { background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--gray-light); }
+        .progress-wrapper { background: var(--bg); padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--gray-light); }
+        body:not(.dark-mode) .progress-wrapper { background: white; }
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--text-light); }
         .progress-container { width: 100%; background-color: var(--gray-light); border-radius: 10px; height: 12px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background: var(--success); transition: width 0.4s ease; border-radius: 10px; }
@@ -126,51 +145,45 @@
 
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
-        .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; }
+        .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; color: #1e293b; }
         .click-blue { background-color: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 8px; border: 2px solid #3b82f6; font-weight: bold; }
         .text-danger-huge { color: var(--danger); font-size: 2.2rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
-        .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
+        .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--gray-light); transition: background 0.3s; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--gray-light); transition: background 0.3s; }
+        body:not(.dark-mode) .bottom-nav { background: white; }
         .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.85rem; font-weight: bold; cursor: pointer; background: none; border: none; }
         .bottom-nav-item.active { color: var(--primary); }
         .bottom-nav-item i { font-size: 1.6rem; font-style: normal; }
 
-        #editor-passos-container { max-height: 55vh; overflow-y: auto; background: #f8fafc; padding: 15px; border-radius: 16px; border: 2px solid #cbd5e1; margin-bottom: 20px; transition: background 0.3s; }
-        .step-editor-item { background: white; border-radius: 16px; margin-bottom: 25px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid var(--gray-light); display: flex; flex-direction: column; transition: background 0.3s; }
-        .step-editor-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; border-radius: 16px 16px 0 0; border-bottom: 1px solid var(--gray-light); transition: background 0.3s; }
-        .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--gray-light); background: white; transition: background 0.3s; }
-        .quill-editor-container { min-height: 150px; background: white; font-size: 1.2rem; border: none; transition: background 0.3s, color 0.3s; }
+        #editor-passos-container { max-height: 55vh; overflow-y: auto; background: var(--bg); padding: 15px; border-radius: 16px; border: 2px solid var(--gray-light); margin-bottom: 20px; transition: background 0.3s; }
+        .step-editor-item { background: var(--bg); border-radius: 16px; margin-bottom: 25px; border-left: 6px solid var(--primary); border-top: 1px solid var(--gray-light); border-right: 1px solid var(--gray-light); border-bottom: 1px solid var(--gray-light); display: flex; flex-direction: column; transition: background 0.3s; }
+        body:not(.dark-mode) .step-editor-item { background: white; }
+        .step-editor-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: var(--gray-light); border-radius: 16px 16px 0 0; }
+        .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--gray-light); background: var(--bg); color: var(--text); }
+        body:not(.dark-mode) .ql-toolbar.ql-snow { background: white; }
+        .quill-editor-container { min-height: 150px; background: var(--bg); color: var(--text); font-size: 1.2rem; border: none; }
+        body:not(.dark-mode) .quill-editor-container { background: white; }
         .ql-editor { min-height: 150px; padding: 20px; }
-        .row-inputs { display: flex; gap: 15px; padding: 15px 20px; background: white; border-radius: 0 0 16px 16px; border-top: 1px solid var(--gray-light); flex-wrap: wrap; align-items: center; transition: background 0.3s; }
+        
+        /* Ajustes específicos de ícones no editor para modo escuro */
+        body.dark-mode .ql-stroke { stroke: var(--text-light); }
+        body.dark-mode .ql-fill { fill: var(--text-light); }
+        body.dark-mode .ql-picker { color: var(--text-light); }
+
+        .row-inputs { display: flex; gap: 15px; padding: 15px 20px; background: var(--bg); border-radius: 0 0 16px 16px; border-top: 1px solid var(--gray-light); flex-wrap: wrap; align-items: center; transition: background 0.3s; }
+        body:not(.dark-mode) .row-inputs { background: white; }
         .row-inputs > input, .row-inputs > select { flex: 1; margin: 0; min-width: 200px; }
         
         .modulos-checkbox-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .modulos-checkbox-grid label { display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gray-light); cursor: pointer; font-size: 0.95rem; margin-top: 0; font-weight: normal; }
+        .modulos-checkbox-grid label { display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gray-light); cursor: pointer; font-size: 0.95rem; margin-top: 0; font-weight: normal; color: var(--text); }
         .modulos-checkbox-grid input[type="checkbox"] { width: auto; margin: 0; }
-        .aluno-gerenciamento-card { border: 1px solid var(--gray-light); padding: 15px; border-radius: 16px; margin-bottom: 15px; background: white; }
-        .aluno-gerenciamento-card h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.3rem; display: flex; justify-content: space-between; }
+        
+        .aluno-gerenciamento-card { border: 1px solid var(--gray-light); padding: 15px; border-radius: 16px; margin-bottom: 15px; background: var(--bg); }
+        body:not(.dark-mode) .aluno-gerenciamento-card { background: white; }
+        .aluno-gerenciamento-card h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
         .aluno-gerenciamento-card .curso-tag { background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
-
-        /* MODO ESCURO */
-        body.dark-mode { background:#0f172a; color:#f8fafc; }
-        body.dark-mode header, body.dark-mode #loading-screen { background:#1e293b; color:white; border-color:#334155; }
-        body.dark-mode .card, body.dark-mode .mod-item, body.dark-mode .progress-wrapper, body.dark-mode .historico-item, body.dark-mode .aluno-gerenciamento-card { background:#1e293b; color:white; border-color:#334155; }
-        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4 { color:white; }
-        body.dark-mode p, body.dark-mode label, body.dark-mode .stat-label { color:#cbd5e1; }
-        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background:#0f172a; color:white; border-color:#475569; }
-        body.dark-mode .stat-card { background:#334155; border-color:#475569; }
-        body.dark-mode .bottom-nav { background:#1e293b; border-top-color:#334155; }
-        body.dark-mode .hero { background:linear-gradient(135deg, #1e3a8a, #172554); }
-        body.dark-mode .toast { background: #1e293b; color: white; }
-        body.dark-mode #editor-passos-container { background: #0f172a; border-color: #334155; }
-        body.dark-mode .step-editor-item, body.dark-mode .row-inputs, body.dark-mode .ql-toolbar.ql-snow, body.dark-mode .quill-editor-container { background: #1e293b; border-color: #334155; }
-        body.dark-mode .step-editor-header { background: #334155; border-color: #475569; color: white; }
-        body.dark-mode .ql-stroke { stroke: #cbd5e1; }
-        body.dark-mode .ql-fill { fill: #cbd5e1; }
-        body.dark-mode .ql-picker { color: #cbd5e1; }
-        body.dark-mode .modulos-checkbox-grid label { background: #0f172a; border-color: #475569; }
     </style>
 </head>
 <body>
@@ -188,7 +201,6 @@
 
     <div class="container">
 
-        <!-- ==================== LOGIN COM PIN DO ALUNO ==================== -->
         <section id="view-login" class="view-section active" style="text-align: center;">
             <div class="card" style="max-width: 450px; margin: 40px auto; border: 2px solid var(--primary);">
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
@@ -201,72 +213,45 @@
             </div>
         </section>
 
-        <!-- ==================== ÁREA DO ESTUDANTE ==================== -->
         <section id="view-estudante" class="view-section">
             
             <div id="estudante-modulos">
-                <!-- HERO -->
                 <div class="hero">
                     <div class="badge" id="badge-curso-aluno">Portal Educacional 2.0</div>
                     <h2 id="nome-aluno-display">Bem-vindo(a)!</h2>
                     <p>Continue seus estudos e acompanhe sua evolução.</p>
                     <div style="margin-top:20px;">
-                        <button class="btn-action" onclick="alternarModoEscuro()" style="background:#111827; box-shadow:none; padding:10px 20px; font-size:1rem;">🌙 Modo Escuro</button>
+                        <button class="btn-action" onclick="alternarModoEscuro()" style="background:rgba(0,0,0,0.3); box-shadow:none; padding:10px 20px; font-size:1rem;">🌙 Modo Escuro</button>
                     </div>
                 </div>
 
-                <!-- LISTA DE CURSOS -->
-                <div id="lista-cursos-principal">
-                    <h2 style="margin-top:0;">📚 Meus Cursos</h2>
-                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica','Informática 5.0')">
-                        <div class="icon-box">💻</div>
-                        <div class="course-card-content"><h3>Informática 5.0</h3><p>Navegação, atalhos e IA</p></div>
-                    </div>
-                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior','Curso Sênior')">
-                        <div class="icon-box">👵</div>
-                        <div class="course-card-content"><h3>Curso Sênior</h3><p>Inclusão Digital sem complicação</p></div>
-                    </div>
-                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles','Inglês')">
-                        <div class="icon-box">🌎</div>
-                        <div class="course-card-content"><h3>Inglês</h3><p>Preparation, Basic & Intermediate</p></div>
-                    </div>
-                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao','Reposições')">
-                        <div class="icon-box">🔄</div>
-                        <div class="course-card-content"><h3>Reposições</h3><p>Fichas e atividades exclusivas</p></div>
-                    </div>
+                <div id="lista-cursos-principal" style="display:none;">
+                    <h2 style="margin-top:0;">📚 Testar Todos os Cursos</h2>
+                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica')"><div class="icon-box">💻</div><div class="course-card-content"><h3>Informática 5.0</h3></div></div>
+                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior')"><div class="icon-box">👵</div><div class="course-card-content"><h3>Curso Sênior</h3></div></div>
+                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles')"><div class="icon-box">🌎</div><div class="course-card-content"><h3>Inglês</h3></div></div>
+                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao')"><div class="icon-box">🔄</div><div class="course-card-content"><h3>Reposições</h3></div></div>
                 </div>
 
-                <!-- DASHBOARD E ESTATÍSTICAS -->
-                <div class="card">
+                <div class="card" id="card-dashboard-estatisticas">
                     <h2 style="margin-top:0;">📊 Meu Desempenho</h2>
                     <div class="dashboard-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">🎓</div>
-                            <div><div class="stat-value" id="dash-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div><div class="stat-value" id="dash-conquistas">0</div><div class="stat-label">Conquistas</div></div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📈</div>
-                            <div><div class="stat-value" id="dash-progresso">0%</div><div class="stat-label">Progresso Geral</div></div>
-                        </div>
+                        <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="dash-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
+                        <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="dash-conquistas">0</div><div class="stat-label">Conquistas</div></div></div>
+                        <div class="stat-card"><div class="stat-icon">📈</div><div><div class="stat-value" id="dash-progresso">0%</div><div class="stat-label">Progresso Geral</div></div></div>
                     </div>
                 </div>
 
-                <!-- CONQUISTAS E HISTÓRICO -->
-                <div class="card">
+                <div class="card" id="card-dashboard-conquistas">
                     <h2 style="margin-top:0;">🏆 Conquistas</h2>
                     <div id="lista-conquistas"><p style="color:var(--text-light)">Nenhuma conquista desbloqueada.</p></div>
                 </div>
-                <div class="card">
+                <div class="card" id="card-dashboard-historico">
                     <h2 style="margin-top:0;">🕒 Últimas aulas acessadas</h2>
                     <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
                 </div>
 
-                <!-- TRILHA DE APRENDIZADO -->
-                <h2 id="titulo-trilha-dinamico" style="display:none;">📚 Minha Trilha de Aprendizado</h2>
+                <h2 id="titulo-trilha-dinamico">📚 Minha Trilha de Aprendizado</h2>
                 <div class="module-list" id="lista-modulos-estudante"></div>
             </div>
 
@@ -281,10 +266,7 @@
                 <h2 id="titulo-aula-atual" style="margin-bottom: 15px;">Aula</h2>
                 
                 <div class="progress-wrapper">
-                    <div class="progress-header">
-                        <span id="progress-text-step">Passo 1</span>
-                        <span id="progress-text-pct">10%</span>
-                    </div>
+                    <div class="progress-header"><span id="progress-text-step">Passo 1</span><span id="progress-text-pct">10%</span></div>
                     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 </div>
 
@@ -302,7 +284,6 @@
             </div>
         </section>
 
-        <!-- ==================== BLOQUEIO DO PROFESSOR ==================== -->
         <section id="view-professor-bloqueado" class="view-section" style="text-align: center;">
             <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--danger);">
                 <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
@@ -314,33 +295,31 @@
             </div>
         </section>
 
-        <!-- ==================== ÁREA DO PROFESSOR ==================== -->
         <section id="view-professor" class="view-section">
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                 <h2 style="margin:0;">Painel de Controle</h2>
-                <button class="btn-action secondary" style="margin:0; background:var(--text);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
+                <button class="btn-action secondary" style="margin:0; background:var(--primary); color:white; border: 2px solid var(--primary-dark);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
             </div>
 
-            <!-- GESTÃO DE MATRÍCULAS E EDIÇÃO -->
             <div class="card" style="border-left: 5px solid var(--primary);">
                 <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
-                <p>Cadastre, edite ou gerencie quais módulos estão destravados.</p>
+                <p>Cadastre, edite senhas ou gerencie quais módulos estão destravados.</p>
                 
-                <div class="row-inputs" style="background: var(--bg); padding: 15px; border-radius: 12px; border: none; margin-bottom: 20px; align-items: stretch;">
-                    <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome do Aluno (Ex: Gustavo)"></div>
-                    <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="Criar PIN/Senha (Ex: 1234)"></div>
+                <div class="row-inputs" style="padding: 0; background: transparent; border: none; margin-bottom: 20px; align-items: stretch;">
+                    <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome (Ex: Gustavo)" style="margin:0; height:100%;"></div>
+                    <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="PIN (Ex: 1234)" style="margin:0; height:100%;"></div>
                     <div style="flex:1;">
-                        <select id="novo-aluno-curso">
+                        <select id="novo-aluno-curso" style="margin:0; height:100%;">
                             <option value="informatica">Informática 5.0</option>
                             <option value="senior">Curso Sênior</option>
                             <option value="ingles">Inglês 🌎</option>
                             <option value="reposicao">Reposição 🔄</option>
                         </select>
                     </div>
-                    <div style="display: flex; gap: 10px; flex-direction: column;">
-                        <button id="btn-salvar-aluno" class="btn-action" style="margin-top: 0; width: 100%;" onclick="matricularNovoAluno()">Matricular Aluno</button>
-                        <button id="btn-cancelar-edicao" class="btn-action secondary" style="margin-top: 0; width: 100%; display: none;" onclick="cancelarEdicaoAluno()">Cancelar Edição</button>
+                    <div style="display: flex; gap: 10px; flex-direction: column; flex:1;">
+                        <button id="btn-salvar-aluno" class="btn-action" style="margin: 0; height: 100%; padding: 15px 10px;" onclick="matricularNovoAluno()">💾 Salvar Aluno</button>
+                        <button id="btn-cancelar-edicao" class="btn-action secondary" style="margin: 0; padding: 10px; display: none;" onclick="cancelarEdicaoAluno()">Cancelar</button>
                     </div>
                 </div>
 
@@ -348,8 +327,7 @@
                 <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
             </div>
 
-            <!-- ANALYTICS DA PROFESSORA -->
-            <div class="card" style="background:#f8fafc;">
+            <div class="card" style="background:var(--primary-light);">
                 <h2 style="margin-top:0;">📊 Analytics Geral</h2>
                 <div class="dashboard-grid">
                     <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><div class="stat-value" id="analytics-alunos">0</div><div class="stat-label">Alunos Ativos</div></div></div>
@@ -358,7 +336,11 @@
                 </div>
             </div>
 
-            <!-- EDITOR VISUAL -->
+            <div class="card">
+                <h2 style="margin-top:0;">🏆 Ranking Geral dos Alunos</h2>
+                <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
+            </div>
+
             <div class="card">
                 <h2 style="margin-top:0;">Gerenciador de Aulas Multimídia</h2>
                 <p>Crie e edite os conteúdos usando o editor visual avançado.</p>
@@ -393,7 +375,6 @@
 
     </div>
 
-    <!-- Navegação Inferior -->
     <div class="bottom-nav" id="nav-container" style="display:none;">
         <button class="bottom-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
         <button class="bottom-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
@@ -438,12 +419,12 @@
         let professorAutenticado = false;
         let adminPass = "admin123"; 
         let modAlvoClicado = 0;
-        let alunoEmEdicaoId = null; // Variável para controlar a edição
+        let alunoEmEdicaoId = null;
 
         let historicoAluno = JSON.parse(localStorage.getItem("historicoPortal")) || [];
         let conquistasAluno = JSON.parse(localStorage.getItem("conquistasPortal")) || [];
 
-        // --- LOGIN SEGURO (NOME + PIN) ---
+        // --- LOGIN SEGURO E PUXAR DADOS DA NUVEM (CORRIGIDO) ---
         async function entrarComoAluno() {
             const nomeDigitado = document.getElementById('input-nome-aluno').value.trim().toLowerCase();
             const senhaDigitada = document.getElementById('input-senha-aluno-login').value.trim();
@@ -451,6 +432,7 @@
             
             showToast("Verificando dados...", "info");
             try {
+                // Apenas e unicamente puxa da tabela oficial alunos_matriculados!
                 const { data, error } = await bancoDados.from('alunos_matriculados').select('*').eq('nome_aluno', nomeDigitado).eq('senha', senhaDigitada).maybeSingle();
                 
                 if(!data) { showToast("Nome ou PIN incorretos. Tente novamente.", "error"); return; }
@@ -470,8 +452,14 @@
                 document.getElementById('nav-container').style.display = 'flex'; 
                 
                 mudarAba('estudante');
-                document.getElementById('lista-cursos-principal').style.display = 'none'; // Esconde a lista de cursos gerais
-                document.getElementById('titulo-trilha-dinamico').style.display = 'block'; // Mostra o título da trilha
+                
+                // Configura a tela limpa para o aluno real:
+                document.getElementById('lista-cursos-principal').style.display = 'none'; 
+                document.getElementById('card-dashboard-estatisticas').style.display = 'block';
+                document.getElementById('card-dashboard-conquistas').style.display = 'block';
+                document.getElementById('card-dashboard-historico').style.display = 'block';
+                document.getElementById('titulo-trilha-dinamico').style.display = 'block'; 
+                
                 renderizarModulosEstudante(); 
                 atualizarDashboard();
                 renderizarConquistas();
@@ -487,7 +475,8 @@
         function entrarModoTeste() {
             alunoLogado = "professora_teste";
             alunoLogadoDados = { id: 'teste_admin' };
-            // Libera todos os módulos para ela poder navegar livremente em qualquer curso
+            
+            // Libera todos os módulos para a professora não ficar travada
             modulosLiberadosAluno = [];
             ['informatica', 'senior', 'ingles', 'reposicao'].forEach(c => {
                 for(let i=1; i<=10; i++) modulosLiberadosAluno.push(`${c}_${i}`);
@@ -498,14 +487,20 @@
             document.getElementById('badge-curso-aluno').innerText = "Acesso Total Liberado";
             document.getElementById('nav-container').style.display = 'flex';
             
-            showToast("Modo Teste Ativado! Você tem acesso a tudo.", "success");
+            showToast("Modo Teste Ativado! Você tem acesso a todos os cursos.", "success");
             mudarAba('estudante');
-            document.getElementById('lista-cursos-principal').style.display = 'block'; // Professora vê todos os cursos para testar
+            
+            // Ajusta a interface para a Professora escolher os cursos livremente
+            document.getElementById('lista-cursos-principal').style.display = 'block'; 
+            document.getElementById('card-dashboard-estatisticas').style.display = 'none';
+            document.getElementById('card-dashboard-conquistas').style.display = 'none';
+            document.getElementById('card-dashboard-historico').style.display = 'none';
             document.getElementById('titulo-trilha-dinamico').style.display = 'none';
+            document.getElementById('estudante-modulos').style.display = 'none';
         }
 
         async function salvarProgressoAlunoNuvem() {
-            // Se for a professora testando, não salva nada no banco para não sujar os dados!
+            // Professora em teste não suja o banco de dados
             if(!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
             try {
                 await bancoDados.from('alunos_matriculados').update({
@@ -536,7 +531,6 @@
             if(total >= 1 && !conquistasAluno.includes("🎉 Primeira Aula")) { conquistasAluno.push("🎉 Primeira Aula"); ganhouNova=true; }
             if(total >= 5 && !conquistasAluno.includes("🔥 Estudando Sempre")) { conquistasAluno.push("🔥 Estudando Sempre"); ganhouNova=true; }
             if(total >= 10 && !conquistasAluno.includes("🏆 Aluno Dedicado")) { conquistasAluno.push("🏆 Aluno Dedicado"); ganhouNova=true; }
-            if(total >= 25 && !conquistasAluno.includes("🚀 Mestre da Plataforma")) { conquistasAluno.push("🚀 Mestre da Plataforma"); ganhouNova=true; }
             if(ganhouNova && alunoLogado !== 'professora_teste'){
                 localStorage.setItem("conquistasPortal", JSON.stringify(conquistasAluno));
                 renderizarConquistas();
@@ -611,9 +605,15 @@
                 }
             } else {
                 document.getElementById('view-estudante').style.display = 'block';
-                document.getElementById('estudante-modulos').style.display = 'block';
                 document.getElementById('estudante-aulas').style.display = 'none';
                 document.getElementById('estudante-passos').style.display = 'none';
+                
+                if(alunoLogado === 'professora_teste') {
+                    document.getElementById('lista-cursos-principal').style.display = 'block';
+                    document.getElementById('estudante-modulos').style.display = 'none';
+                } else {
+                    document.getElementById('estudante-modulos').style.display = 'block';
+                }
             }
         }
 
@@ -662,7 +662,7 @@
             alunoEmEdicaoId = null;
             document.getElementById('novo-aluno-nome').value = '';
             document.getElementById('novo-aluno-senha').value = '';
-            document.getElementById('btn-salvar-aluno').innerText = "Matricular Aluno";
+            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Aluno";
             document.getElementById('btn-cancelar-edicao').style.display = "none";
         }
 
@@ -690,7 +690,11 @@
                 if(sortedData[0]) document.getElementById('analytics-ranking').innerText = sortedData[0].nome_aluno.toUpperCase();
                 
                 const rankDiv = document.getElementById('ranking-alunos');
-                rankDiv.innerHTML = sortedData.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas</span></div>`).join('');
+                if(rankDiv) {
+                    if(sortedData.length > 0) {
+                        rankDiv.innerHTML = sortedData.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas</span></div>`).join('');
+                    } else { rankDiv.innerHTML = "<p style='color:var(--text-light)'>Nenhum dado de conclusão ainda.</p>"; }
+                }
 
                 listDiv.innerHTML = data.map(aluno => {
                     let maxMod = aluno.curso === 'ingles' ? 9 : 10;
@@ -864,9 +868,9 @@
         }
 
         // --- NAVEGAÇÃO E AULAS DO ESTUDANTE ---
-        function solicitarSenhaCurso(idCurso, titulo) {
+        function solicitarSenhaCurso(idCurso) {
             cursoSelecionado = idCurso;
-            document.getElementById('estudante-cursos').style.display = 'none';
+            document.getElementById('lista-cursos-principal').style.display = 'none';
             document.getElementById('titulo-trilha-dinamico').style.display = 'block';
             document.getElementById('estudante-modulos').style.display = 'block';
             renderizarModulosEstudante();
@@ -891,12 +895,12 @@
                 if (jaLiberado) { classes += " revendo"; badge = "⭐ Acessar"; }
                 else { classes += " bloqueado"; badge = "🔒 Aguarde"; }
 
-                let html = `<div class="${classes}" onclick="tentarAcessarModulo(${m}, '${nExibir}')"><div class="mod-number">${numBg}</div><div class="mod-info"><h4>${nExibir}</h4><p>${desc}</p></div><div class="mod-badge">${badge}</div></div>`;
+                let html = `<div class="${classes}" onclick="tentarAcessarModulo(${m})"><div class="mod-number">${numBg}</div><div class="mod-info"><h4>${nExibir}</h4><p>${desc}</p></div><div class="mod-badge">${badge}</div></div>`;
                 container.innerHTML += html;
             }
         }
 
-        function tentarAcessarModulo(mNum, nome) {
+        function tentarAcessarModulo(mNum) {
             const chaveLiberado = `${cursoSelecionado}_${mNum}`;
             const jaLib = modulosLiberadosAluno.includes(chaveLiberado);
             if (jaLib) { modAlvoClicado = mNum; avancarParaAulasModulo(); } 
@@ -930,7 +934,6 @@
             }
         }
 
-        function voltarParaCursos() { document.getElementById('estudante-modulos').style.display = 'none'; document.getElementById('estudante-cursos').style.display = 'block'; document.getElementById('titulo-trilha-dinamico').style.display = 'none'; }
         function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-modulos').style.display = 'block'; }
 
         async function buscarAulaNuvem(aId) {
@@ -986,7 +989,7 @@
             if (passoAtual >= passosAulaAtual.length) {
                 
                 const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
-                if (!aulasConcluidasAluno.includes(aulaIdCompleto)) {
+                if (!aulasConcluidasAluno.includes(aulaIdCompleto) && alunoLogado !== 'professora_teste') {
                     aulasConcluidasAluno.push(aulaIdCompleto);
                     salvarProgressoAlunoNuvem();
                 }
