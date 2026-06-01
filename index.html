@@ -181,9 +181,14 @@
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
                 <h2 style="color:var(--primary); margin-top:0;">Acesse seu Portal</h2>
                 <p style="color:var(--text-light); margin-bottom: 20px;">Insira os dados fornecidos pela professora.</p>
+                
                 <input type="text" id="input-nome-aluno" placeholder="Seu Nome (Ex: Gustavo)" style="text-align: center; font-size: 1.4rem; padding: 15px;">
                 <input type="password" id="input-senha-aluno-login" placeholder="Seu PIN (Ex: 1234)" style="text-align: center; font-size: 1.4rem; padding: 15px; letter-spacing: 5px;">
+                
                 <button class="btn-action" style="width: 100%; font-size:1.4rem; margin-top: 20px;" onclick="entrarComoAluno()">ENTRAR NAS AULAS</button>
+                
+                <!-- Botão discreto para a Professora -->
+                <button class="btn-action secondary" style="width: 100%; margin-top: 15px; background: transparent; color: var(--text-light); box-shadow: none;" onclick="mudarAba('professor')">👩‍🏫 Sou a Professora</button>
             </div>
         </section>
 
