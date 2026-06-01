@@ -290,7 +290,7 @@
                 <div class="card step-viewer-card" style="text-align:center;">
                     <div class="step-scroll-area" id="area-rolagem-aluno">
                         <div id="galeria-imagens-aluno" class="images-gallery"></div>
-                        <div id="conteudo-passo" class="step-text"></div>
+                        <div id="conteudo-passo" class="step-text ql-editor" style="padding: 0;"></div>
                         <div id="link-passo-container" style="margin-bottom: 10px;"></div>
                     </div>
                     <div class="nav-steps">
@@ -979,20 +979,25 @@
             } catch (err) { showToast("Falha na conexão.", "error"); }
         }
 
-        function mostrarPasso() {
+function mostrarPasso() {
             const passo = passosAulaAtual[passoAtual];
             const galeria = document.getElementById('galeria-imagens-aluno');
             galeria.innerHTML = '';
-            if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
+            
+            if (passo.imagem) passo.imagem.split(',').forEach(u => { 
+                if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; 
+            });
 
             let textoFormatado = passo.texto;
+            
+            // FÓRMULA BLINDADA: Agora os atalhos mágicos ignoram os códigos de formatação do Editor Visual!
             textoFormatado = textoFormatado
-                .replace(/\*(.*?)\*/g, '<span class="click-target">$1</span>')
-                .replace(/\|(.*?)\|/g, '<span class="click-blue">$1</span>')
-                .replace(/!(.*?)!/g, '<span class="text-danger-huge">$1</span>')
-                .replace(/\+(.*?)\+/g, '<span class="text-success-medium">$1</span>')
-                .replace(/=(.*?)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
-                .replace(/\{([\s\S]*?)\}/g, '<img src="$1" class="inline-gif">');
+                .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
+                .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
+                .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
+                .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
+                .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
+                .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">');
 
             document.getElementById('conteudo-passo').innerHTML = textoFormatado;
             document.getElementById('link-passo-container').innerHTML = passo.link ? `<a href="${passo.link.trim()}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-top:20px;">🔗 ABRIR MATERIAL EXTERNO</a>` : '';
