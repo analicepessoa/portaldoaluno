@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estudante - Informática & Idiomas</title>
     
+    <!-- PWA (Aplicativo) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
 
+    <!-- Bibliotecas: Supabase e o Editor Visual (Quill.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -66,7 +68,7 @@
         /* --- DASHBOARD 2.0 & HERO --- */
         .hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 24px; padding: 40px 30px; color: white; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2); }
         .hero .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(5px); }
-        .hero h2 { margin: 0 0 10px 0; font-size: 2.2rem; font-weight: 800; color: white; }
+        .hero h2 { margin: 0 0 10px 0; font-size: 2.2rem; font-weight: 800; text-transform: capitalize; color: white; }
         .hero p { margin: 0; font-size: 1.2rem; opacity: 0.9; line-height: 1.5; }
 
         .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-top:20px; }
@@ -85,7 +87,7 @@
         .resultado-busca { padding:15px; border:1px solid var(--primary); border-radius:12px; margin-top:10px; background: var(--primary-light); font-weight: bold; color: var(--primary-dark); }
 
         /* --- CARDS DE CURSO --- */
-        #lista-cursos-principal { margin-top: 20px; }
+        #lista-cursos-principal { margin-top: 20px; margin-bottom: 30px; }
         .course-card { display: flex; align-items: center; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
         .course-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.1); }
         .course-card .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-right: 20px; flex-shrink: 0; }
@@ -116,24 +118,48 @@
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
         .mod-item.bloqueado .mod-badge { background: var(--gray-light); color: var(--text-light); }
 
-        /* --- VISUALIZADOR DA AULA --- */
+        /* --- VISUALIZADOR DA AULA E PROGRESSO --- */
         .progress-wrapper { background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--gray-light); }
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--text-light); }
         .progress-container { width: 100%; background-color: var(--gray-light); border-radius: 10px; height: 12px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background: var(--success); transition: width 0.4s ease; border-radius: 10px; }
-        .step-viewer-card { display: flex; flex-direction: column; max-height: 60vh; min-height: 400px; padding: 25px; }
-        .step-scroll-area { flex-grow: 1; overflow-y: auto; padding-right: 15px; margin-bottom: 20px; }
+        
+        /* 🛡️ CADEADO DE LAYOUT: CAIXA FIXA PARA O ALUNO 🛡️ */
+        .step-viewer-card { 
+            display: flex; 
+            flex-direction: column; 
+            height: 65vh; /* Altura fixa garantida */
+            min-height: 450px; 
+            padding: 25px; 
+            overflow: hidden; /* Impede a caixa de estourar */
+        }
+        .step-scroll-area { 
+            flex: 1 1 auto; /* Cresce e encolhe respeitando o pai */
+            overflow-y: auto; 
+            padding-right: 15px; 
+            margin-bottom: 15px; 
+            min-height: 0; /* O segredo para não estourar o flexbox! */
+        }
         .step-scroll-area::-webkit-scrollbar { width: 8px; }
         .step-scroll-area::-webkit-scrollbar-track { background: var(--gray-light); border-radius: 4px; }
         .step-scroll-area::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        
+        .nav-steps { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 0; 
+            flex-shrink: 0; /* Impede os botões de serem esmagados e mantém eles ancorados na base */
+        }
+        .btn-step { flex: 1; padding: 20px; font-size: 1.3rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s; }
+        .btn-step:active { transform: scale(0.98); }
+
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
         .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; }
         .click-blue { background-color: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 8px; border: 2px solid #3b82f6; font-weight: bold; }
         .text-danger-huge { color: var(--danger); font-size: 2.2rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
-        .nav-steps { display: flex; gap: 15px; margin-top: 0; }
-        .btn-step { flex: 1; padding: 20px; font-size: 1.3rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s; }
+        .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
 
         /* --- NAVEGAÇÃO INFERIOR --- */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--gray-light); transition: background 0.3s; }
@@ -164,7 +190,6 @@
         body.dark-mode .bottom-nav { background:#1e293b; border-top-color:#334155; }
         body.dark-mode .hero { background:linear-gradient(135deg, #1e3a8a, #172554); }
         body.dark-mode .toast { background: #1e293b; color: white; }
-        /* Dark mode para o Editor Visual */
         body.dark-mode #editor-passos-container { background: #0f172a; border-color: #334155; }
         body.dark-mode .step-editor-item, body.dark-mode .row-inputs, body.dark-mode .ql-toolbar.ql-snow, body.dark-mode .quill-editor-container { background: #1e293b; border-color: #334155; }
         body.dark-mode .step-editor-header { background: #334155; border-color: #475569; color: white; }
@@ -188,6 +213,7 @@
 
     <div class="container">
 
+        <!-- ==================== LOGIN SIMPLES DO ALUNO ==================== -->
         <section id="view-login" class="view-section active" style="text-align: center;">
             <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--primary);">
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
@@ -198,9 +224,11 @@
             </div>
         </section>
 
+        <!-- ==================== ÁREA DO ESTUDANTE ==================== -->
         <section id="view-estudante" class="view-section">
             
             <div id="estudante-cursos">
+                <!-- HERO -->
                 <div class="hero">
                     <div class="badge">Portal Educacional 2.0</div>
                     <h2 id="nome-aluno-display">Bem-vindo(a)!</h2>
@@ -210,6 +238,28 @@
                     </div>
                 </div>
 
+                <!-- 📚 LISTA DE CURSOS AGORA APARECE PRIMEIRO 📚 -->
+                <div id="lista-cursos-principal">
+                    <h2 style="margin-top:0;">📚 Meus Cursos</h2>
+                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica','Informática 5.0')">
+                        <div class="icon-box">💻</div>
+                        <div class="course-card-content"><h3>Informática 5.0</h3><p>Navegação, atalhos e IA</p></div>
+                    </div>
+                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior','Curso Sênior')">
+                        <div class="icon-box">👵</div>
+                        <div class="course-card-content"><h3>Curso Sênior</h3><p>Inclusão Digital sem complicação</p></div>
+                    </div>
+                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles','Inglês')">
+                        <div class="icon-box">🌎</div>
+                        <div class="course-card-content"><h3>Inglês</h3><p>Preparation, Basic & Intermediate</p></div>
+                    </div>
+                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao','Reposições')">
+                        <div class="icon-box">🔄</div>
+                        <div class="course-card-content"><h3>Reposições</h3><p>Fichas e atividades exclusivas</p></div>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD E ESTATÍSTICAS -->
                 <div class="card">
                     <h2 style="margin-top:0;">📊 Meu Desempenho</h2>
                     <div class="dashboard-grid">
@@ -250,58 +300,45 @@
                     </div>
                 </div>
 
+                <!-- FAVORITOS -->
                 <div class="card">
                     <h2 style="margin-top:0;">⭐ Favoritos</h2>
                     <div id="lista-favoritos"><p style="color:var(--text-light);">Nenhum favorito salvo.</p></div>
                 </div>
 
+                <!-- CONQUISTAS -->
                 <div class="card">
                     <h2 style="margin-top:0;">🏆 Conquistas</h2>
                     <div id="lista-conquistas"><p style="color:var(--text-light)">Nenhuma conquista desbloqueada.</p></div>
                 </div>
 
+                <!-- CERTIFICADOS -->
                 <div class="card">
                     <h2 style="margin-top:0;">📜 Certificados</h2>
                     <div id="certificados-aluno"><p style="color:var(--text-light)">Complete 20 aulas para emitir seu certificado.</p></div>
                 </div>
 
+                <!-- HISTÓRICO -->
                 <div class="card">
                     <h2 style="margin-top:0;">🕒 Últimas aulas acessadas</h2>
                     <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
                 </div>
 
+                <!-- AVISOS DA PROFESSORA -->
                 <div class="card">
                     <h2 style="margin-top:0;">📢 Avisos da Professora</h2>
                     <div id="avisosPortal"><p style="color:var(--text-light)">Nenhum aviso no momento.</p></div>
                 </div>
 
+                <!-- AGENDA DE AULAS -->
                 <div class="card">
                     <h2 style="margin-top:0;">📅 Próximas Aulas (Agenda)</h2>
                     <div id="agenda-lista-aluno"><p style="color:var(--text-light)">Nenhuma aula agendada.</p></div>
                 </div>
 
-                <div id="lista-cursos-principal">
-                    <h2 style="margin-top:20px;">📚 Meus Cursos</h2>
-                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica','Informática 5.0')">
-                        <div class="icon-box">💻</div>
-                        <div class="course-card-content"><h3>Informática 5.0</h3><p>Navegação, atalhos e IA</p></div>
-                    </div>
-                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior','Curso Sênior')">
-                        <div class="icon-box">👵</div>
-                        <div class="course-card-content"><h3>Curso Sênior</h3><p>Inclusão Digital sem complicação</p></div>
-                    </div>
-                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles','Inglês')">
-                        <div class="icon-box">🌎</div>
-                        <div class="course-card-content"><h3>Inglês</h3><p>Preparation, Basic & Intermediate</p></div>
-                    </div>
-                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao','Reposições')">
-                        <div class="icon-box">🔄</div>
-                        <div class="course-card-content"><h3>Reposições</h3><p>Fichas e atividades exclusivas</p></div>
-                    </div>
-                </div>
-
             </div>
 
+            <!-- TELAS DE NAVEGAÇÃO DO CURSO -->
             <div id="estudante-senha-tela" style="display:none; text-align: center;">
                 <button class="btn-action secondary" style="width:100%; margin-bottom:20px;" onclick="voltarParaModulos()">< Voltar</button>
                 <div class="card" style="max-width: 400px; margin: 0 auto;">
@@ -314,7 +351,7 @@
             </div>
 
             <div id="estudante-modulos" style="display:none;">
-                <button class="btn-action secondary" style="margin-bottom: 20px;" onclick="voltarParaCursos()">< Voltar ao Dashboard</button>
+                <button class="btn-action secondary" style="margin-bottom: 20px;" onclick="voltarParaCursos()">< Voltar aos Cursos</button>
                 <h2>Trilha de Aprendizado</h2>
                 <div class="module-list" id="lista-modulos-estudante"></div>
             </div>
@@ -351,6 +388,7 @@
             </div>
         </section>
 
+        <!-- ==================== BLOQUEIO DO PROFESSOR ==================== -->
         <section id="view-professor-bloqueado" class="view-section" style="text-align: center;">
             <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--danger);">
                 <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
@@ -361,32 +399,15 @@
             </div>
         </section>
 
+        <!-- ==================== ÁREA DO PROFESSOR ==================== -->
         <section id="view-professor" class="view-section">
             
             <div class="card" style="background:#f8fafc;">
                 <h2 style="margin-top:0;">📊 Analytics Geral</h2>
                 <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">👨‍🎓</div>
-                        <div>
-                            <div class="stat-value" id="analytics-alunos">0</div>
-                            <div class="stat-label">Alunos Ativos</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🎓</div>
-                        <div>
-                            <div class="stat-value" id="analytics-aulas">0</div>
-                            <div class="stat-label">Aulas Concluídas Totais</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div>
-                            <div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div>
-                            <div class="stat-label">Top Aluno</div>
-                        </div>
-                    </div>
+                    <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><div class="stat-value" id="analytics-alunos">0</div><div class="stat-label">Alunos Ativos</div></div></div>
+                    <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas Totais</div></div></div>
+                    <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div><div class="stat-label">Top Aluno</div></div></div>
                 </div>
             </div>
 
@@ -454,9 +475,9 @@
                 </div>
 
                 <div style="background: var(--success-light); padding: 20px; border-radius: 16px; border: 2px solid #bbf7d0; margin-top: 20px;">
-                    <label style="color: var(--success); margin-top:0;">🔑 Senha de Revisão Exclusiva para este item:</label>
+                    <label style="color: var(--success); margin-top:0;">🔑 Senha Exclusiva para este item:</label>
                     <div style="display:flex; gap:10px; margin-top:5px; flex-wrap:wrap;">
-                        <input type="text" id="prof-senha-modulo-especifica" style="margin-top:0; flex:1; min-width:200px;" placeholder="Crie uma senha única para trancar revisões">
+                        <input type="text" id="prof-senha-modulo-especifica" style="margin-top:0; flex:1; min-width:200px;" placeholder="Crie uma senha única">
                         <button type="button" class="btn-action" style="margin-top:0; background:var(--primary);" onclick="salvarSenhaModuloExclusivaBotao()">Gravar Senha</button>
                     </div>
                 </div>
@@ -472,6 +493,7 @@
 
     </div>
 
+    <!-- Navegação Inferior -->
     <div class="bottom-nav" id="nav-container" style="display:none;">
         <button class="bottom-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
         <button class="bottom-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
@@ -505,7 +527,6 @@
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-        // Variaveis de Estado
         let alunoLogado = ''; 
         let modulosLiberadosAluno = []; 
         let aulasConcluidasAluno = []; 
@@ -521,7 +542,6 @@
         let professorAutenticado = false;
         let modAlvoClicado = 0;
 
-        // Arrays Locais Secundários (Conquistas, Histórico, Favs)
         let favoritosAluno = JSON.parse(localStorage.getItem("favoritosPortal")) || [];
         let historicoAluno = JSON.parse(localStorage.getItem("historicoPortal")) || [];
         let conquistasAluno = JSON.parse(localStorage.getItem("conquistasPortal")) || [];
@@ -535,7 +555,6 @@
             document.getElementById('nome-aluno-display').innerText = `Olá, ${nomeVisivel}!`;
             document.getElementById('nav-container').style.display = 'flex'; 
             
-            // Carrega toda a vida do aluno na nuvem
             await carregarProgressoAlunoGlobal();
             
             mudarAba('estudante');
@@ -565,7 +584,6 @@
 
         async function salvarProgressoAlunoNuvemLocal(curso) {
             if(!bancoDados || !alunoLogado || !curso) return;
-            // Filtra os arrays globais apenas para este curso antes de salvar na linha do curso
             const modsCurso = modulosLiberadosAluno.filter(m => m.includes(`${curso}_`)).map(m => m.replace(`${curso}_`,''));
             const aulasCurso = aulasConcluidasAluno.filter(a => a.includes(`${curso}_`)).map(a => a.replace(`${curso}_`,''));
             try {
@@ -660,7 +678,7 @@
             card.id = "card-retomar-aula";
             card.style.borderLeft = "5px solid var(--success)";
             card.innerHTML = `<h2 style="margin-top:0;">▶ Continuar Estudando</h2><p>Você tem uma aula em andamento.</p><button class="btn-action" style="background:var(--success);" onclick="retomarUltimaAula()">Retomar Aula</button>`;
-            hero.insertBefore(card, hero.children[1]);
+            hero.insertBefore(card, hero.children[1]); // Insere abaixo do hero banner
         }
 
         function retomarUltimaAula() {
@@ -670,7 +688,6 @@
             cursoSelecionado = aula.curso;
             modSelecionado = aula.modulo;
             modAlvoClicado = parseInt(modSelecionado.replace('modulo_', ''));
-            // Simula entrada direta pois já estava liberado antes
             document.getElementById('estudante-cursos').style.display = 'none';
             avancarParaAulasModulo();
             buscarAulaNuvem(aula.aula);
@@ -758,7 +775,7 @@
             if (aba === 'professor') {
                 if (professorAutenticado) {
                     document.getElementById('view-professor').style.display = 'block';
-                    carregarAnalyticsProf(); // Atualiza painel gerencial
+                    carregarAnalyticsProf(); 
                 } else {
                     document.getElementById('input-senha-admin').value = '';
                     document.getElementById('view-professor-bloqueado').style.display = 'block';
@@ -784,9 +801,8 @@
                     document.getElementById('analytics-aulas').innerText = totalAulas;
                     
                     data.sort((a,b) => (b.aulas_concluidas?.length||0) - (a.aulas_concluidas?.length||0));
-                    if(data[0]) document.getElementById('analytics-ranking').innerText = data[0].nome_aluno;
+                    if(data[0]) document.getElementById('analytics-ranking').innerText = data[0].nome_aluno.toUpperCase();
                     
-                    // Renderiza Ranking List
                     const rankDiv = document.getElementById('ranking-alunos');
                     if(data.length > 0) {
                         rankDiv.innerHTML = data.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between; align-items:center;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas concluídas</span></div>`).join('');
@@ -1151,8 +1167,8 @@
                     const nCru = data.nome_aula ? data.nome_aula.split('|||')[0].trim() : "Atividade";
                     document.getElementById('titulo-aula-atual').innerText = nCru;
                     
-                    registrarHistorico(nCru); // Adiciona ao histórico
-                    salvarUltimaAula(); // Salva para continuação automática
+                    registrarHistorico(nCru); 
+                    salvarUltimaAula(); 
 
                     mostrarPasso();
                 } else showToast("Roteiro não configurado.", "warning");
@@ -1209,12 +1225,6 @@
 
         function voltarParaAulas() { document.getElementById('estudante-passos').style.display = 'none'; document.getElementById('estudante-aulas').style.display = 'block'; }
 
-    </script>
-    
-    <script>
-        if("serviceWorker" in navigator){
-            navigator.serviceWorker.register("sw.js").catch(err => console.log("SW não instalado localmente ainda."));
-        }
     </script>
 </body>
 </html>
