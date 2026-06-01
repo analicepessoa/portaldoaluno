@@ -79,6 +79,17 @@
         .historico-item strong { color:var(--primary); font-size: 1.1rem; }
         .resultado-busca { padding:15px; border:1px solid var(--primary); border-radius:12px; margin-top:10px; background: var(--primary-light); font-weight: bold; color: var(--primary-dark); }
 
+        #lista-cursos-principal { margin-top: 20px; margin-bottom: 30px; }
+        .course-card { display: flex; align-items: center; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .course-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.1); }
+        .course-card .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-right: 20px; flex-shrink: 0; }
+        .course-card.inf .icon-box { background: var(--primary-light); color: var(--primary); }
+        .course-card.sen .icon-box { background: #f3e8ff; color: #7c3aed; }
+        .course-card.ing .icon-box { background: var(--danger-light); color: var(--danger); }
+        .course-card.rep .icon-box { background: var(--warning-light); color: var(--warning); }
+        .course-card h3 { margin: 0 0 5px 0; font-size: 1.4rem; color: var(--text); }
+        .course-card p { margin: 0; color: var(--text-light); font-size: 1rem; }
+
         .module-list { display: flex; flex-direction: column; gap: 12px; }
         .mod-item { display: flex; align-items: center; background: white; padding: 16px 20px; border-radius: 16px; border: 2px solid var(--gray-light); cursor: pointer; transition: all 0.2s; }
         .mod-item:hover { border-color: var(--primary); background: var(--primary-light); }
@@ -90,6 +101,9 @@
         .mod-item.ativo { border-color: var(--primary); }
         .mod-item.ativo .mod-number { background: var(--primary); color: white; }
         .mod-item.ativo .mod-badge { background: var(--primary-light); color: var(--primary-dark); }
+        .mod-item.revendo { border-color: var(--success); }
+        .mod-item.revendo .mod-number { background: var(--success-light); color: var(--success); }
+        .mod-item.revendo .mod-badge { background: var(--success-light); color: var(--success); }
         .mod-item.bloqueado { opacity: 0.6; cursor: not-allowed; }
         .mod-item.bloqueado:hover { border-color: var(--gray-light); background: white; }
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
@@ -132,7 +146,6 @@
         .row-inputs { display: flex; gap: 15px; padding: 15px 20px; background: white; border-radius: 0 0 16px 16px; border-top: 1px solid var(--gray-light); flex-wrap: wrap; align-items: center; transition: background 0.3s; }
         .row-inputs > input, .row-inputs > select { flex: 1; margin: 0; min-width: 200px; }
         
-        /* GESTÃO DE ALUNOS - CHECKBOXES */
         .modulos-checkbox-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .modulos-checkbox-grid label { display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gray-light); cursor: pointer; font-size: 0.95rem; margin-top: 0; font-weight: normal; }
         .modulos-checkbox-grid input[type="checkbox"] { width: auto; margin: 0; }
@@ -181,13 +194,9 @@
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
                 <h2 style="color:var(--primary); margin-top:0;">Acesse seu Portal</h2>
                 <p style="color:var(--text-light); margin-bottom: 20px;">Insira os dados fornecidos pela professora.</p>
-                
                 <input type="text" id="input-nome-aluno" placeholder="Seu Nome (Ex: Gustavo)" style="text-align: center; font-size: 1.4rem; padding: 15px;">
                 <input type="password" id="input-senha-aluno-login" placeholder="Seu PIN (Ex: 1234)" style="text-align: center; font-size: 1.4rem; padding: 15px; letter-spacing: 5px;">
-                
                 <button class="btn-action" style="width: 100%; font-size:1.4rem; margin-top: 20px;" onclick="entrarComoAluno()">ENTRAR NAS AULAS</button>
-                
-                <!-- Botão discreto para a Professora -->
                 <button class="btn-action secondary" style="width: 100%; margin-top: 15px; background: transparent; color: var(--text-light); box-shadow: none;" onclick="mudarAba('professor')">👩‍🏫 Sou a Professora</button>
             </div>
         </section>
@@ -203,6 +212,27 @@
                     <p>Continue seus estudos e acompanhe sua evolução.</p>
                     <div style="margin-top:20px;">
                         <button class="btn-action" onclick="alternarModoEscuro()" style="background:#111827; box-shadow:none; padding:10px 20px; font-size:1rem;">🌙 Modo Escuro</button>
+                    </div>
+                </div>
+
+                <!-- LISTA DE CURSOS -->
+                <div id="lista-cursos-principal">
+                    <h2 style="margin-top:0;">📚 Meus Cursos</h2>
+                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica','Informática 5.0')">
+                        <div class="icon-box">💻</div>
+                        <div class="course-card-content"><h3>Informática 5.0</h3><p>Navegação, atalhos e IA</p></div>
+                    </div>
+                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior','Curso Sênior')">
+                        <div class="icon-box">👵</div>
+                        <div class="course-card-content"><h3>Curso Sênior</h3><p>Inclusão Digital sem complicação</p></div>
+                    </div>
+                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles','Inglês')">
+                        <div class="icon-box">🌎</div>
+                        <div class="course-card-content"><h3>Inglês</h3><p>Preparation, Basic & Intermediate</p></div>
+                    </div>
+                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao','Reposições')">
+                        <div class="icon-box">🔄</div>
+                        <div class="course-card-content"><h3>Reposições</h3><p>Fichas e atividades exclusivas</p></div>
                     </div>
                 </div>
 
@@ -235,8 +265,8 @@
                     <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
                 </div>
 
-                <!-- TRILHA DE APRENDIZADO (LISTA DE MÓDULOS) -->
-                <h2>📚 Minha Trilha de Aprendizado</h2>
+                <!-- TRILHA DE APRENDIZADO -->
+                <h2 id="titulo-trilha-dinamico" style="display:none;">📚 Minha Trilha de Aprendizado</h2>
                 <div class="module-list" id="lista-modulos-estudante"></div>
             </div>
 
@@ -280,18 +310,24 @@
                 <p>Painel de gestão pedagógica.</p>
                 <input type="password" id="input-senha-admin" style="text-align: center; font-size: 2rem; letter-spacing: 5px;" placeholder="***">
                 <button class="btn-action" style="background:var(--danger); width:100%; margin-top: 20px;" onclick="validarAcessoProfessor()">DESBLOQUEAR</button>
+                <button class="btn-action secondary" style="width: 100%; margin-top: 15px; background: transparent; color: var(--text-light); box-shadow: none;" onclick="mudarAba('estudante')">< Voltar</button>
             </div>
         </section>
 
         <!-- ==================== ÁREA DO PROFESSOR ==================== -->
         <section id="view-professor" class="view-section">
             
-            <!-- NOVA GESTÃO DE MATRÍCULAS -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <h2 style="margin:0;">Painel de Controle</h2>
+                <button class="btn-action secondary" style="margin:0; background:var(--text);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
+            </div>
+
+            <!-- GESTÃO DE MATRÍCULAS E EDIÇÃO -->
             <div class="card" style="border-left: 5px solid var(--primary);">
                 <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
-                <p>Cadastre novos alunos ou gerencie quais módulos estão destravados para eles.</p>
+                <p>Cadastre, edite ou gerencie quais módulos estão destravados.</p>
                 
-                <div class="row-inputs" style="background: var(--bg); padding: 15px; border-radius: 12px; border: none; margin-bottom: 20px;">
+                <div class="row-inputs" style="background: var(--bg); padding: 15px; border-radius: 12px; border: none; margin-bottom: 20px; align-items: stretch;">
                     <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome do Aluno (Ex: Gustavo)"></div>
                     <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="Criar PIN/Senha (Ex: 1234)"></div>
                     <div style="flex:1;">
@@ -302,7 +338,10 @@
                             <option value="reposicao">Reposição 🔄</option>
                         </select>
                     </div>
-                    <div><button class="btn-action" style="margin-top: 0; height: 100%;" onclick="matricularNovoAluno()">Matricular Aluno</button></div>
+                    <div style="display: flex; gap: 10px; flex-direction: column;">
+                        <button id="btn-salvar-aluno" class="btn-action" style="margin-top: 0; width: 100%;" onclick="matricularNovoAluno()">Matricular Aluno</button>
+                        <button id="btn-cancelar-edicao" class="btn-action secondary" style="margin-top: 0; width: 100%; display: none;" onclick="cancelarEdicaoAluno()">Cancelar Edição</button>
+                    </div>
                 </div>
 
                 <h3>Alunos Matriculados:</h3>
@@ -317,20 +356,6 @@
                     <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
                     <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div><div class="stat-label">Top Aluno</div></div></div>
                 </div>
-            </div>
-
-            <div class="card" style="border-left: 5px solid var(--warning);">
-                <h2 style="margin-top:0;">📢 Publicar Aviso</h2>
-                <input type="text" id="avisoTitulo" placeholder="Título do aviso (Ex: Feriado)">
-                <textarea id="avisoTexto" placeholder="Mensagem completa..." rows="3"></textarea>
-                <button class="btn-action" style="background:var(--warning);" onclick="salvarAviso()">Publicar Aviso</button>
-            </div>
-
-            <div class="card" style="border-left: 5px solid var(--success);">
-                <h2 style="margin-top:0;">📅 Adicionar à Agenda</h2>
-                <input type="date" id="agendaData">
-                <textarea id="agendaTexto" placeholder="Descrição da aula (Ex: Aula ao vivo de Excel)" rows="2"></textarea>
-                <button class="btn-action" style="background:var(--success);" onclick="salvarAgenda()">Agendar Aula</button>
             </div>
 
             <!-- EDITOR VISUAL -->
@@ -392,10 +417,8 @@
             setTimeout(() => { const tela = document.getElementById("loading-screen"); if(tela) tela.style.opacity = '0'; setTimeout(()=> {if(tela) tela.remove();}, 400); }, 800);
             inicializarPainel();
             carregarTema();
-            carregarAvisos();
         });
 
-        // --- BANCO DE DADOS SUPABASE ---
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -413,13 +436,14 @@
         let nomesCustomizados = {};
         const nomesModulosIngles = ["Preparation", "Basic 01 - Mid Term", "Basic 01 - End Term", "Basic 02 - Mid Term", "Basic 02 - End Term", "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"];
         let professorAutenticado = false;
-        let adminPass = "admin123"; // Fallback
+        let adminPass = "admin123"; 
         let modAlvoClicado = 0;
+        let alunoEmEdicaoId = null; // Variável para controlar a edição
 
         let historicoAluno = JSON.parse(localStorage.getItem("historicoPortal")) || [];
         let conquistasAluno = JSON.parse(localStorage.getItem("conquistasPortal")) || [];
 
-        // --- NOVO LOGIN SEGURO (NOME + PIN) ---
+        // --- LOGIN SEGURO (NOME + PIN) ---
         async function entrarComoAluno() {
             const nomeDigitado = document.getElementById('input-nome-aluno').value.trim().toLowerCase();
             const senhaDigitada = document.getElementById('input-senha-aluno-login').value.trim();
@@ -446,7 +470,9 @@
                 document.getElementById('nav-container').style.display = 'flex'; 
                 
                 mudarAba('estudante');
-                renderizarModulosEstudante(); // Vai direto para os módulos do curso dele!
+                document.getElementById('lista-cursos-principal').style.display = 'none'; // Esconde a lista de cursos gerais
+                document.getElementById('titulo-trilha-dinamico').style.display = 'block'; // Mostra o título da trilha
+                renderizarModulosEstudante(); 
                 atualizarDashboard();
                 renderizarConquistas();
                 renderizarHistorico();
@@ -457,8 +483,30 @@
             } catch(e) { showToast("Erro de conexão.", "error"); }
         }
 
+        // --- MODO TESTE DA PROFESSORA ---
+        function entrarModoTeste() {
+            alunoLogado = "professora_teste";
+            alunoLogadoDados = { id: 'teste_admin' };
+            // Libera todos os módulos para ela poder navegar livremente em qualquer curso
+            modulosLiberadosAluno = [];
+            ['informatica', 'senior', 'ingles', 'reposicao'].forEach(c => {
+                for(let i=1; i<=10; i++) modulosLiberadosAluno.push(`${c}_${i}`);
+            });
+            aulasConcluidasAluno = [];
+            
+            document.getElementById('nome-aluno-display').innerText = "Modo de Teste 👁️";
+            document.getElementById('badge-curso-aluno').innerText = "Acesso Total Liberado";
+            document.getElementById('nav-container').style.display = 'flex';
+            
+            showToast("Modo Teste Ativado! Você tem acesso a tudo.", "success");
+            mudarAba('estudante');
+            document.getElementById('lista-cursos-principal').style.display = 'block'; // Professora vê todos os cursos para testar
+            document.getElementById('titulo-trilha-dinamico').style.display = 'none';
+        }
+
         async function salvarProgressoAlunoNuvem() {
-            if(!bancoDados || !alunoLogadoDados) return;
+            // Se for a professora testando, não salva nada no banco para não sujar os dados!
+            if(!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
             try {
                 await bancoDados.from('alunos_matriculados').update({
                     modulos_liberados: modulosLiberadosAluno,
@@ -488,7 +536,8 @@
             if(total >= 1 && !conquistasAluno.includes("🎉 Primeira Aula")) { conquistasAluno.push("🎉 Primeira Aula"); ganhouNova=true; }
             if(total >= 5 && !conquistasAluno.includes("🔥 Estudando Sempre")) { conquistasAluno.push("🔥 Estudando Sempre"); ganhouNova=true; }
             if(total >= 10 && !conquistasAluno.includes("🏆 Aluno Dedicado")) { conquistasAluno.push("🏆 Aluno Dedicado"); ganhouNova=true; }
-            if(ganhouNova){
+            if(total >= 25 && !conquistasAluno.includes("🚀 Mestre da Plataforma")) { conquistasAluno.push("🚀 Mestre da Plataforma"); ganhouNova=true; }
+            if(ganhouNova && alunoLogado !== 'professora_teste'){
                 localStorage.setItem("conquistasPortal", JSON.stringify(conquistasAluno));
                 renderizarConquistas();
                 showToast("Nova Conquista Desbloqueada! 🏆", "success");
@@ -496,6 +545,7 @@
         }
 
         function registrarHistorico(nome) {
+            if(alunoLogado === 'professora_teste') return;
             historicoAluno.unshift({ titulo: nome, data: new Date().toLocaleString() });
             historicoAluno = historicoAluno.slice(0,5);
             localStorage.setItem("historicoPortal", JSON.stringify(historicoAluno));
@@ -508,17 +558,15 @@
             else div.innerHTML = historicoAluno.map(item => `<div class="historico-item"><strong>${item.titulo}</strong><div>${item.data}</div></div>`).join('');
         }
 
-        // --- CONTINUAÇÃO E MODO ESCURO ---
-        function alternarModoEscuro() {
-            document.body.classList.toggle("dark-mode");
-            localStorage.setItem("temaPortal", document.body.classList.contains("dark-mode"));
-        }
-
+        function alternarModoEscuro() { document.body.classList.toggle("dark-mode"); localStorage.setItem("temaPortal", document.body.classList.contains("dark-mode")); }
         function carregarTema() { if(localStorage.getItem("temaPortal") === "true") document.body.classList.add("dark-mode"); }
 
-        function salvarUltimaAula() { localStorage.setItem("ultimaAulaPortal", JSON.stringify({ curso: cursoSelecionado, modulo: modSelecionado, aula: aulaSelecionada })); }
+        function salvarUltimaAula() { 
+            if(alunoLogado !== 'professora_teste') localStorage.setItem("ultimaAulaPortal", JSON.stringify({ curso: cursoSelecionado, modulo: modSelecionado, aula: aulaSelecionada })); 
+        }
 
         function verificarUltimaAula() {
+            if(alunoLogado === 'professora_teste') return;
             const dados = localStorage.getItem("ultimaAulaPortal");
             if(!dados) return;
             if(document.getElementById('card-retomar-aula')) return;
@@ -539,36 +587,6 @@
             document.getElementById('estudante-modulos').style.display = 'none';
             avancarParaAulasModulo();
             buscarAulaNuvem(aula.aula);
-        }
-
-        function buscarConteudo() { /* Desativado nesta view simplificada para não poluir o painel do aluno */ }
-
-        // --- SISTEMA DE AVISOS E AGENDA ---
-        async function salvarAviso() {
-            if(!bancoDados) return;
-            const t = document.getElementById("avisoTitulo").value.trim();
-            const m = document.getElementById("avisoTexto").value.trim();
-            if(!t || !m) return;
-            await bancoDados.from("avisos").insert({ titulo: t, mensagem: m });
-            showToast("Aviso publicado!", "success");
-            document.getElementById("avisoTitulo").value = ''; document.getElementById("avisoTexto").value = '';
-        }
-
-        async function carregarAvisos() {
-            if(!bancoDados) return;
-            const { data } = await bancoDados.from("avisos").select("*").order("id", {ascending:false});
-            const div = document.getElementById("avisosPortal");
-            if(!data || !data.length) div.innerHTML = "<p style='color:var(--text-light)'>Nenhum aviso no momento.</p>";
-            else div.innerHTML = data.map(a => `<div class="historico-item" style="border-left:4px solid var(--warning);"><strong>${a.titulo}</strong><p style="margin:5px 0 0 0;">${a.mensagem}</p></div>`).join('');
-        }
-
-        async function salvarAgenda() {
-            if(!bancoDados) return;
-            const d = document.getElementById("agendaData").value;
-            const desc = document.getElementById("agendaTexto").value.trim();
-            if(!d || !desc) return;
-            await bancoDados.from("agenda").insert({ data_aula: d, descricao: desc });
-            showToast("Aula agendada!", "success");
         }
 
         // --- AREA DA PROFESSORA ---
@@ -596,11 +614,10 @@
                 document.getElementById('estudante-modulos').style.display = 'block';
                 document.getElementById('estudante-aulas').style.display = 'none';
                 document.getElementById('estudante-passos').style.display = 'none';
-                renderizarModulosEstudante();
             }
         }
 
-        // --- GESTÃO DE ALUNOS (PROFESSORA) ---
+        // --- GESTÃO DE ALUNOS (CRUD) ---
         async function matricularNovoAluno() {
             if(!bancoDados) return;
             const nome = document.getElementById('novo-aluno-nome').value.trim().toLowerCase();
@@ -609,27 +626,62 @@
             
             if(!nome || !senha) { showToast("Preencha o Nome e o PIN!", "warning"); return; }
             
-            const idUnico = `${nome}_${Date.now()}`;
             try {
-                await bancoDados.from('alunos_matriculados').insert({
-                    id: idUnico, nome_aluno: nome, senha: senha, curso: curso
-                });
-                showToast(`Aluno ${nome} matriculado!`, "success");
-                document.getElementById('novo-aluno-nome').value = '';
-                document.getElementById('novo-aluno-senha').value = '';
+                if (alunoEmEdicaoId) {
+                    // MODO EDIÇÃO
+                    await bancoDados.from('alunos_matriculados').update({
+                        nome_aluno: nome, senha: senha, curso: curso
+                    }).eq('id', alunoEmEdicaoId);
+                    showToast(`Dados de ${nome} atualizados!`, "success");
+                    cancelarEdicaoAluno();
+                } else {
+                    // MODO CRIAÇÃO (NOVO)
+                    const idUnico = `${nome}_${Date.now()}`;
+                    await bancoDados.from('alunos_matriculados').insert({
+                        id: idUnico, nome_aluno: nome, senha: senha, curso: curso
+                    });
+                    showToast(`Aluno ${nome} matriculado!`, "success");
+                    document.getElementById('novo-aluno-nome').value = '';
+                    document.getElementById('novo-aluno-senha').value = '';
+                }
                 carregarGestaoAlunosProf();
-            } catch(e) { showToast("Erro ao matricular", "error"); }
+            } catch(e) { showToast("Erro ao salvar.", "error"); }
+        }
+
+        function prepararEdicaoAluno(id, nome, senha, curso) {
+            alunoEmEdicaoId = id;
+            document.getElementById('novo-aluno-nome').value = nome;
+            document.getElementById('novo-aluno-senha').value = senha;
+            document.getElementById('novo-aluno-curso').value = curso;
+            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Alterações";
+            document.getElementById('btn-cancelar-edicao').style.display = "block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoAluno() {
+            alunoEmEdicaoId = null;
+            document.getElementById('novo-aluno-nome').value = '';
+            document.getElementById('novo-aluno-senha').value = '';
+            document.getElementById('btn-salvar-aluno').innerText = "Matricular Aluno";
+            document.getElementById('btn-cancelar-edicao').style.display = "none";
+        }
+
+        async function excluirAluno(id, nome) {
+            if(!confirm(`Tem certeza que deseja EXCLUIR o(a) aluno(a) ${nome.toUpperCase()}? Todo o histórico de acesso dele(a) será apagado!`)) return;
+            try {
+                await bancoDados.from('alunos_matriculados').delete().eq('id', id);
+                showToast("Aluno excluído com sucesso.", "success");
+                carregarGestaoAlunosProf();
+            } catch(e) { showToast("Erro ao excluir.", "error"); }
         }
 
         async function carregarGestaoAlunosProf() {
             if(!bancoDados) return;
             try {
                 const { data } = await bancoDados.from('alunos_matriculados').select('*').order('nome_aluno', {ascending: true});
-                
                 const listDiv = document.getElementById('lista-gestao-alunos');
                 if(!data || data.length === 0) { listDiv.innerHTML = "<p>Nenhum aluno matriculado ainda.</p>"; return; }
                 
-                // Analytics
                 document.getElementById('analytics-alunos').innerText = data.length;
                 let totalAulas = 0; data.forEach(d => { if(d.aulas_concluidas) totalAulas += d.aulas_concluidas.length; });
                 document.getElementById('analytics-aulas').innerText = totalAulas;
@@ -640,45 +692,44 @@
                 const rankDiv = document.getElementById('ranking-alunos');
                 rankDiv.innerHTML = sortedData.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas</span></div>`).join('');
 
-                // Renderiza os Cards de Controle
                 listDiv.innerHTML = data.map(aluno => {
                     let maxMod = aluno.curso === 'ingles' ? 9 : 10;
                     let checkboxesHTML = '';
                     let liberados = aluno.modulos_liberados || [];
-                    
                     for(let m=1; m<=maxMod; m++) {
-                        let isChecked = liberados.includes(String(m)) ? 'checked' : '';
+                        let chaveLib = `${aluno.curso}_${m}`;
+                        let isChecked = liberados.includes(chaveLib) ? 'checked' : '';
                         let labelMod = aluno.curso === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
-                        checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${m}', this.checked)" ${isChecked}> ${labelMod}</label>`;
+                        checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${chaveLib}', this.checked)" ${isChecked}> ${labelMod}</label>`;
                     }
-                    
                     const labelsCursos = { informatica: "Informática", senior: "Sênior", ingles: "Inglês", reposicao: "Reposição" };
                     return `<div class="aluno-gerenciamento-card">
-                                <h4>${aluno.nome_aluno.toUpperCase()} <span class="curso-tag">${labelsCursos[aluno.curso]}</span></h4>
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                    <h4>${aluno.nome_aluno.toUpperCase()} <span class="curso-tag">${labelsCursos[aluno.curso]}</span></h4>
+                                    <div style="display:flex; gap:10px;">
+                                        <button style="background:transparent; border:none; cursor:pointer; font-size:1.4rem;" onclick="prepararEdicaoAluno('${aluno.id}', '${aluno.nome_aluno}', '${aluno.senha}', '${aluno.curso}')" title="Editar">✏️</button>
+                                        <button style="background:transparent; border:none; cursor:pointer; font-size:1.4rem;" onclick="excluirAluno('${aluno.id}', '${aluno.nome_aluno}')" title="Excluir">🗑️</button>
+                                    </div>
+                                </div>
                                 <p style="margin:0 0 10px 0; font-size:0.9rem; color:var(--text-light);">PIN: ${aluno.senha}</p>
                                 <div class="modulos-checkbox-grid">${checkboxesHTML}</div>
                             </div>`;
                 }).join('');
-
             } catch(e){}
         }
 
-        async function toggleModuloAluno(alunoId, modNum, isLiberar) {
+        async function toggleModuloAluno(alunoId, chaveLib, isLiberar) {
             if(!bancoDados) return;
             try {
                 const { data } = await bancoDados.from('alunos_matriculados').select('modulos_liberados').eq('id', alunoId).single();
                 let liberados = data.modulos_liberados || [];
-                
-                if(isLiberar && !liberados.includes(modNum)) liberados.push(modNum);
-                else if(!isLiberar) liberados = liberados.filter(m => m !== modNum);
-                
+                if(isLiberar && !liberados.includes(chaveLib)) liberados.push(chaveLib);
+                else if(!isLiberar) liberados = liberados.filter(m => m !== chaveLib);
                 await bancoDados.from('alunos_matriculados').update({ modulos_liberados: liberados }).eq('id', alunoId);
-                showToast("Acesso atualizado!", "success");
             } catch(e) {}
         }
 
         // --- EDITOR DA PROFESSORA ---
-        function preencherSelectsProf() {} // Limpado pois removemos as senhas antigas
         function atualizarLabelsEditor() {
             const c = document.getElementById('prof-curso').value;
             const selectMod = document.getElementById('prof-modulo');
@@ -689,16 +740,9 @@
                 if (c === 'ingles') nomeOpt = nomesModulosIngles[m-1];
                 selectMod.innerHTML += `<option value="modulo_${m}">${nomeOpt}</option>`;
             }
-            if (c === 'reposicao') {
-                document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno/Ficha:';
-                document.getElementById('prof-nome-aula').placeholder = 'Ex: Prática de Word';
-            } else if (c === 'ingles') {
-                document.getElementById('label-nome-modulo').innerText = 'Nome do Nível:';
-                document.getElementById('prof-nome-aula').placeholder = 'Ex: Lesson 01';
-            } else {
-                document.getElementById('label-nome-modulo').innerText = 'Nome do Módulo:';
-                document.getElementById('prof-nome-aula').placeholder = 'Ex: Aula 01';
-            }
+            if (c === 'reposicao') { document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno/Ficha:'; document.getElementById('prof-nome-aula').placeholder = 'Ex: Prática de Word'; } 
+            else if (c === 'ingles') { document.getElementById('label-nome-modulo').innerText = 'Nome do Nível:'; document.getElementById('prof-nome-aula').placeholder = 'Ex: Lesson 01'; } 
+            else { document.getElementById('label-nome-modulo').innerText = 'Nome do Módulo:'; document.getElementById('prof-nome-aula').placeholder = 'Ex: Aula 01 - Pastas'; }
             atualizarSelectAulasProf();
             carregarTextoExistente();
         }
@@ -717,10 +761,7 @@
         function inicializarPainel() { atualizarLabelsEditor(); if (bancoDados) { baixarNomesCustomizados(); baixarSenhasAdmin(); } }
 
         async function baixarSenhasAdmin() {
-            try {
-                const { data } = await bancoDados.from('config_cursos').select('senha').eq('id', 'admin').maybeSingle();
-                if(data) adminPass = data.senha;
-            } catch(e){}
+            try { const { data } = await bancoDados.from('config_cursos').select('senha').eq('id', 'admin').maybeSingle(); if(data) adminPass = data.senha; } catch(e){}
         }
 
         function validarAcessoProfessor() {
@@ -823,12 +864,18 @@
         }
 
         // --- NAVEGAÇÃO E AULAS DO ESTUDANTE ---
+        function solicitarSenhaCurso(idCurso, titulo) {
+            cursoSelecionado = idCurso;
+            document.getElementById('estudante-cursos').style.display = 'none';
+            document.getElementById('titulo-trilha-dinamico').style.display = 'block';
+            document.getElementById('estudante-modulos').style.display = 'block';
+            renderizarModulosEstudante();
+        }
+
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
-            
             let maxMod = cursoSelecionado === 'ingles' ? 9 : 10;
-
             for (let m = 1; m <= maxMod; m++) {
                 let nExibir = cursoSelecionado === 'reposicao' ? `Ficha ${String(m).padStart(2, '0')}` : `Módulo ${String(m).padStart(2, '0')}`;
                 if(cursoSelecionado === 'ingles') nExibir = nomesModulosIngles[m-1];
@@ -837,10 +884,10 @@
                 let cache = nomesCustomizados[`${cursoSelecionado}_modulo_${m}_aula_1`];
                 if(cache && cache.modulo) { nExibir = cache.modulo; desc = "Roteiro personalizado"; }
 
-                const jaLiberado = modulosLiberadosAluno.includes(String(m));
+                const chaveLiberado = `${cursoSelecionado}_${m}`;
+                const jaLiberado = modulosLiberadosAluno.includes(chaveLiberado);
                 let classes = "mod-item", badge = "", numBg = String(m).padStart(2, '0');
 
-                // Agora só tem DUAS cores: Liberado (Verde) e Bloqueado (Cinza). Você controla o que é ativo.
                 if (jaLiberado) { classes += " revendo"; badge = "⭐ Acessar"; }
                 else { classes += " bloqueado"; badge = "🔒 Aguarde"; }
 
@@ -850,13 +897,10 @@
         }
 
         function tentarAcessarModulo(mNum, nome) {
-            const jaLib = modulosLiberadosAluno.includes(String(mNum));
-            if (jaLib) {
-                modAlvoClicado = mNum;
-                avancarParaAulasModulo();
-            } else { 
-                showToast("Este módulo está trancado. Peça para a professora liberar!", "warning"); 
-            }
+            const chaveLiberado = `${cursoSelecionado}_${mNum}`;
+            const jaLib = modulosLiberadosAluno.includes(chaveLiberado);
+            if (jaLib) { modAlvoClicado = mNum; avancarParaAulasModulo(); } 
+            else { showToast("Este módulo está trancado. Peça para a professora liberar!", "warning"); }
         }
 
         function avancarParaAulasModulo() {
@@ -878,7 +922,7 @@
                 let nAula = cursoSelecionado === 'ingles' ? `Lesson ${String(a).padStart(2, '0')}` : `Atividade 0${a}`;
                 if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`]) nAula = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`].aula;
                 
-                const aulaIdCompleto = `aula_${a}`; // simplificado para UI
+                const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
                 const jaConcluida = aulasConcluidasAluno.includes(aulaIdCompleto);
                 const badgeExtra = jaConcluida ? `<div class="mod-badge" style="background:var(--success-light); color:var(--success);">✅ Concluída</div>` : `<div class="mod-badge" style="background:transparent;">▶</div>`;
                 
@@ -886,6 +930,7 @@
             }
         }
 
+        function voltarParaCursos() { document.getElementById('estudante-modulos').style.display = 'none'; document.getElementById('estudante-cursos').style.display = 'block'; document.getElementById('titulo-trilha-dinamico').style.display = 'none'; }
         function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-modulos').style.display = 'block'; }
 
         async function buscarAulaNuvem(aId) {
@@ -939,16 +984,20 @@
         function mudarPasso(direcao) {
             passoAtual += direcao;
             if (passoAtual >= passosAulaAtual.length) {
-                if (!aulasConcluidasAluno.includes(aulaSelecionada)) {
-                    aulasConcluidasAluno.push(aulaSelecionada);
+                
+                const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
+                if (!aulasConcluidasAluno.includes(aulaIdCompleto)) {
+                    aulasConcluidasAluno.push(aulaIdCompleto);
                     salvarProgressoAlunoNuvem();
                 }
+
                 verificarConquistas();
                 atualizarDashboard();
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
                 avancarParaAulasModulo(); 
                 document.getElementById('estudante-passos').style.display = 'none';
                 document.getElementById('estudante-aulas').style.display = 'block';
+
             } else mostrarPasso();
         }
 
