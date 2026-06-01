@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estudante - Informática & Idiomas</title>
     
-    <!-- PWA (Aplicativo) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
 
-    <!-- Bibliotecas: Supabase e o Editor Visual (Quill.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -33,7 +31,6 @@
 
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
 
-        /* --- TOAST NOTIFICATIONS --- */
         .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; color: var(--text); padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; font-weight: bold; animation: slideIn 0.3s ease-out forwards; border-left: 6px solid var(--primary); font-size: 1.1rem; }
         .toast.success { border-left-color: var(--success); }
@@ -42,12 +39,10 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        /* --- LOADING SCREEN --- */
         #loading-screen { position:fixed; inset:0; background:white; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.4s; }
         .loader { width:70px; height:70px; border:6px solid #ddd; border-top:6px solid var(--primary); border-radius:50%; animation:girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 100%{ transform:rotate(360deg); } }
 
-        /* --- CABEÇALHO SUPERIOR --- */
         header { background-color: white; color: var(--primary); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; transition: background 0.3s, color 0.3s; }
         header h1 { margin: 0; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
@@ -56,7 +51,6 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- COMPONENTES BÁSICOS --- */
         .card { background: white; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--gray-light); margin-bottom: 25px; padding: 30px; transition: background 0.3s, border-color 0.3s; }
         .btn-action { background-color: var(--primary); color: white; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
         .btn-action:hover { opacity: 0.9; }
@@ -65,7 +59,6 @@
         input:focus, select:focus { border-color: var(--primary); outline: none; }
         h2 { font-size: 2rem; color: var(--primary); margin-top: 0; font-weight: 700; transition: color 0.3s; }
 
-        /* --- DASHBOARD 2.0 & HERO --- */
         .hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 24px; padding: 40px 30px; color: white; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2); }
         .hero .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(5px); }
         .hero h2 { margin: 0 0 10px 0; font-size: 2.2rem; font-weight: 800; text-transform: capitalize; color: white; }
@@ -86,19 +79,6 @@
         .historico-item strong { color:var(--primary); font-size: 1.1rem; }
         .resultado-busca { padding:15px; border:1px solid var(--primary); border-radius:12px; margin-top:10px; background: var(--primary-light); font-weight: bold; color: var(--primary-dark); }
 
-        /* --- CARDS DE CURSO --- */
-        #lista-cursos-principal { margin-top: 20px; margin-bottom: 30px; }
-        .course-card { display: flex; align-items: center; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 15px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-        .course-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.1); }
-        .course-card .icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-right: 20px; flex-shrink: 0; }
-        .course-card.inf .icon-box { background: var(--primary-light); color: var(--primary); }
-        .course-card.sen .icon-box { background: #f3e8ff; color: #7c3aed; }
-        .course-card.ing .icon-box { background: var(--danger-light); color: var(--danger); }
-        .course-card.rep .icon-box { background: var(--warning-light); color: var(--warning); }
-        .course-card h3 { margin: 0 0 5px 0; font-size: 1.4rem; color: var(--text); }
-        .course-card p { margin: 0; color: var(--text-light); font-size: 1rem; }
-
-        /* --- MÓDULOS E AULAS --- */
         .module-list { display: flex; flex-direction: column; gap: 12px; }
         .mod-item { display: flex; align-items: center; background: white; padding: 16px 20px; border-radius: 16px; border: 2px solid var(--gray-light); cursor: pointer; transition: all 0.2s; }
         .mod-item:hover { border-color: var(--primary); background: var(--primary-light); }
@@ -110,46 +90,23 @@
         .mod-item.ativo { border-color: var(--primary); }
         .mod-item.ativo .mod-number { background: var(--primary); color: white; }
         .mod-item.ativo .mod-badge { background: var(--primary-light); color: var(--primary-dark); }
-        .mod-item.revendo { border-color: var(--success); }
-        .mod-item.revendo .mod-number { background: var(--success-light); color: var(--success); }
-        .mod-item.revendo .mod-badge { background: var(--success-light); color: var(--success); }
         .mod-item.bloqueado { opacity: 0.6; cursor: not-allowed; }
         .mod-item.bloqueado:hover { border-color: var(--gray-light); background: white; }
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
         .mod-item.bloqueado .mod-badge { background: var(--gray-light); color: var(--text-light); }
 
-        /* --- VISUALIZADOR DA AULA E PROGRESSO --- */
         .progress-wrapper { background: white; padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--gray-light); }
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--text-light); }
         .progress-container { width: 100%; background-color: var(--gray-light); border-radius: 10px; height: 12px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background: var(--success); transition: width 0.4s ease; border-radius: 10px; }
         
-        /* 🛡️ CADEADO DE LAYOUT: CAIXA FIXA PARA O ALUNO 🛡️ */
-        .step-viewer-card { 
-            display: flex; 
-            flex-direction: column; 
-            height: 65vh; /* Altura fixa garantida */
-            min-height: 450px; 
-            padding: 25px; 
-            overflow: hidden; /* Impede a caixa de estourar */
-        }
-        .step-scroll-area { 
-            flex: 1 1 auto; /* Cresce e encolhe respeitando o pai */
-            overflow-y: auto; 
-            padding-right: 15px; 
-            margin-bottom: 15px; 
-            min-height: 0; /* O segredo para não estourar o flexbox! */
-        }
+        .step-viewer-card { display: flex; flex-direction: column; height: 65vh; min-height: 450px; padding: 25px; overflow: hidden; }
+        .step-scroll-area { flex: 1 1 auto; overflow-y: auto; padding-right: 15px; margin-bottom: 15px; min-height: 0; }
         .step-scroll-area::-webkit-scrollbar { width: 8px; }
         .step-scroll-area::-webkit-scrollbar-track { background: var(--gray-light); border-radius: 4px; }
         .step-scroll-area::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
         
-        .nav-steps { 
-            display: flex; 
-            gap: 15px; 
-            margin-top: 0; 
-            flex-shrink: 0; /* Impede os botões de serem esmagados e mantém eles ancorados na base */
-        }
+        .nav-steps { display: flex; gap: 15px; margin-top: 0; flex-shrink: 0; }
         .btn-step { flex: 1; padding: 20px; font-size: 1.3rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s; }
         .btn-step:active { transform: scale(0.98); }
 
@@ -161,13 +118,11 @@
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
         .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
 
-        /* --- NAVEGAÇÃO INFERIOR --- */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--gray-light); transition: background 0.3s; }
         .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.85rem; font-weight: bold; cursor: pointer; background: none; border: none; }
         .bottom-nav-item.active { color: var(--primary); }
         .bottom-nav-item i { font-size: 1.6rem; font-style: normal; }
 
-        /* --- EDITOR VISUAL QUILL --- */
         #editor-passos-container { max-height: 55vh; overflow-y: auto; background: #f8fafc; padding: 15px; border-radius: 16px; border: 2px solid #cbd5e1; margin-bottom: 20px; transition: background 0.3s; }
         .step-editor-item { background: white; border-radius: 16px; margin-bottom: 25px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.02); border: 1px solid var(--gray-light); display: flex; flex-direction: column; transition: background 0.3s; }
         .step-editor-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; border-radius: 16px 16px 0 0; border-bottom: 1px solid var(--gray-light); transition: background 0.3s; }
@@ -177,12 +132,18 @@
         .row-inputs { display: flex; gap: 15px; padding: 15px 20px; background: white; border-radius: 0 0 16px 16px; border-top: 1px solid var(--gray-light); flex-wrap: wrap; align-items: center; transition: background 0.3s; }
         .row-inputs > input, .row-inputs > select { flex: 1; margin: 0; min-width: 200px; }
         
-        /* =====================
-           DARK MODE (MODO ESCURO)
-        ===================== */
+        /* GESTÃO DE ALUNOS - CHECKBOXES */
+        .modulos-checkbox-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .modulos-checkbox-grid label { display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gray-light); cursor: pointer; font-size: 0.95rem; margin-top: 0; font-weight: normal; }
+        .modulos-checkbox-grid input[type="checkbox"] { width: auto; margin: 0; }
+        .aluno-gerenciamento-card { border: 1px solid var(--gray-light); padding: 15px; border-radius: 16px; margin-bottom: 15px; background: white; }
+        .aluno-gerenciamento-card h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.3rem; display: flex; justify-content: space-between; }
+        .aluno-gerenciamento-card .curso-tag { background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+
+        /* MODO ESCURO */
         body.dark-mode { background:#0f172a; color:#f8fafc; }
         body.dark-mode header, body.dark-mode #loading-screen { background:#1e293b; color:white; border-color:#334155; }
-        body.dark-mode .card, body.dark-mode .course-card, body.dark-mode .mod-item, body.dark-mode .progress-wrapper, body.dark-mode .historico-item { background:#1e293b; color:white; border-color:#334155; }
+        body.dark-mode .card, body.dark-mode .mod-item, body.dark-mode .progress-wrapper, body.dark-mode .historico-item, body.dark-mode .aluno-gerenciamento-card { background:#1e293b; color:white; border-color:#334155; }
         body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4 { color:white; }
         body.dark-mode p, body.dark-mode label, body.dark-mode .stat-label { color:#cbd5e1; }
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background:#0f172a; color:white; border-color:#475569; }
@@ -196,6 +157,7 @@
         body.dark-mode .ql-stroke { stroke: #cbd5e1; }
         body.dark-mode .ql-fill { fill: #cbd5e1; }
         body.dark-mode .ql-picker { color: #cbd5e1; }
+        body.dark-mode .modulos-checkbox-grid label { background: #0f172a; border-color: #475569; }
     </style>
 </head>
 <body>
@@ -213,49 +175,29 @@
 
     <div class="container">
 
-        <!-- ==================== LOGIN SIMPLES DO ALUNO ==================== -->
+        <!-- ==================== LOGIN COM PIN DO ALUNO ==================== -->
         <section id="view-login" class="view-section active" style="text-align: center;">
-            <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--primary);">
+            <div class="card" style="max-width: 450px; margin: 40px auto; border: 2px solid var(--primary);">
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
-                <h2 style="color:var(--primary); margin-top:0;">Qual é o seu nome?</h2>
-                <p style="color:var(--text-light); margin-bottom: 20px;">Digite seu nome para acessar seu painel de progresso.</p>
-                <input type="text" id="input-nome-aluno" placeholder="Ex: Gustavo" style="text-align: center; font-size: 1.5rem; padding: 15px;">
-                <button class="btn-action" style="width: 100%; font-size:1.4rem;" onclick="entrarComoAluno()">COMEÇAR A ESTUDAR</button>
+                <h2 style="color:var(--primary); margin-top:0;">Acesse seu Portal</h2>
+                <p style="color:var(--text-light); margin-bottom: 20px;">Insira os dados fornecidos pela professora.</p>
+                <input type="text" id="input-nome-aluno" placeholder="Seu Nome (Ex: Gustavo)" style="text-align: center; font-size: 1.4rem; padding: 15px;">
+                <input type="password" id="input-senha-aluno-login" placeholder="Seu PIN (Ex: 1234)" style="text-align: center; font-size: 1.4rem; padding: 15px; letter-spacing: 5px;">
+                <button class="btn-action" style="width: 100%; font-size:1.4rem; margin-top: 20px;" onclick="entrarComoAluno()">ENTRAR NAS AULAS</button>
             </div>
         </section>
 
         <!-- ==================== ÁREA DO ESTUDANTE ==================== -->
         <section id="view-estudante" class="view-section">
             
-            <div id="estudante-cursos">
+            <div id="estudante-modulos">
                 <!-- HERO -->
                 <div class="hero">
-                    <div class="badge">Portal Educacional 2.0</div>
+                    <div class="badge" id="badge-curso-aluno">Portal Educacional 2.0</div>
                     <h2 id="nome-aluno-display">Bem-vindo(a)!</h2>
                     <p>Continue seus estudos e acompanhe sua evolução.</p>
                     <div style="margin-top:20px;">
                         <button class="btn-action" onclick="alternarModoEscuro()" style="background:#111827; box-shadow:none; padding:10px 20px; font-size:1rem;">🌙 Modo Escuro</button>
-                    </div>
-                </div>
-
-                <!-- 📚 LISTA DE CURSOS AGORA APARECE PRIMEIRO 📚 -->
-                <div id="lista-cursos-principal">
-                    <h2 style="margin-top:0;">📚 Meus Cursos</h2>
-                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica','Informática 5.0')">
-                        <div class="icon-box">💻</div>
-                        <div class="course-card-content"><h3>Informática 5.0</h3><p>Navegação, atalhos e IA</p></div>
-                    </div>
-                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior','Curso Sênior')">
-                        <div class="icon-box">👵</div>
-                        <div class="course-card-content"><h3>Curso Sênior</h3><p>Inclusão Digital sem complicação</p></div>
-                    </div>
-                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles','Inglês')">
-                        <div class="icon-box">🌎</div>
-                        <div class="course-card-content"><h3>Inglês</h3><p>Preparation, Basic & Intermediate</p></div>
-                    </div>
-                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao','Reposições')">
-                        <div class="icon-box">🔄</div>
-                        <div class="course-card-content"><h3>Reposições</h3><p>Fichas e atividades exclusivas</p></div>
                     </div>
                 </div>
 
@@ -265,94 +207,31 @@
                     <div class="dashboard-grid">
                         <div class="stat-card">
                             <div class="stat-icon">🎓</div>
-                            <div>
-                                <div class="stat-value" id="dash-aulas">0</div>
-                                <div class="stat-label">Aulas Concluídas</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⭐</div>
-                            <div>
-                                <div class="stat-value" id="dash-favoritos">0</div>
-                                <div class="stat-label">Favoritos</div>
-                            </div>
+                            <div><div class="stat-value" id="dash-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">🏆</div>
-                            <div>
-                                <div class="stat-value" id="dash-conquistas">0</div>
-                                <div class="stat-label">Conquistas</div>
-                            </div>
+                            <div><div class="stat-value" id="dash-conquistas">0</div><div class="stat-label">Conquistas</div></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon">📈</div>
-                            <div>
-                                <div class="stat-value" id="dash-progresso">0%</div>
-                                <div class="stat-label">Progresso Geral</div>
-                            </div>
+                            <div><div class="stat-value" id="dash-progresso">0%</div><div class="stat-label">Progresso Geral</div></div>
                         </div>
                     </div>
-                    
-                    <div style="margin-top:20px;">
-                        <label>🔍 Buscar aula</label>
-                        <input type="text" id="campoBusca" placeholder="Digite o nome do curso..." onkeyup="buscarConteudo()">
-                        <div id="resultadosBusca"></div>
-                    </div>
                 </div>
 
-                <!-- FAVORITOS -->
-                <div class="card">
-                    <h2 style="margin-top:0;">⭐ Favoritos</h2>
-                    <div id="lista-favoritos"><p style="color:var(--text-light);">Nenhum favorito salvo.</p></div>
-                </div>
-
-                <!-- CONQUISTAS -->
+                <!-- CONQUISTAS E HISTÓRICO -->
                 <div class="card">
                     <h2 style="margin-top:0;">🏆 Conquistas</h2>
                     <div id="lista-conquistas"><p style="color:var(--text-light)">Nenhuma conquista desbloqueada.</p></div>
                 </div>
-
-                <!-- CERTIFICADOS -->
-                <div class="card">
-                    <h2 style="margin-top:0;">📜 Certificados</h2>
-                    <div id="certificados-aluno"><p style="color:var(--text-light)">Complete 20 aulas para emitir seu certificado.</p></div>
-                </div>
-
-                <!-- HISTÓRICO -->
                 <div class="card">
                     <h2 style="margin-top:0;">🕒 Últimas aulas acessadas</h2>
                     <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
                 </div>
 
-                <!-- AVISOS DA PROFESSORA -->
-                <div class="card">
-                    <h2 style="margin-top:0;">📢 Avisos da Professora</h2>
-                    <div id="avisosPortal"><p style="color:var(--text-light)">Nenhum aviso no momento.</p></div>
-                </div>
-
-                <!-- AGENDA DE AULAS -->
-                <div class="card">
-                    <h2 style="margin-top:0;">📅 Próximas Aulas (Agenda)</h2>
-                    <div id="agenda-lista-aluno"><p style="color:var(--text-light)">Nenhuma aula agendada.</p></div>
-                </div>
-
-            </div>
-
-            <!-- TELAS DE NAVEGAÇÃO DO CURSO -->
-            <div id="estudante-senha-tela" style="display:none; text-align: center;">
-                <button class="btn-action secondary" style="width:100%; margin-bottom:20px;" onclick="voltarParaModulos()">< Voltar</button>
-                <div class="card" style="max-width: 400px; margin: 0 auto;">
-                    <div style="font-size: 3rem; margin-bottom: 10px;">🔐</div>
-                    <h2 id="titulo-senha-curso">Acesso Restrito</h2>
-                    <p style="color:var(--text-light);" id="subtitulo-senha-contexto">Digite a senha.</p>
-                    <input type="password" id="input-senha-aluno" style="text-align: center; font-size: 2rem; letter-spacing: 5px;" placeholder="***">
-                    <button class="btn-action" style="width: 100%; font-size: 1.4rem; margin-top: 20px;" onclick="validarSenhaAcesso()">ENTRAR NA SALA</button>
-                </div>
-            </div>
-
-            <div id="estudante-modulos" style="display:none;">
-                <button class="btn-action secondary" style="margin-bottom: 20px;" onclick="voltarParaCursos()">< Voltar aos Cursos</button>
-                <h2>Trilha de Aprendizado</h2>
+                <!-- TRILHA DE APRENDIZADO (LISTA DE MÓDULOS) -->
+                <h2>📚 Minha Trilha de Aprendizado</h2>
                 <div class="module-list" id="lista-modulos-estudante"></div>
             </div>
 
@@ -402,18 +281,37 @@
         <!-- ==================== ÁREA DO PROFESSOR ==================== -->
         <section id="view-professor" class="view-section">
             
+            <!-- NOVA GESTÃO DE MATRÍCULAS -->
+            <div class="card" style="border-left: 5px solid var(--primary);">
+                <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
+                <p>Cadastre novos alunos ou gerencie quais módulos estão destravados para eles.</p>
+                
+                <div class="row-inputs" style="background: var(--bg); padding: 15px; border-radius: 12px; border: none; margin-bottom: 20px;">
+                    <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome do Aluno (Ex: Gustavo)"></div>
+                    <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="Criar PIN/Senha (Ex: 1234)"></div>
+                    <div style="flex:1;">
+                        <select id="novo-aluno-curso">
+                            <option value="informatica">Informática 5.0</option>
+                            <option value="senior">Curso Sênior</option>
+                            <option value="ingles">Inglês 🌎</option>
+                            <option value="reposicao">Reposição 🔄</option>
+                        </select>
+                    </div>
+                    <div><button class="btn-action" style="margin-top: 0; height: 100%;" onclick="matricularNovoAluno()">Matricular Aluno</button></div>
+                </div>
+
+                <h3>Alunos Matriculados:</h3>
+                <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
+            </div>
+
+            <!-- ANALYTICS DA PROFESSORA -->
             <div class="card" style="background:#f8fafc;">
                 <h2 style="margin-top:0;">📊 Analytics Geral</h2>
                 <div class="dashboard-grid">
                     <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><div class="stat-value" id="analytics-alunos">0</div><div class="stat-label">Alunos Ativos</div></div></div>
-                    <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas Totais</div></div></div>
+                    <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
                     <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div><div class="stat-label">Top Aluno</div></div></div>
                 </div>
-            </div>
-
-            <div class="card">
-                <h2 style="margin-top:0;">🏆 Ranking Geral dos Alunos</h2>
-                <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
             </div>
 
             <div class="card" style="border-left: 5px solid var(--warning);">
@@ -428,29 +326,9 @@
                 <input type="date" id="agendaData">
                 <textarea id="agendaTexto" placeholder="Descrição da aula (Ex: Aula ao vivo de Excel)" rows="2"></textarea>
                 <button class="btn-action" style="background:var(--success);" onclick="salvarAgenda()">Agendar Aula</button>
-                <h3 style="margin-top:20px;">Aulas Agendadas:</h3>
-                <div id="agenda-lista-prof"><p style="color:var(--text-light)">Nenhuma aula agendada.</p></div>
             </div>
 
-            <div class="card" style="background: var(--primary-light); border-color: #bfdbfe;">
-                <h3 style="margin-top:0; color:var(--primary-dark);">⚙️ Segurança e Liberação de Módulos</h3>
-                <div class="row-inputs" style="padding:0; background:transparent; border:none;">
-                    <div style="flex:1"><label>Senha Informática:</label><input type="text" id="senha-prof-inf"></div>
-                    <div style="flex:1"><label>Senha Sênior:</label><input type="text" id="senha-prof-sen"></div>
-                    <div style="flex:1"><label style="color:var(--danger);">Senha Inglês:</label><input type="text" id="senha-prof-ing" style="border-color:var(--danger);"></div>
-                    <div style="flex:1"><label style="color:var(--warning);">Senha Reposição:</label><input type="text" id="senha-prof-rep" style="border-color:var(--warning);"></div>
-                    <div style="flex:1"><label style="color:var(--danger);">Senha Admin:</label><input type="text" id="senha-prof-admin" style="border-color:var(--danger);"></div>
-                </div>
-                <hr style="border:1px solid #bfdbfe; margin:20px 0;">
-                <div class="row-inputs" style="padding:0; background:transparent; border:none;">
-                    <div style="flex:1"><label>Ativo - Informática:</label><select id="prof-modulo-ativo-inf"></select></div>
-                    <div style="flex:1"><label>Ativo - Sênior:</label><select id="prof-modulo-ativo-sen"></select></div>
-                    <div style="flex:1"><label style="color:var(--danger);">Ativo - Inglês:</label><select id="prof-modulo-ativo-ing"></select></div>
-                    <div style="flex:1"><label style="color:var(--warning);">Ativo - Reposição:</label><select id="prof-modulo-ativo-rep"></select></div>
-                </div>
-                <button class="btn-action" onclick="salvarSenhasNuvem()">Salvar Permissões Globais</button>
-            </div>
-
+            <!-- EDITOR VISUAL -->
             <div class="card">
                 <h2 style="margin-top:0;">Gerenciador de Aulas Multimídia</h2>
                 <p>Crie e edite os conteúdos usando o editor visual avançado.</p>
@@ -474,14 +352,6 @@
                     <div style="flex:2;"><label id="label-nome-aula">Nome Visível da Aula:</label><input type="text" id="prof-nome-aula"></div>
                 </div>
 
-                <div style="background: var(--success-light); padding: 20px; border-radius: 16px; border: 2px solid #bbf7d0; margin-top: 20px;">
-                    <label style="color: var(--success); margin-top:0;">🔑 Senha Exclusiva para este item:</label>
-                    <div style="display:flex; gap:10px; margin-top:5px; flex-wrap:wrap;">
-                        <input type="text" id="prof-senha-modulo-especifica" style="margin-top:0; flex:1; min-width:200px;" placeholder="Crie uma senha única">
-                        <button type="button" class="btn-action" style="margin-top:0; background:var(--primary);" onclick="salvarSenhaModuloExclusivaBotao()">Gravar Senha</button>
-                    </div>
-                </div>
-
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
                 <h3>Passos do Roteiro</h3>
                 <div id="editor-passos-container"></div>
@@ -500,7 +370,6 @@
     </div>
 
     <script>
-        // --- FUNÇÕES GLOBAIS DE UI ---
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -519,7 +388,6 @@
             inicializarPainel();
             carregarTema();
             carregarAvisos();
-            carregarAgenda();
         });
 
         // --- BANCO DE DADOS SUPABASE ---
@@ -527,87 +395,80 @@
         const SUPABASE_KEY = "sb_publishable_vGBe4D10ir5VP9DWQh-89A_iywhmJOH";
         const bancoDados = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+        let alunoLogadoDados = null;
         let alunoLogado = ''; 
         let modulosLiberadosAluno = []; 
         let aulasConcluidasAluno = []; 
         let cursoSelecionado = '';
+        
         let modSelecionado = '';
         let aulaSelecionada = '';
         let passosAulaAtual = [];
         let passoAtual = 0;
         let nomesCustomizados = {};
-        let senhasModulosGerais = {}; 
         const nomesModulosIngles = ["Preparation", "Basic 01 - Mid Term", "Basic 01 - End Term", "Basic 02 - Mid Term", "Basic 02 - End Term", "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"];
-        let senhasCursos = { informatica: "123", senior: "456", ingles: "english123", reposicao: "789", admin: "admin123", modAtivoInf: "9", modAtivoSen: "1", modAtivoIng: "1", modAtivoRep: "1" };
         let professorAutenticado = false;
+        let adminPass = "admin123"; // Fallback
         let modAlvoClicado = 0;
 
-        let favoritosAluno = JSON.parse(localStorage.getItem("favoritosPortal")) || [];
         let historicoAluno = JSON.parse(localStorage.getItem("historicoPortal")) || [];
         let conquistasAluno = JSON.parse(localStorage.getItem("conquistasPortal")) || [];
 
-        // --- LOGIN E PROGRESSO GLOBAL ---
+        // --- NOVO LOGIN SEGURO (NOME + PIN) ---
         async function entrarComoAluno() {
             const nomeDigitado = document.getElementById('input-nome-aluno').value.trim().toLowerCase();
-            if (!nomeDigitado) { showToast("Por favor, digite seu nome!", "warning"); return; }
-            alunoLogado = nomeDigitado;
-            const nomeVisivel = nomeDigitado.charAt(0).toUpperCase() + nomeDigitado.slice(1);
-            document.getElementById('nome-aluno-display').innerText = `Olá, ${nomeVisivel}!`;
-            document.getElementById('nav-container').style.display = 'flex'; 
+            const senhaDigitada = document.getElementById('input-senha-aluno-login').value.trim();
+            if (!nomeDigitado || !senhaDigitada) { showToast("Preencha seu Nome e PIN!", "warning"); return; }
             
-            await carregarProgressoAlunoGlobal();
-            
-            mudarAba('estudante');
-            atualizarDashboard();
-            renderizarFavoritos();
-            renderizarConquistas();
-            renderizarHistorico();
-            verificarConquistas();
-            verificarCertificados();
-            verificarUltimaAula();
+            showToast("Verificando dados...", "info");
+            try {
+                const { data, error } = await bancoDados.from('alunos_matriculados').select('*').eq('nome_aluno', nomeDigitado).eq('senha', senhaDigitada).maybeSingle();
+                
+                if(!data) { showToast("Nome ou PIN incorretos. Tente novamente.", "error"); return; }
+                
+                alunoLogadoDados = data;
+                alunoLogado = data.nome_aluno;
+                cursoSelecionado = data.curso;
+                modulosLiberadosAluno = data.modulos_liberados || [];
+                aulasConcluidasAluno = data.aulas_concluidas || [];
+
+                const nomeVisivel = alunoLogado.charAt(0).toUpperCase() + alunoLogado.slice(1);
+                document.getElementById('nome-aluno-display').innerText = `Olá, ${nomeVisivel}!`;
+                
+                const labelsCursos = { informatica: "Informática 5.0", senior: "Curso Sênior", ingles: "Inglês 🌎", reposicao: "Reposições 🔄" };
+                document.getElementById('badge-curso-aluno').innerText = `Turma: ${labelsCursos[cursoSelecionado] || "Portal Educacional"}`;
+                
+                document.getElementById('nav-container').style.display = 'flex'; 
+                
+                mudarAba('estudante');
+                renderizarModulosEstudante(); // Vai direto para os módulos do curso dele!
+                atualizarDashboard();
+                renderizarConquistas();
+                renderizarHistorico();
+                verificarConquistas();
+                verificarUltimaAula();
+                showToast("Acesso Liberado! Bom estudo.", "success");
+
+            } catch(e) { showToast("Erro de conexão.", "error"); }
         }
 
-        async function carregarProgressoAlunoGlobal() {
-            if(!bancoDados || !alunoLogado) return;
+        async function salvarProgressoAlunoNuvem() {
+            if(!bancoDados || !alunoLogadoDados) return;
             try {
-                const { data } = await bancoDados.from('progresso_alunos').select('*').eq('nome_aluno', alunoLogado);
-                aulasConcluidasAluno = []; 
-                modulosLiberadosAluno = [];
-                if(data) {
-                    data.forEach(row => {
-                        if(row.aulas_concluidas) aulasConcluidasAluno.push(...row.aulas_concluidas);
-                        if(row.modulos_liberados) modulosLiberadosAluno.push(...row.modulos_liberados);
-                    });
-                }
-            } catch(e) {}
-        }
-
-        async function salvarProgressoAlunoNuvemLocal(curso) {
-            if(!bancoDados || !alunoLogado || !curso) return;
-            const modsCurso = modulosLiberadosAluno.filter(m => m.includes(`${curso}_`)).map(m => m.replace(`${curso}_`,''));
-            const aulasCurso = aulasConcluidasAluno.filter(a => a.includes(`${curso}_`)).map(a => a.replace(`${curso}_`,''));
-            try {
-                await bancoDados.from('progresso_alunos').upsert({
-                    id: `${alunoLogado}_${curso}`, nome_aluno: alunoLogado, curso: curso,
-                    modulos_liberados: modsCurso, aulas_concluidas: aulasCurso
-                });
+                await bancoDados.from('alunos_matriculados').update({
+                    modulos_liberados: modulosLiberadosAluno,
+                    aulas_concluidas: aulasConcluidasAluno
+                }).eq('id', alunoLogadoDados.id);
             } catch(e) {}
         }
 
         // --- DASHBOARD E GAMEFICAÇÃO ---
         function atualizarDashboard() {
             document.getElementById("dash-aulas").innerText = aulasConcluidasAluno.length;
-            document.getElementById("dash-favoritos").innerText = favoritosAluno.length;
             document.getElementById("dash-conquistas").innerText = conquistasAluno.length;
             const totalAulasPortal = 100;
             const progresso = Math.min(100, Math.round((aulasConcluidasAluno.length / totalAulasPortal) * 100));
             document.getElementById("dash-progresso").innerText = progresso + "%";
-        }
-
-        function renderizarFavoritos() {
-            const div = document.getElementById("lista-favoritos");
-            if(favoritosAluno.length === 0) div.innerHTML = "<p style='color:var(--text-light)'>Nenhum favorito salvo.</p>";
-            else div.innerHTML = favoritosAluno.map(item => `<div class="favorito-item">${item}</div>`).join("");
         }
 
         function renderizarConquistas() {
@@ -622,7 +483,6 @@
             if(total >= 1 && !conquistasAluno.includes("🎉 Primeira Aula")) { conquistasAluno.push("🎉 Primeira Aula"); ganhouNova=true; }
             if(total >= 5 && !conquistasAluno.includes("🔥 Estudando Sempre")) { conquistasAluno.push("🔥 Estudando Sempre"); ganhouNova=true; }
             if(total >= 10 && !conquistasAluno.includes("🏆 Aluno Dedicado")) { conquistasAluno.push("🏆 Aluno Dedicado"); ganhouNova=true; }
-            if(total >= 25 && !conquistasAluno.includes("🚀 Mestre da Plataforma")) { conquistasAluno.push("🚀 Mestre da Plataforma"); ganhouNova=true; }
             if(ganhouNova){
                 localStorage.setItem("conquistasPortal", JSON.stringify(conquistasAluno));
                 renderizarConquistas();
@@ -632,7 +492,7 @@
 
         function registrarHistorico(nome) {
             historicoAluno.unshift({ titulo: nome, data: new Date().toLocaleString() });
-            historicoAluno = historicoAluno.slice(0,10);
+            historicoAluno = historicoAluno.slice(0,5);
             localStorage.setItem("historicoPortal", JSON.stringify(historicoAluno));
             renderizarHistorico();
         }
@@ -643,19 +503,6 @@
             else div.innerHTML = historicoAluno.map(item => `<div class="historico-item"><strong>${item.titulo}</strong><div>${item.data}</div></div>`).join('');
         }
 
-        function verificarCertificados() {
-            const div = document.getElementById("certificados-aluno");
-            if(aulasConcluidasAluno.length < 20) return;
-            div.innerHTML = `<div class="badge-conquista" style="text-align:center; padding:20px;">📜 Certificado de Participação<br><br><button class="btn-action" onclick="gerarCertificado()">Emitir PDF</button></div>`;
-        }
-
-        function gerarCertificado() {
-            const nome = (alunoLogado || "Aluno").toUpperCase();
-            const novaJanela = window.open();
-            novaJanela.document.write(`<html><body style="text-align:center; font-family:Arial; padding:80px; border:15px solid #2563eb; margin:20px;"><h1 style="font-size:3rem; color:#1e40af;">CERTIFICADO</h1><h2 style="font-size:2.5rem; margin-top:40px;">${nome}</h2><p style="font-size:1.5rem; margin-top:20px;">Concluiu com excelência as atividades no Portal Educacional.</p><br><p style="font-size:1.2rem; margin-top:40px;">Data: ${new Date().toLocaleDateString()}</p></body></html>`);
-            setTimeout(()=>novaJanela.print(), 500);
-        }
-
         // --- CONTINUAÇÃO E MODO ESCURO ---
         function alternarModoEscuro() {
             document.body.classList.toggle("dark-mode");
@@ -664,21 +511,17 @@
 
         function carregarTema() { if(localStorage.getItem("temaPortal") === "true") document.body.classList.add("dark-mode"); }
 
-        function salvarUltimaAula() {
-            localStorage.setItem("ultimaAulaPortal", JSON.stringify({ curso: cursoSelecionado, modulo: modSelecionado, aula: aulaSelecionada }));
-        }
+        function salvarUltimaAula() { localStorage.setItem("ultimaAulaPortal", JSON.stringify({ curso: cursoSelecionado, modulo: modSelecionado, aula: aulaSelecionada })); }
 
         function verificarUltimaAula() {
             const dados = localStorage.getItem("ultimaAulaPortal");
             if(!dados) return;
             if(document.getElementById('card-retomar-aula')) return;
-            const hero = document.getElementById("estudante-cursos");
+            const hero = document.getElementById("estudante-modulos");
             const card = document.createElement("div");
-            card.className = "card";
-            card.id = "card-retomar-aula";
-            card.style.borderLeft = "5px solid var(--success)";
+            card.className = "card"; card.id = "card-retomar-aula"; card.style.borderLeft = "5px solid var(--success)";
             card.innerHTML = `<h2 style="margin-top:0;">▶ Continuar Estudando</h2><p>Você tem uma aula em andamento.</p><button class="btn-action" style="background:var(--success);" onclick="retomarUltimaAula()">Retomar Aula</button>`;
-            hero.insertBefore(card, hero.children[1]); // Insere abaixo do hero banner
+            hero.insertBefore(card, hero.children[1]); 
         }
 
         function retomarUltimaAula() {
@@ -688,22 +531,12 @@
             cursoSelecionado = aula.curso;
             modSelecionado = aula.modulo;
             modAlvoClicado = parseInt(modSelecionado.replace('modulo_', ''));
-            document.getElementById('estudante-cursos').style.display = 'none';
+            document.getElementById('estudante-modulos').style.display = 'none';
             avancarParaAulasModulo();
             buscarAulaNuvem(aula.aula);
         }
 
-        function buscarConteudo() {
-            const termo = document.getElementById("campoBusca").value.toLowerCase();
-            const resultados = document.getElementById("resultadosBusca");
-            resultados.innerHTML = "";
-            if(termo.length < 2) return;
-            document.querySelectorAll(".course-card").forEach(card => {
-                if(card.innerText.toLowerCase().includes(termo)) {
-                    resultados.innerHTML += `<div class="resultado-busca" style="cursor:pointer;" onclick="card.click()">${card.innerText}</div>`;
-                }
-            });
-        }
+        function buscarConteudo() { /* Desativado nesta view simplificada para não poluir o painel do aluno */ }
 
         // --- SISTEMA DE AVISOS E AGENDA ---
         async function salvarAviso() {
@@ -711,22 +544,17 @@
             const t = document.getElementById("avisoTitulo").value.trim();
             const m = document.getElementById("avisoTexto").value.trim();
             if(!t || !m) return;
-            try {
-                await bancoDados.from("avisos").insert({ titulo: t, mensagem: m });
-                showToast("Aviso publicado com sucesso!", "success");
-                document.getElementById("avisoTitulo").value = ''; document.getElementById("avisoTexto").value = '';
-                carregarAvisos();
-            } catch(e){}
+            await bancoDados.from("avisos").insert({ titulo: t, mensagem: m });
+            showToast("Aviso publicado!", "success");
+            document.getElementById("avisoTitulo").value = ''; document.getElementById("avisoTexto").value = '';
         }
 
         async function carregarAvisos() {
             if(!bancoDados) return;
-            try {
-                const { data } = await bancoDados.from("avisos").select("*").order("id", {ascending:false});
-                const div = document.getElementById("avisosPortal");
-                if(!data || !data.length) div.innerHTML = "<p style='color:var(--text-light)'>Nenhum aviso no momento.</p>";
-                else div.innerHTML = data.map(a => `<div class="historico-item" style="border-left:4px solid var(--warning);"><strong>${a.titulo}</strong><p style="margin:5px 0 0 0;">${a.mensagem}</p><span style="font-size:0.8rem;color:var(--text-light);">${new Date(a.data_criacao).toLocaleDateString()}</span></div>`).join('');
-            } catch(e){}
+            const { data } = await bancoDados.from("avisos").select("*").order("id", {ascending:false});
+            const div = document.getElementById("avisosPortal");
+            if(!data || !data.length) div.innerHTML = "<p style='color:var(--text-light)'>Nenhum aviso no momento.</p>";
+            else div.innerHTML = data.map(a => `<div class="historico-item" style="border-left:4px solid var(--warning);"><strong>${a.titulo}</strong><p style="margin:5px 0 0 0;">${a.mensagem}</p></div>`).join('');
         }
 
         async function salvarAgenda() {
@@ -734,30 +562,8 @@
             const d = document.getElementById("agendaData").value;
             const desc = document.getElementById("agendaTexto").value.trim();
             if(!d || !desc) return;
-            try {
-                await bancoDados.from("agenda").insert({ data_aula: d, descricao: desc });
-                showToast("Aula agendada com sucesso!", "success");
-                carregarAgenda();
-            } catch(e){}
-        }
-
-        async function carregarAgenda() {
-            if(!bancoDados) return;
-            try {
-                const { data } = await bancoDados.from("agenda").select("*").order("data_aula", {ascending:true});
-                const divA = document.getElementById("agenda-lista-aluno");
-                const divP = document.getElementById("agenda-lista-prof");
-                if(!data || !data.length) {
-                    const txt = "<p style='color:var(--text-light)'>Nenhuma aula agendada.</p>";
-                    if(divA) divA.innerHTML = txt; if(divP) divP.innerHTML = txt;
-                } else {
-                    const html = data.map(item => {
-                        const dataF = item.data_aula.split('-').reverse().join('/');
-                        return `<div class="historico-item" style="border-left:4px solid var(--success);"><strong>📆 ${dataF}</strong><p style="margin:5px 0 0 0;">${item.descricao}</p></div>`;
-                    }).join('');
-                    if(divA) divA.innerHTML = html; if(divP) divP.innerHTML = html;
-                }
-            } catch(e){}
+            await bancoDados.from("agenda").insert({ data_aula: d, descricao: desc });
+            showToast("Aula agendada!", "success");
         }
 
         // --- AREA DA PROFESSORA ---
@@ -775,55 +581,99 @@
             if (aba === 'professor') {
                 if (professorAutenticado) {
                     document.getElementById('view-professor').style.display = 'block';
-                    carregarAnalyticsProf(); 
+                    carregarGestaoAlunosProf(); 
                 } else {
                     document.getElementById('input-senha-admin').value = '';
                     document.getElementById('view-professor-bloqueado').style.display = 'block';
                 }
             } else {
                 document.getElementById('view-estudante').style.display = 'block';
-                document.getElementById('estudante-cursos').style.display = 'block';
-                document.getElementById('estudante-modulos').style.display = 'none';
+                document.getElementById('estudante-modulos').style.display = 'block';
                 document.getElementById('estudante-aulas').style.display = 'none';
                 document.getElementById('estudante-passos').style.display = 'none';
+                renderizarModulosEstudante();
             }
         }
 
-        async function carregarAnalyticsProf() {
+        // --- GESTÃO DE ALUNOS (PROFESSORA) ---
+        async function matricularNovoAluno() {
+            if(!bancoDados) return;
+            const nome = document.getElementById('novo-aluno-nome').value.trim().toLowerCase();
+            const senha = document.getElementById('novo-aluno-senha').value.trim();
+            const curso = document.getElementById('novo-aluno-curso').value;
+            
+            if(!nome || !senha) { showToast("Preencha o Nome e o PIN!", "warning"); return; }
+            
+            const idUnico = `${nome}_${Date.now()}`;
+            try {
+                await bancoDados.from('alunos_matriculados').insert({
+                    id: idUnico, nome_aluno: nome, senha: senha, curso: curso
+                });
+                showToast(`Aluno ${nome} matriculado!`, "success");
+                document.getElementById('novo-aluno-nome').value = '';
+                document.getElementById('novo-aluno-senha').value = '';
+                carregarGestaoAlunosProf();
+            } catch(e) { showToast("Erro ao matricular", "error"); }
+        }
+
+        async function carregarGestaoAlunosProf() {
             if(!bancoDados) return;
             try {
-                const { data } = await bancoDados.from('progresso_alunos').select('*');
-                if(data) {
-                    const unicos = new Set(data.map(d => d.nome_aluno)).size;
-                    document.getElementById('analytics-alunos').innerText = unicos;
-                    let totalAulas = 0;
-                    data.forEach(d => { if(d.aulas_concluidas) totalAulas += d.aulas_concluidas.length; });
-                    document.getElementById('analytics-aulas').innerText = totalAulas;
+                const { data } = await bancoDados.from('alunos_matriculados').select('*').order('nome_aluno', {ascending: true});
+                
+                const listDiv = document.getElementById('lista-gestao-alunos');
+                if(!data || data.length === 0) { listDiv.innerHTML = "<p>Nenhum aluno matriculado ainda.</p>"; return; }
+                
+                // Analytics
+                document.getElementById('analytics-alunos').innerText = data.length;
+                let totalAulas = 0; data.forEach(d => { if(d.aulas_concluidas) totalAulas += d.aulas_concluidas.length; });
+                document.getElementById('analytics-aulas').innerText = totalAulas;
+                
+                let sortedData = [...data].sort((a,b) => (b.aulas_concluidas?.length||0) - (a.aulas_concluidas?.length||0));
+                if(sortedData[0]) document.getElementById('analytics-ranking').innerText = sortedData[0].nome_aluno.toUpperCase();
+                
+                const rankDiv = document.getElementById('ranking-alunos');
+                rankDiv.innerHTML = sortedData.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas</span></div>`).join('');
+
+                // Renderiza os Cards de Controle
+                listDiv.innerHTML = data.map(aluno => {
+                    let maxMod = aluno.curso === 'ingles' ? 9 : 10;
+                    let checkboxesHTML = '';
+                    let liberados = aluno.modulos_liberados || [];
                     
-                    data.sort((a,b) => (b.aulas_concluidas?.length||0) - (a.aulas_concluidas?.length||0));
-                    if(data[0]) document.getElementById('analytics-ranking').innerText = data[0].nome_aluno.toUpperCase();
-                    
-                    const rankDiv = document.getElementById('ranking-alunos');
-                    if(data.length > 0) {
-                        rankDiv.innerHTML = data.slice(0,10).map((aluno, index) => `<div class="historico-item" style="display:flex; justify-content:space-between; align-items:center;"><strong>#${index+1} - ${aluno.nome_aluno.toUpperCase()}</strong><span>${aluno.aulas_concluidas?.length||0} aulas concluídas</span></div>`).join('');
+                    for(let m=1; m<=maxMod; m++) {
+                        let isChecked = liberados.includes(String(m)) ? 'checked' : '';
+                        let labelMod = aluno.curso === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
+                        checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${m}', this.checked)" ${isChecked}> ${labelMod}</label>`;
                     }
-                }
+                    
+                    const labelsCursos = { informatica: "Informática", senior: "Sênior", ingles: "Inglês", reposicao: "Reposição" };
+                    return `<div class="aluno-gerenciamento-card">
+                                <h4>${aluno.nome_aluno.toUpperCase()} <span class="curso-tag">${labelsCursos[aluno.curso]}</span></h4>
+                                <p style="margin:0 0 10px 0; font-size:0.9rem; color:var(--text-light);">PIN: ${aluno.senha}</p>
+                                <div class="modulos-checkbox-grid">${checkboxesHTML}</div>
+                            </div>`;
+                }).join('');
+
             } catch(e){}
         }
 
-        function preencherSelectsProf() {
-            const selectModInf = document.getElementById('prof-modulo-ativo-inf');
-            const selectModSen = document.getElementById('prof-modulo-ativo-sen');
-            const selectModIng = document.getElementById('prof-modulo-ativo-ing');
-            const selectModRep = document.getElementById('prof-modulo-ativo-rep');
-            selectModInf.innerHTML = ''; selectModSen.innerHTML = ''; selectModIng.innerHTML = ''; selectModRep.innerHTML = '';
-            for (let m = 1; m <= 10; m++) {
-                let optStr = `<option value="${m}">Módulo ${String(m).padStart(2, '0')}</option>`;
-                selectModInf.innerHTML += optStr; selectModSen.innerHTML += optStr; selectModRep.innerHTML += `<option value="${m}">Ficha ${String(m).padStart(2, '0')}</option>`;
-                if(m <= 9) selectModIng.innerHTML += `<option value="${m}">${nomesModulosIngles[m-1]}</option>`;
-            }
+        async function toggleModuloAluno(alunoId, modNum, isLiberar) {
+            if(!bancoDados) return;
+            try {
+                const { data } = await bancoDados.from('alunos_matriculados').select('modulos_liberados').eq('id', alunoId).single();
+                let liberados = data.modulos_liberados || [];
+                
+                if(isLiberar && !liberados.includes(modNum)) liberados.push(modNum);
+                else if(!isLiberar) liberados = liberados.filter(m => m !== modNum);
+                
+                await bancoDados.from('alunos_matriculados').update({ modulos_liberados: liberados }).eq('id', alunoId);
+                showToast("Acesso atualizado!", "success");
+            } catch(e) {}
         }
 
+        // --- EDITOR DA PROFESSORA ---
+        function preencherSelectsProf() {} // Limpado pois removemos as senhas antigas
         function atualizarLabelsEditor() {
             const c = document.getElementById('prof-curso').value;
             const selectMod = document.getElementById('prof-modulo');
@@ -835,20 +685,14 @@
                 selectMod.innerHTML += `<option value="modulo_${m}">${nomeOpt}</option>`;
             }
             if (c === 'reposicao') {
-                document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno e Matéria:';
-                document.getElementById('prof-nome-modulo').placeholder = 'Ex: Gustavo - Informática';
-                document.getElementById('label-identificador-aula').innerText = 'Título da Atividade:';
+                document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno/Ficha:';
                 document.getElementById('prof-nome-aula').placeholder = 'Ex: Prática de Word';
             } else if (c === 'ingles') {
-                document.getElementById('label-nome-modulo').innerText = 'Nome Visível do Nível:';
-                document.getElementById('prof-nome-modulo').placeholder = 'Ex: Preparation - Part 1';
-                document.getElementById('label-identificador-aula').innerText = 'Lesson / Aula:';
-                document.getElementById('prof-nome-aula').placeholder = 'Ex: Lesson 01 - Greetings';
+                document.getElementById('label-nome-modulo').innerText = 'Nome do Nível:';
+                document.getElementById('prof-nome-aula').placeholder = 'Ex: Lesson 01';
             } else {
-                document.getElementById('label-nome-modulo').innerText = 'Nome Visível do Módulo:';
-                document.getElementById('prof-nome-modulo').placeholder = 'Ex: Introdução';
-                document.getElementById('label-identificador-aula').innerText = 'Nome Visível da Aula:';
-                document.getElementById('prof-nome-aula').placeholder = 'Ex: Aula 01 - Pastas';
+                document.getElementById('label-nome-modulo').innerText = 'Nome do Módulo:';
+                document.getElementById('prof-nome-aula').placeholder = 'Ex: Aula 01';
             }
             atualizarSelectAulasProf();
             carregarTextoExistente();
@@ -862,64 +706,28 @@
             selectAula.innerHTML = '';
             let maxAulas = 8, labelPref = "Etapa";
             if (c === 'ingles') { maxAulas = (mNum === 1) ? 5 : 15; labelPref = "Lesson"; }
-            for (let a = 1; a <= maxAulas; a++) {
-                selectAula.innerHTML += `<option value="aula_${a}">${labelPref} ${String(a).padStart(2, '0')}</option>`;
-            }
+            for (let a = 1; a <= maxAulas; a++) { selectAula.innerHTML += `<option value="aula_${a}">${labelPref} ${String(a).padStart(2, '0')}</option>`; }
         }
 
-        function inicializarPainel() { preencherSelectsProf(); atualizarLabelsEditor(); if (bancoDados) { baixarNomesCustomizados(); baixarSenhasNuvem(); } }
+        function inicializarPainel() { atualizarLabelsEditor(); if (bancoDados) { baixarNomesCustomizados(); baixarSenhasAdmin(); } }
 
-        async function baixarSenhasNuvem() {
-            if (!bancoDados) return;
+        async function baixarSenhasAdmin() {
             try {
-                const { data } = await bancoDados.from('config_cursos').select('*');
-                if (data) {
-                    data.forEach(c => {
-                        senhasCursos[c.id] = c.senha;
-                        if(document.getElementById(`senha-prof-${c.id.substring(0,3)}`)) document.getElementById(`senha-prof-${c.id.substring(0,3)}`).value = c.senha;
-                        if(c.id === 'admin') document.getElementById('senha-prof-admin').value = c.senha;
-                        if(c.id === 'modAtivoInf') document.getElementById('prof-modulo-ativo-inf').value = c.senha;
-                        if(c.id === 'modAtivoSen') document.getElementById('prof-modulo-ativo-sen').value = c.senha;
-                        if(c.id === 'modAtivoIng') document.getElementById('prof-modulo-ativo-ing').value = c.senha;
-                        if(c.id === 'modAtivoRep') document.getElementById('prof-modulo-ativo-rep').value = c.senha;
-                    });
-                }
-            } catch (e) {}
-        }
-
-        async function baixarSenhasModulosIndependente() {
-            if (!bancoDados) return;
-            try {
-                const { data } = await bancoDados.from('roteiros_aulas').select('id, nome_aula').like('id', 'secretpass_%');
-                if (data) { senhasModulosGerais = {}; data.forEach(item => { senhasModulosGerais[item.id.replace('secretpass_', '')] = item.nome_aula; }); }
-            } catch(e) {}
-        }
-
-        async function salvarSenhasNuvem() {
-            if (!bancoDados) return;
-            const admS = document.getElementById('senha-prof-admin').value.trim();
-            if(admS === '') { showToast("A senha admin não pode ficar em branco!", "error"); return; }
-            try {
-                const ids = ['informatica', 'senior', 'ingles', 'reposicao', 'admin', 'modAtivoInf', 'modAtivoSen', 'modAtivoIng', 'modAtivoRep'];
-                const vals = ['inf', 'sen', 'ing', 'rep', 'admin', 'ativo-inf', 'ativo-sen', 'ativo-ing', 'ativo-rep'].map(x => document.getElementById(x.includes('ativo') ? `prof-modulo-${x}` : `senha-prof-${x}`).value.trim());
-                for(let i=0; i<ids.length; i++){ await bancoDados.from('config_cursos').upsert({ id: ids[i], senha: vals[i] }, { on: 'id' }); }
-                showToast("Permissões atualizadas na nuvem!", "success");
-                baixarSenhasNuvem();
-            } catch (e) { showToast("Erro ao salvar permissões", "error"); }
+                const { data } = await bancoDados.from('config_cursos').select('senha').eq('id', 'admin').maybeSingle();
+                if(data) adminPass = data.senha;
+            } catch(e){}
         }
 
         function validarAcessoProfessor() {
-            if (document.getElementById('input-senha-admin').value.trim() === senhasCursos.admin) {
-                professorAutenticado = true;
-                showToast("Acesso Liberado. Bom trabalho, Professora!", "success");
-                mudarAba('professor');
+            if (document.getElementById('input-senha-admin').value.trim() === adminPass) {
+                professorAutenticado = true; showToast("Acesso Liberado!", "success"); mudarAba('professor');
             } else { showToast("Senha incorreta!", "error"); }
         }
 
         async function baixarNomesCustomizados() {
             if (!bancoDados) return;
             try {
-                const { data } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula').not('id', 'like', 'secretpass_%');
+                const { data } = await bancoDados.from('roteiros_aulas').select('id, nome_modulo, nome_aula');
                 if (data) {
                     nomesCustomizados = {};
                     data.forEach(item => {
@@ -927,7 +735,6 @@
                         if (nAula.includes('|||')) nAula = nAula.split('|||')[0].trim();
                         nomesCustomizados[item.id] = { modulo: item.nome_modulo, aula: nAula };
                     });
-                    await baixarSenhasModulosIndependente();
                 }
             } catch (e) {}
         }
@@ -943,14 +750,11 @@
                 <div class="row-inputs">
                     <input type="text" class="edit-img" placeholder="Link Imagem Externa (Opc)" value="${urlImg}">
                     <input type="text" class="edit-link" placeholder="Link de Botão (Opc)" value="${urlLink}">
-                    <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarNumeracaoEditor();">Remover Etapa</button>
+                    <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarNumeracaoEditor();">Remover</button>
                 </div>
             `;
             container.appendChild(div);
-            const quill = new Quill(`#${editorId}`, {
-                theme: 'snow', placeholder: 'Escreva a instrução visual para o aluno...',
-                modules: { toolbar: [ [{ 'size': ['small', false, 'large', 'huge'] }], ['bold', 'italic', 'underline', 'strike'], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['link', 'image', 'video'], ['clean'] ] }
-            });
+            const quill = new Quill(`#${editorId}`, { theme: 'snow', placeholder: 'Escreva a instrução visual...', modules: { toolbar: [ [{ 'size': ['small', false, 'large', 'huge'] }], ['bold', 'italic', 'underline', 'strike'], [{ 'color': [] }, { 'background': [] }], [{ 'align': [] }], ['link', 'image', 'video'], ['clean'] ] } });
             if (textoHtml) { quill.clipboard.dangerouslyPasteHTML(textoHtml); }
             div.quillInstance = quill;
             reordenarNumeracaoEditor();
@@ -966,30 +770,15 @@
 
         function reordenarNumeracaoEditor() { Array.from(document.getElementById('editor-passos-container').children).forEach((div, idx) => { div.querySelector('.step-label').innerText = `Passo ${idx + 1}`; }); }
 
-        async function salvarSenhaModuloExclusivaBotao() {
-            if (!bancoDados) return;
-            const c = document.getElementById('prof-curso').value;
-            const m = document.getElementById('prof-modulo').value;
-            const senha = document.getElementById('prof-senha-modulo-especifica').value.trim();
-            if (!senha) { showToast("Digite uma senha primeiro!", "warning"); return; }
-            try {
-                await bancoDados.from('roteiros_aulas').upsert({ id: `secretpass_${c}_${m}`, modulo_id: `${c}_${m}`, aula_id: 'config_senha', nome_modulo: 'Configuração', nome_aula: senha, passos: ["TRAVADA"], passos_midia: [] });
-                showToast("Chave exclusiva gravada!", "success");
-                await baixarSenhasModulosIndependente();
-            } catch (err) { showToast("Erro ao gravar senha", "error"); }
-        }
-
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
             document.getElementById('editor-passos-container').innerHTML = '';
-            document.getElementById('prof-senha-modulo-especifica').value = senhasModulosGerais[`${c}_${m}`] || '';
             try {
                 const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', `${c}_${m}_${a}`).maybeSingle();
                 if (data) {
-                    let titulo = data.nome_aula || '';
-                    if (titulo.includes('|||')) titulo = titulo.split('|||')[0].trim();
+                    let titulo = data.nome_aula || ''; if (titulo.includes('|||')) titulo = titulo.split('|||')[0].trim();
                     document.getElementById('prof-nome-aula').value = titulo;
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
                     if (data.passos_midia) data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
@@ -1013,9 +802,7 @@
             document.querySelectorAll('.step-editor-item').forEach(item => {
                 const quill = item.quillInstance;
                 const txtHtml = quill ? quill.root.innerHTML : '';
-                if(quill && quill.getText().trim() !== '') {
-                    pacotePassos.push({ texto: txtHtml, imagem: item.querySelector('.edit-img').value.trim(), link: item.querySelector('.edit-link').value.trim() });
-                }
+                if(quill && quill.getText().trim() !== '') { pacotePassos.push({ texto: txtHtml, imagem: item.querySelector('.edit-img').value.trim(), link: item.querySelector('.edit-link').value.trim() }); }
             });
 
             if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo!", "warning"); return; }
@@ -1025,30 +812,16 @@
 
             try {
                 await bancoDados.from('roteiros_aulas').upsert({ id: `${c}_${m}_${a}`, modulo_id: `${c}_${m}`, aula_id: a, nome_modulo: nModulo || dMod, nome_aula: nAula || dAula, passos_midia: pacotePassos, passos: ["html_rich_text"] });
-                showToast("Aula salva e sincronizada! 🚀", "success");
+                showToast("Aula salva com sucesso! 🚀", "success");
                 await baixarNomesCustomizados();
-            } catch (err) { showToast("Erro ao salvar aula", "error"); }
+            } catch (err) { showToast("Erro ao salvar", "error"); }
         }
 
         // --- NAVEGAÇÃO E AULAS DO ESTUDANTE ---
-        function solicitarSenhaCurso(idCurso, titulo) {
-            cursoSelecionado = idCurso;
-            document.getElementById('estudante-cursos').style.display = 'none';
-            document.getElementById('estudante-modulos').style.display = 'block';
-            renderizarModulosEstudante();
-        }
-
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
             
-            let mAtivoStr = '1';
-            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
-            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
-            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
-            else mAtivoStr = senhasCursos.modAtivoRep;
-            
-            let mAtivo = parseInt(mAtivoStr || "1");
             let maxMod = cursoSelecionado === 'ingles' ? 9 : 10;
 
             for (let m = 1; m <= maxMod; m++) {
@@ -1059,13 +832,12 @@
                 let cache = nomesCustomizados[`${cursoSelecionado}_modulo_${m}_aula_1`];
                 if(cache && cache.modulo) { nExibir = cache.modulo; desc = "Roteiro personalizado"; }
 
-                const chaveLiberado = `${cursoSelecionado}_${m}`;
-                const jaLiberado = modulosLiberadosAluno.includes(chaveLiberado);
+                const jaLiberado = modulosLiberadosAluno.includes(String(m));
                 let classes = "mod-item", badge = "", numBg = String(m).padStart(2, '0');
 
-                if (m === mAtivo) { classes += " ativo"; badge = "⚡ Hoje"; }
-                else if (jaLiberado || m < mAtivo) { classes += " revendo"; badge = "⭐ Liberado"; }
-                else { classes += " bloqueado"; badge = "🔒 Em breve"; }
+                // Agora só tem DUAS cores: Liberado (Verde) e Bloqueado (Cinza). Você controla o que é ativo.
+                if (jaLiberado) { classes += " revendo"; badge = "⭐ Acessar"; }
+                else { classes += " bloqueado"; badge = "🔒 Aguarde"; }
 
                 let html = `<div class="${classes}" onclick="tentarAcessarModulo(${m}, '${nExibir}')"><div class="mod-number">${numBg}</div><div class="mod-info"><h4>${nExibir}</h4><p>${desc}</p></div><div class="mod-badge">${badge}</div></div>`;
                 container.innerHTML += html;
@@ -1073,54 +845,12 @@
         }
 
         function tentarAcessarModulo(mNum, nome) {
-            let mAtivoStr = '1';
-            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
-            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
-            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
-            else mAtivoStr = senhasCursos.modAtivoRep;
-
-            let mAtivo = parseInt(mAtivoStr || "1");
-            const chaveLiberado = `${cursoSelecionado}_${mNum}`;
-            const jaLib = modulosLiberadosAluno.includes(chaveLiberado);
-            modAlvoClicado = mNum;
-
-            if (mNum === mAtivo) {
-                document.getElementById('estudante-modulos').style.display = 'none';
-                document.getElementById('estudante-senha-tela').style.display = 'block';
-                document.getElementById('subtitulo-senha-contexto').innerText = cursoSelecionado === 'reposicao' ? "Insira a senha da ficha." : "Digite a senha do portal para a aula de hoje.";
-            } else if (jaLib || mNum < mAtivo) {
-                if (jaLib) avancarParaAulasModulo();
-                else {
-                    document.getElementById('estudante-modulos').style.display = 'none';
-                    document.getElementById('estudante-senha-tela').style.display = 'block';
-                    document.getElementById('subtitulo-senha-contexto').innerText = senhasModulosGerais[`${cursoSelecionado}_modulo_${mNum}`] ? "Digite a chave secreta desta aula." : "Conteúdo antigo. Peça a chave para a professora.";
-                }
-            } else { showToast("Ainda não chegamos neste tópico! ⏳", "warning"); }
-        }
-
-        function validarSenhaAcesso() {
-            const digitada = document.getElementById('input-senha-aluno').value.trim();
-            document.getElementById('input-senha-aluno').value = ''; 
-            
-            let mAtivoStr = '1';
-            if(cursoSelecionado === 'informatica') mAtivoStr = senhasCursos.modAtivoInf;
-            else if(cursoSelecionado === 'senior') mAtivoStr = senhasCursos.modAtivoSen;
-            else if(cursoSelecionado === 'ingles') mAtivoStr = senhasCursos.modAtivoIng;
-            else mAtivoStr = senhasCursos.modAtivoRep;
-            let mAtivo = parseInt(mAtivoStr || "1");
-            
-            if (modAlvoClicado === mAtivo) {
-                if (digitada === senhasCursos[cursoSelecionado]) avancarParaAulasModulo();
-                else showToast("Senha incorreta!", "error");
-            } else {
-                if (senhasModulosGerais[`${cursoSelecionado}_modulo_${modAlvoClicado}`] === digitada) {
-                    const chaveLiberado = `${cursoSelecionado}_${modAlvoClicado}`;
-                    if (!modulosLiberadosAluno.includes(chaveLiberado)) {
-                        modulosLiberadosAluno.push(chaveLiberado);
-                        salvarProgressoAlunoNuvemLocal(cursoSelecionado);
-                    }
-                    avancarParaAulasModulo();
-                } else showToast("Chave de revisão incorreta!", "error");
+            const jaLib = modulosLiberadosAluno.includes(String(mNum));
+            if (jaLib) {
+                modAlvoClicado = mNum;
+                avancarParaAulasModulo();
+            } else { 
+                showToast("Este módulo está trancado. Peça para a professora liberar!", "warning"); 
             }
         }
 
@@ -1130,7 +860,6 @@
             if(cursoSelecionado === 'ingles') nTemp = nomesModulosIngles[modAlvoClicado-1];
             if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`]) nTemp = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`].modulo;
 
-            document.getElementById('estudante-senha-tela').style.display = 'none';
             document.getElementById('estudante-modulos').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
             document.getElementById('titulo-modulo-atual').innerText = nTemp;
@@ -1144,7 +873,7 @@
                 let nAula = cursoSelecionado === 'ingles' ? `Lesson ${String(a).padStart(2, '0')}` : `Atividade 0${a}`;
                 if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`]) nAula = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`].aula;
                 
-                const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
+                const aulaIdCompleto = `aula_${a}`; // simplificado para UI
                 const jaConcluida = aulasConcluidasAluno.includes(aulaIdCompleto);
                 const badgeExtra = jaConcluida ? `<div class="mod-badge" style="background:var(--success-light); color:var(--success);">✅ Concluída</div>` : `<div class="mod-badge" style="background:transparent;">▶</div>`;
                 
@@ -1152,8 +881,7 @@
             }
         }
 
-        function voltarParaCursos() { document.getElementById('estudante-modulos').style.display = 'none'; document.getElementById('estudante-cursos').style.display = 'block'; }
-        function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-senha-tela').style.display = 'none'; document.getElementById('estudante-modulos').style.display = 'block'; }
+        function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-modulos').style.display = 'block'; }
 
         async function buscarAulaNuvem(aId) {
             aulaSelecionada = aId;
@@ -1206,20 +934,16 @@
         function mudarPasso(direcao) {
             passoAtual += direcao;
             if (passoAtual >= passosAulaAtual.length) {
-                
-                const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
-                if (!aulasConcluidasAluno.includes(aulaIdCompleto)) {
-                    aulasConcluidasAluno.push(aulaIdCompleto);
-                    salvarProgressoAlunoNuvemLocal(cursoSelecionado);
+                if (!aulasConcluidasAluno.includes(aulaSelecionada)) {
+                    aulasConcluidasAluno.push(aulaSelecionada);
+                    salvarProgressoAlunoNuvem();
                 }
-
                 verificarConquistas();
                 atualizarDashboard();
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
                 avancarParaAulasModulo(); 
                 document.getElementById('estudante-passos').style.display = 'none';
                 document.getElementById('estudante-aulas').style.display = 'block';
-
             } else mostrarPasso();
         }
 
