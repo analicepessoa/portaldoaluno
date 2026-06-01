@@ -29,7 +29,6 @@
             --gray-light: #e2e8f0;
         }
 
-        /* === INTELIGÊNCIA DO MODO ESCURO === */
         body.dark-mode {
             --bg: #0f172a;
             --text: #f8fafc;
@@ -64,7 +63,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--bg); border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--gray-light); margin-bottom: 25px; padding: 30px; transition: background 0.3s, border-color 0.3s; }
-        body:not(.dark-mode) .card { background: white; } /* Mantém cartões brancos no modo claro */
+        body:not(.dark-mode) .card { background: white; } 
         
         .btn-action { background-color: var(--primary); color: white; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
         .btn-action:hover { opacity: 0.9; }
@@ -167,7 +166,6 @@
         body:not(.dark-mode) .quill-editor-container { background: white; }
         .ql-editor { min-height: 150px; padding: 20px; }
         
-        /* Ajustes específicos de ícones no editor para modo escuro */
         body.dark-mode .ql-stroke { stroke: var(--text-light); }
         body.dark-mode .ql-fill { fill: var(--text-light); }
         body.dark-mode .ql-picker { color: var(--text-light); }
@@ -201,6 +199,7 @@
 
     <div class="container">
 
+        <!-- ==================== LOGIN COM PIN DO ALUNO ==================== -->
         <section id="view-login" class="view-section active" style="text-align: center;">
             <div class="card" style="max-width: 450px; margin: 40px auto; border: 2px solid var(--primary);">
                 <div style="font-size: 3.5rem; margin-bottom: 10px;">👋</div>
@@ -213,9 +212,12 @@
             </div>
         </section>
 
+        <!-- ==================== ÁREA DO ESTUDANTE ==================== -->
         <section id="view-estudante" class="view-section">
             
-            <div id="estudante-modulos">
+            <!-- PAINEL GERAL DO ALUNO (HERO + DASHBOARD + MÓDULOS) -->
+            <div id="estudante-painel-home">
+                
                 <div class="hero">
                     <div class="badge" id="badge-curso-aluno">Portal Educacional 2.0</div>
                     <h2 id="nome-aluno-display">Bem-vindo(a)!</h2>
@@ -225,42 +227,57 @@
                     </div>
                 </div>
 
-                <div id="lista-cursos-principal" style="display:none;">
+                <!-- CAIXA DE RETOMAR AULA INJETADA AQUI -->
+                <div id="area-ultima-aula"></div>
+
+                <!-- LISTA DE CURSOS (APENAS PARA A PROFESSORA EM MODO TESTE) -->
+                <div id="lista-cursos-principal" style="display:none; margin-bottom: 30px;">
                     <h2 style="margin-top:0;">📚 Testar Todos os Cursos</h2>
-                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica')"><div class="icon-box">💻</div><div class="course-card-content"><h3>Informática 5.0</h3></div></div>
-                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior')"><div class="icon-box">👵</div><div class="course-card-content"><h3>Curso Sênior</h3></div></div>
-                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles')"><div class="icon-box">🌎</div><div class="course-card-content"><h3>Inglês</h3></div></div>
-                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao')"><div class="icon-box">🔄</div><div class="course-card-content"><h3>Reposições</h3></div></div>
+                    <div class="course-card inf" onclick="solicitarSenhaCurso('informatica')"><div class="icon-box">💻</div><div class="course-card-content"><h3>Informática 5.0</h3><p>Visão de Teste</p></div></div>
+                    <div class="course-card sen" onclick="solicitarSenhaCurso('senior')"><div class="icon-box">👵</div><div class="course-card-content"><h3>Curso Sênior</h3><p>Visão de Teste</p></div></div>
+                    <div class="course-card ing" onclick="solicitarSenhaCurso('ingles')"><div class="icon-box">🌎</div><div class="course-card-content"><h3>Inglês</h3><p>Visão de Teste</p></div></div>
+                    <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao')"><div class="icon-box">🔄</div><div class="course-card-content"><h3>Reposições</h3><p>Visão de Teste</p></div></div>
                 </div>
 
-                <div class="card" id="card-dashboard-estatisticas">
-                    <h2 style="margin-top:0;">📊 Meu Desempenho</h2>
-                    <div class="dashboard-grid">
-                        <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="dash-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
-                        <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="dash-conquistas">0</div><div class="stat-label">Conquistas</div></div></div>
-                        <div class="stat-card"><div class="stat-icon">📈</div><div><div class="stat-value" id="dash-progresso">0%</div><div class="stat-label">Progresso Geral</div></div></div>
+                <!-- DASHBOARD (APENAS PARA ALUNO REAL) -->
+                <div id="dashboard-aluno-real">
+                    <div class="card">
+                        <h2 style="margin-top:0;">📊 Meu Desempenho</h2>
+                        <div class="dashboard-grid">
+                            <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="dash-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
+                            <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="dash-conquistas">0</div><div class="stat-label">Conquistas</div></div></div>
+                            <div class="stat-card"><div class="stat-icon">📈</div><div><div class="stat-value" id="dash-progresso">0%</div><div class="stat-label">Progresso Geral</div></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h2 style="margin-top:0;">🏆 Conquistas</h2>
+                        <div id="lista-conquistas"><p style="color:var(--text-light)">Nenhuma conquista desbloqueada.</p></div>
+                    </div>
+                    <div class="card">
+                        <h2 style="margin-top:0;">🕒 Últimas aulas acessadas</h2>
+                        <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
                     </div>
                 </div>
 
-                <div class="card" id="card-dashboard-conquistas">
-                    <h2 style="margin-top:0;">🏆 Conquistas</h2>
-                    <div id="lista-conquistas"><p style="color:var(--text-light)">Nenhuma conquista desbloqueada.</p></div>
-                </div>
-                <div class="card" id="card-dashboard-historico">
-                    <h2 style="margin-top:0;">🕒 Últimas aulas acessadas</h2>
-                    <div id="historico-aulas"><p style="color:var(--text-light)">Ainda não há histórico.</p></div>
+                <!-- ÁREA DE MÓDULOS (Sempre visível para aluno, e visível após click na Professora) -->
+                <div id="area-modulos">
+                    <!-- Botão de voltar só aparece para a Professora -->
+                    <button class="btn-action secondary" id="btn-voltar-cursos-teste" style="display:none; margin-bottom: 20px;" onclick="voltarParaCursosTeste()">< Voltar aos Cursos</button>
+                    
+                    <h2 id="titulo-trilha-dinamico">📚 Minha Trilha de Aprendizado</h2>
+                    <div class="module-list" id="lista-modulos-estudante"></div>
                 </div>
 
-                <h2 id="titulo-trilha-dinamico">📚 Minha Trilha de Aprendizado</h2>
-                <div class="module-list" id="lista-modulos-estudante"></div>
             </div>
 
+            <!-- TELA DA LISTA DE AULAS DO MÓDULO -->
             <div id="estudante-aulas" style="display:none;">
                 <button class="btn-action secondary" style="margin-bottom: 20px;" onclick="voltarParaModulos()">< Voltar para Trilha</button>
                 <h2 id="titulo-modulo-atual">Aulas Disponíveis:</h2>
                 <div class="module-list" id="lista-aulas-estudante"></div>
             </div>
 
+            <!-- TELA DA AULA E SLIDES -->
             <div id="estudante-passos" style="display:none;">
                 <button class="btn-action secondary" style="margin-bottom: 15px;" onclick="voltarParaAulas()">< Sair da Aula</button>
                 <h2 id="titulo-aula-atual" style="margin-bottom: 15px;">Aula</h2>
@@ -282,8 +299,10 @@
                     </div>
                 </div>
             </div>
+
         </section>
 
+        <!-- ==================== BLOQUEIO DO PROFESSOR ==================== -->
         <section id="view-professor-bloqueado" class="view-section" style="text-align: center;">
             <div class="card" style="max-width: 400px; margin: 40px auto; border: 2px solid var(--danger);">
                 <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
@@ -295,6 +314,7 @@
             </div>
         </section>
 
+        <!-- ==================== ÁREA DO PROFESSOR ==================== -->
         <section id="view-professor" class="view-section">
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
@@ -302,6 +322,7 @@
                 <button class="btn-action secondary" style="margin:0; background:var(--primary); color:white; border: 2px solid var(--primary-dark);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
             </div>
 
+            <!-- GESTÃO DE MATRÍCULAS E EDIÇÃO -->
             <div class="card" style="border-left: 5px solid var(--primary);">
                 <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
                 <p>Cadastre, edite senhas ou gerencie quais módulos estão destravados.</p>
@@ -327,6 +348,7 @@
                 <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
             </div>
 
+            <!-- ANALYTICS DA PROFESSORA -->
             <div class="card" style="background:var(--primary-light);">
                 <h2 style="margin-top:0;">📊 Analytics Geral</h2>
                 <div class="dashboard-grid">
@@ -341,6 +363,7 @@
                 <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
             </div>
 
+            <!-- EDITOR VISUAL -->
             <div class="card">
                 <h2 style="margin-top:0;">Gerenciador de Aulas Multimídia</h2>
                 <p>Crie e edite os conteúdos usando o editor visual avançado.</p>
@@ -375,6 +398,7 @@
 
     </div>
 
+    <!-- Navegação Inferior -->
     <div class="bottom-nav" id="nav-container" style="display:none;">
         <button class="bottom-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
         <button class="bottom-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
@@ -424,7 +448,7 @@
         let historicoAluno = JSON.parse(localStorage.getItem("historicoPortal")) || [];
         let conquistasAluno = JSON.parse(localStorage.getItem("conquistasPortal")) || [];
 
-        // --- LOGIN SEGURO E PUXAR DADOS DA NUVEM (CORRIGIDO) ---
+        // --- LOGIN E LÓGICA DE DADOS ---
         async function entrarComoAluno() {
             const nomeDigitado = document.getElementById('input-nome-aluno').value.trim().toLowerCase();
             const senhaDigitada = document.getElementById('input-senha-aluno-login').value.trim();
@@ -432,7 +456,6 @@
             
             showToast("Verificando dados...", "info");
             try {
-                // Apenas e unicamente puxa da tabela oficial alunos_matriculados!
                 const { data, error } = await bancoDados.from('alunos_matriculados').select('*').eq('nome_aluno', nomeDigitado).eq('senha', senhaDigitada).maybeSingle();
                 
                 if(!data) { showToast("Nome ou PIN incorretos. Tente novamente.", "error"); return; }
@@ -453,12 +476,11 @@
                 
                 mudarAba('estudante');
                 
-                // Configura a tela limpa para o aluno real:
+                // Configuração limpa para o aluno real
                 document.getElementById('lista-cursos-principal').style.display = 'none'; 
-                document.getElementById('card-dashboard-estatisticas').style.display = 'block';
-                document.getElementById('card-dashboard-conquistas').style.display = 'block';
-                document.getElementById('card-dashboard-historico').style.display = 'block';
-                document.getElementById('titulo-trilha-dinamico').style.display = 'block'; 
+                document.getElementById('btn-voltar-cursos-teste').style.display = 'none';
+                document.getElementById('dashboard-aluno-real').style.display = 'block';
+                document.getElementById('area-modulos').style.display = 'block'; 
                 
                 renderizarModulosEstudante(); 
                 atualizarDashboard();
@@ -471,12 +493,10 @@
             } catch(e) { showToast("Erro de conexão.", "error"); }
         }
 
-        // --- MODO TESTE DA PROFESSORA ---
         function entrarModoTeste() {
             alunoLogado = "professora_teste";
             alunoLogadoDados = { id: 'teste_admin' };
             
-            // Libera todos os módulos para a professora não ficar travada
             modulosLiberadosAluno = [];
             ['informatica', 'senior', 'ingles', 'reposicao'].forEach(c => {
                 for(let i=1; i<=10; i++) modulosLiberadosAluno.push(`${c}_${i}`);
@@ -490,17 +510,13 @@
             showToast("Modo Teste Ativado! Você tem acesso a todos os cursos.", "success");
             mudarAba('estudante');
             
-            // Ajusta a interface para a Professora escolher os cursos livremente
+            // Configuração para a Professora Testar
             document.getElementById('lista-cursos-principal').style.display = 'block'; 
-            document.getElementById('card-dashboard-estatisticas').style.display = 'none';
-            document.getElementById('card-dashboard-conquistas').style.display = 'none';
-            document.getElementById('card-dashboard-historico').style.display = 'none';
-            document.getElementById('titulo-trilha-dinamico').style.display = 'none';
-            document.getElementById('estudante-modulos').style.display = 'none';
+            document.getElementById('dashboard-aluno-real').style.display = 'none';
+            document.getElementById('area-modulos').style.display = 'none';
         }
 
         async function salvarProgressoAlunoNuvem() {
-            // Professora em teste não suja o banco de dados
             if(!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
             try {
                 await bancoDados.from('alunos_matriculados').update({
@@ -510,7 +526,7 @@
             } catch(e) {}
         }
 
-        // --- DASHBOARD E GAMEFICAÇÃO ---
+        // --- GAMEFICAÇÃO ---
         function atualizarDashboard() {
             document.getElementById("dash-aulas").innerText = aulasConcluidasAluno.length;
             document.getElementById("dash-conquistas").innerText = conquistasAluno.length;
@@ -563,12 +579,14 @@
             if(alunoLogado === 'professora_teste') return;
             const dados = localStorage.getItem("ultimaAulaPortal");
             if(!dados) return;
-            if(document.getElementById('card-retomar-aula')) return;
-            const hero = document.getElementById("estudante-modulos");
-            const card = document.createElement("div");
-            card.className = "card"; card.id = "card-retomar-aula"; card.style.borderLeft = "5px solid var(--success)";
-            card.innerHTML = `<h2 style="margin-top:0;">▶ Continuar Estudando</h2><p>Você tem uma aula em andamento.</p><button class="btn-action" style="background:var(--success);" onclick="retomarUltimaAula()">Retomar Aula</button>`;
-            hero.insertBefore(card, hero.children[1]); 
+            const container = document.getElementById("area-ultima-aula");
+            container.innerHTML = `
+                <div class="card" style="border-left: 5px solid var(--success); margin-bottom: 30px;">
+                    <h2 style="margin-top:0;">▶ Continuar Estudando</h2>
+                    <p>Você tem uma aula em andamento.</p>
+                    <button class="btn-action" style="background:var(--success);" onclick="retomarUltimaAula()">Retomar Aula</button>
+                </div>
+            `;
         }
 
         function retomarUltimaAula() {
@@ -578,12 +596,13 @@
             cursoSelecionado = aula.curso;
             modSelecionado = aula.modulo;
             modAlvoClicado = parseInt(modSelecionado.replace('modulo_', ''));
-            document.getElementById('estudante-modulos').style.display = 'none';
+            
+            document.getElementById('estudante-painel-home').style.display = 'none';
             avancarParaAulasModulo();
             buscarAulaNuvem(aula.aula);
         }
 
-        // --- AREA DA PROFESSORA ---
+        // --- NAVEGAÇÃO ENTRE ABAS ---
         function mudarAba(aba) {
             if (!alunoLogado && aba === 'estudante') {
                 document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
@@ -605,14 +624,19 @@
                 }
             } else {
                 document.getElementById('view-estudante').style.display = 'block';
+                document.getElementById('estudante-painel-home').style.display = 'block';
                 document.getElementById('estudante-aulas').style.display = 'none';
                 document.getElementById('estudante-passos').style.display = 'none';
                 
+                // Reposiciona o layout dependendo de quem é
                 if(alunoLogado === 'professora_teste') {
                     document.getElementById('lista-cursos-principal').style.display = 'block';
-                    document.getElementById('estudante-modulos').style.display = 'none';
+                    document.getElementById('dashboard-aluno-real').style.display = 'none';
+                    document.getElementById('area-modulos').style.display = 'none';
                 } else {
-                    document.getElementById('estudante-modulos').style.display = 'block';
+                    document.getElementById('lista-cursos-principal').style.display = 'none';
+                    document.getElementById('dashboard-aluno-real').style.display = 'block';
+                    document.getElementById('area-modulos').style.display = 'block';
                 }
             }
         }
@@ -628,19 +652,13 @@
             
             try {
                 if (alunoEmEdicaoId) {
-                    // MODO EDIÇÃO
-                    await bancoDados.from('alunos_matriculados').update({
-                        nome_aluno: nome, senha: senha, curso: curso
-                    }).eq('id', alunoEmEdicaoId);
-                    showToast(`Dados de ${nome} atualizados!`, "success");
+                    await bancoDados.from('alunos_matriculados').update({ nome_aluno: nome, senha: senha, curso: curso }).eq('id', alunoEmEdicaoId);
+                    showToast(`Dados atualizados!`, "success");
                     cancelarEdicaoAluno();
                 } else {
-                    // MODO CRIAÇÃO (NOVO)
                     const idUnico = `${nome}_${Date.now()}`;
-                    await bancoDados.from('alunos_matriculados').insert({
-                        id: idUnico, nome_aluno: nome, senha: senha, curso: curso
-                    });
-                    showToast(`Aluno ${nome} matriculado!`, "success");
+                    await bancoDados.from('alunos_matriculados').insert({ id: idUnico, nome_aluno: nome, senha: senha, curso: curso });
+                    showToast(`Aluno matriculado!`, "success");
                     document.getElementById('novo-aluno-nome').value = '';
                     document.getElementById('novo-aluno-senha').value = '';
                 }
@@ -653,7 +671,7 @@
             document.getElementById('novo-aluno-nome').value = nome;
             document.getElementById('novo-aluno-senha').value = senha;
             document.getElementById('novo-aluno-curso').value = curso;
-            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Alterações";
+            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Aluno";
             document.getElementById('btn-cancelar-edicao').style.display = "block";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -667,7 +685,7 @@
         }
 
         async function excluirAluno(id, nome) {
-            if(!confirm(`Tem certeza que deseja EXCLUIR o(a) aluno(a) ${nome.toUpperCase()}? Todo o histórico de acesso dele(a) será apagado!`)) return;
+            if(!confirm(`Tem certeza que deseja EXCLUIR o aluno ${nome.toUpperCase()}?`)) return;
             try {
                 await bancoDados.from('alunos_matriculados').delete().eq('id', id);
                 showToast("Aluno excluído com sucesso.", "success");
@@ -867,13 +885,18 @@
             } catch (err) { showToast("Erro ao salvar", "error"); }
         }
 
-        // --- NAVEGAÇÃO E AULAS DO ESTUDANTE ---
+        // --- NAVEGAÇÃO ENTRE CURSOS E AULAS DO ALUNO ---
         function solicitarSenhaCurso(idCurso) {
             cursoSelecionado = idCurso;
             document.getElementById('lista-cursos-principal').style.display = 'none';
-            document.getElementById('titulo-trilha-dinamico').style.display = 'block';
-            document.getElementById('estudante-modulos').style.display = 'block';
+            document.getElementById('area-modulos').style.display = 'block';
+            document.getElementById('btn-voltar-cursos-teste').style.display = 'block'; // Mostra botão voltar
             renderizarModulosEstudante();
+        }
+
+        function voltarParaCursosTeste() {
+            document.getElementById('area-modulos').style.display = 'none';
+            document.getElementById('lista-cursos-principal').style.display = 'block';
         }
 
         function renderizarModulosEstudante() {
@@ -913,7 +936,7 @@
             if(cursoSelecionado === 'ingles') nTemp = nomesModulosIngles[modAlvoClicado-1];
             if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`]) nTemp = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`].modulo;
 
-            document.getElementById('estudante-modulos').style.display = 'none';
+            document.getElementById('estudante-painel-home').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
             document.getElementById('titulo-modulo-atual').innerText = nTemp;
             
@@ -934,7 +957,7 @@
             }
         }
 
-        function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-modulos').style.display = 'block'; }
+        function voltarParaModulos() { document.getElementById('estudante-aulas').style.display = 'none'; document.getElementById('estudante-painel-home').style.display = 'block'; }
 
         async function buscarAulaNuvem(aId) {
             aulaSelecionada = aId;
