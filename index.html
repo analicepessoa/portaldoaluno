@@ -215,7 +215,6 @@
         <!-- ==================== ÁREA DO ESTUDANTE ==================== -->
         <section id="view-estudante" class="view-section">
             
-            <!-- PAINEL GERAL DO ALUNO (HERO + DASHBOARD + MÓDULOS) -->
             <div id="estudante-painel-home">
                 
                 <div class="hero">
@@ -227,10 +226,8 @@
                     </div>
                 </div>
 
-                <!-- CAIXA DE RETOMAR AULA INJETADA AQUI -->
                 <div id="area-ultima-aula"></div>
 
-                <!-- LISTA DE CURSOS (APENAS PARA A PROFESSORA EM MODO TESTE) -->
                 <div id="lista-cursos-principal" style="display:none; margin-bottom: 30px;">
                     <h2 style="margin-top:0;">📚 Testar Todos os Cursos</h2>
                     <div class="course-card inf" onclick="solicitarSenhaCurso('informatica')"><div class="icon-box">💻</div><div class="course-card-content"><h3>Informática 5.0</h3><p>Visão de Teste</p></div></div>
@@ -239,7 +236,6 @@
                     <div class="course-card rep" onclick="solicitarSenhaCurso('reposicao')"><div class="icon-box">🔄</div><div class="course-card-content"><h3>Reposições</h3><p>Visão de Teste</p></div></div>
                 </div>
 
-                <!-- DASHBOARD (APENAS PARA ALUNO REAL) -->
                 <div id="dashboard-aluno-real">
                     <div class="card">
                         <h2 style="margin-top:0;">📊 Meu Desempenho</h2>
@@ -259,25 +255,20 @@
                     </div>
                 </div>
 
-                <!-- ÁREA DE MÓDULOS (Sempre visível para aluno, e visível após click na Professora) -->
                 <div id="area-modulos">
-                    <!-- Botão de voltar só aparece para a Professora -->
                     <button class="btn-action secondary" id="btn-voltar-cursos-teste" style="display:none; margin-bottom: 20px;" onclick="voltarParaCursosTeste()">< Voltar aos Cursos</button>
-                    
                     <h2 id="titulo-trilha-dinamico">📚 Minha Trilha de Aprendizado</h2>
                     <div class="module-list" id="lista-modulos-estudante"></div>
                 </div>
 
             </div>
 
-            <!-- TELA DA LISTA DE AULAS DO MÓDULO -->
             <div id="estudante-aulas" style="display:none;">
                 <button class="btn-action secondary" style="margin-bottom: 20px;" onclick="voltarParaModulos()">< Voltar para Trilha</button>
                 <h2 id="titulo-modulo-atual">Aulas Disponíveis:</h2>
                 <div class="module-list" id="lista-aulas-estudante"></div>
             </div>
 
-            <!-- TELA DA AULA E SLIDES -->
             <div id="estudante-passos" style="display:none;">
                 <button class="btn-action secondary" style="margin-bottom: 15px;" onclick="voltarParaAulas()">< Sair da Aula</button>
                 <h2 id="titulo-aula-atual" style="margin-bottom: 15px;">Aula</h2>
@@ -290,7 +281,7 @@
                 <div class="card step-viewer-card" style="text-align:center;">
                     <div class="step-scroll-area" id="area-rolagem-aluno">
                         <div id="galeria-imagens-aluno" class="images-gallery"></div>
-                        <div id="conteudo-passo" class="step-text ql-editor" style="padding: 0;"></div>
+                        <div id="conteudo-passo" class="step-text ql-editor" style="padding:0;"></div>
                         <div id="link-passo-container" style="margin-bottom: 10px;"></div>
                     </div>
                     <div class="nav-steps">
@@ -322,7 +313,6 @@
                 <button class="btn-action secondary" style="margin:0; background:var(--primary); color:white; border: 2px solid var(--primary-dark);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
             </div>
 
-            <!-- GESTÃO DE MATRÍCULAS E EDIÇÃO -->
             <div class="card" style="border-left: 5px solid var(--primary);">
                 <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
                 <p>Cadastre, edite senhas ou gerencie quais módulos estão destravados.</p>
@@ -348,7 +338,6 @@
                 <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
             </div>
 
-            <!-- ANALYTICS DA PROFESSORA -->
             <div class="card" style="background:var(--primary-light);">
                 <h2 style="margin-top:0;">📊 Analytics Geral</h2>
                 <div class="dashboard-grid">
@@ -363,7 +352,6 @@
                 <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
             </div>
 
-            <!-- EDITOR VISUAL -->
             <div class="card">
                 <h2 style="margin-top:0;">Gerenciador de Aulas Multimídia</h2>
                 <p>Crie e edite os conteúdos usando o editor visual avançado.</p>
@@ -432,6 +420,7 @@
         let alunoLogado = ''; 
         let modulosLiberadosAluno = []; 
         let aulasConcluidasAluno = []; 
+        let aulasBloqueadasAluno = []; // NOVA VARIÁVEL: Aulas de reposição bloqueadas
         let cursoSelecionado = '';
         
         let modSelecionado = '';
@@ -465,6 +454,7 @@
                 cursoSelecionado = data.curso;
                 modulosLiberadosAluno = data.modulos_liberados || [];
                 aulasConcluidasAluno = data.aulas_concluidas || [];
+                aulasBloqueadasAluno = data.aulas_bloqueadas || []; // Carrega bloqueios de reposição
 
                 const nomeVisivel = alunoLogado.charAt(0).toUpperCase() + alunoLogado.slice(1);
                 document.getElementById('nome-aluno-display').innerText = `Olá, ${nomeVisivel}!`;
@@ -476,7 +466,6 @@
                 
                 mudarAba('estudante');
                 
-                // Configuração limpa para o aluno real
                 document.getElementById('lista-cursos-principal').style.display = 'none'; 
                 document.getElementById('btn-voltar-cursos-teste').style.display = 'none';
                 document.getElementById('dashboard-aluno-real').style.display = 'block';
@@ -498,6 +487,7 @@
             alunoLogadoDados = { id: 'teste_admin' };
             
             modulosLiberadosAluno = [];
+            aulasBloqueadasAluno = [];
             ['informatica', 'senior', 'ingles', 'reposicao'].forEach(c => {
                 for(let i=1; i<=10; i++) modulosLiberadosAluno.push(`${c}_${i}`);
             });
@@ -507,10 +497,9 @@
             document.getElementById('badge-curso-aluno').innerText = "Acesso Total Liberado";
             document.getElementById('nav-container').style.display = 'flex';
             
-            showToast("Modo Teste Ativado! Você tem acesso a todos os cursos.", "success");
+            showToast("Modo Teste Ativado!", "success");
             mudarAba('estudante');
             
-            // Configuração para a Professora Testar
             document.getElementById('lista-cursos-principal').style.display = 'block'; 
             document.getElementById('dashboard-aluno-real').style.display = 'none';
             document.getElementById('area-modulos').style.display = 'none';
@@ -628,7 +617,6 @@
                 document.getElementById('estudante-aulas').style.display = 'none';
                 document.getElementById('estudante-passos').style.display = 'none';
                 
-                // Reposiciona o layout dependendo de quem é
                 if(alunoLogado === 'professora_teste') {
                     document.getElementById('lista-cursos-principal').style.display = 'block';
                     document.getElementById('dashboard-aluno-real').style.display = 'none';
@@ -641,7 +629,7 @@
             }
         }
 
-        // --- GESTÃO DE ALUNOS (CRUD) ---
+        // --- GESTÃO DE ALUNOS E REPOSIÇÕES ---
         async function matricularNovoAluno() {
             if(!bancoDados) return;
             const nome = document.getElementById('novo-aluno-nome').value.trim().toLowerCase();
@@ -718,12 +706,39 @@
                     let maxMod = aluno.curso === 'ingles' ? 9 : 10;
                     let checkboxesHTML = '';
                     let liberados = aluno.modulos_liberados || [];
+                    let aulasBloqueadas = aluno.aulas_bloqueadas || [];
+                    
+                    // Renderiza os Módulos Liberados (Raiz)
                     for(let m=1; m<=maxMod; m++) {
                         let chaveLib = `${aluno.curso}_${m}`;
                         let isChecked = liberados.includes(chaveLib) ? 'checked' : '';
                         let labelMod = aluno.curso === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
                         checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${chaveLib}', this.checked)" ${isChecked}> ${labelMod}</label>`;
                     }
+
+                    // Renderiza as Aulas Específicas de Reposição dentro do Módulo
+                    let painelAulasHTML = `<div id="painel-aulas-${aluno.id}" style="display:none; margin-top: 15px; border-top: 1px dashed var(--gray-light); padding-top: 15px;">`;
+                    if(liberados.length === 0) {
+                        painelAulasHTML += `<p style="font-size:0.9rem; color:var(--text-light);">Nenhum módulo liberado para exibir as aulas.</p>`;
+                    } else {
+                        // Ordena os modulos para exibir bonito (ex: informatica_1, informatica_2)
+                        liberados.sort((a,b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1])).forEach(chaveMod => {
+                            let modNum = parseInt(chaveMod.split('_')[1]);
+                            let nomeModStr = aluno.curso === 'ingles' ? nomesModulosIngles[modNum-1] : `Módulo ${modNum}`;
+                            let maxAulasDentro = (aluno.curso === 'ingles') ? (modNum === 1 ? 5 : 15) : 8;
+                            
+                            painelAulasHTML += `<div style="margin-bottom: 10px;"><strong>${nomeModStr}</strong><div class="modulos-checkbox-grid">`;
+                            for(let a=1; a<=maxAulasDentro; a++) {
+                                let aulaIdCompleto = `${aluno.curso}_modulo_${modNum}_aula_${a}`;
+                                // Se ESTÁ na lista de bloqueadas, checkbox fica DESMARCADO. Se NÃO ESTÁ, fica MARCADO (Liberada).
+                                let isChecked = aulasBloqueadas.includes(aulaIdCompleto) ? '' : 'checked';
+                                painelAulasHTML += `<label><input type="checkbox" onchange="toggleAulaBloqueada('${aluno.id}', '${aulaIdCompleto}', this.checked)" ${isChecked}> Aula ${a}</label>`;
+                            }
+                            painelAulasHTML += `</div></div>`;
+                        });
+                    }
+                    painelAulasHTML += `</div>`;
+
                     const labelsCursos = { informatica: "Informática", senior: "Sênior", ingles: "Inglês", reposicao: "Reposição" };
                     return `<div class="aluno-gerenciamento-card">
                                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -735,6 +750,8 @@
                                 </div>
                                 <p style="margin:0 0 10px 0; font-size:0.9rem; color:var(--text-light);">PIN: ${aluno.senha}</p>
                                 <div class="modulos-checkbox-grid">${checkboxesHTML}</div>
+                                <button class="btn-action secondary" style="padding: 6px 12px; font-size: 0.9rem; margin-top: 15px;" onclick="document.getElementById('painel-aulas-${aluno.id}').style.display = document.getElementById('painel-aulas-${aluno.id}').style.display === 'none' ? 'block' : 'none'">⚙️ Gerenciar Aulas Individuais</button>
+                                ${painelAulasHTML}
                             </div>`;
                 }).join('');
             } catch(e){}
@@ -748,6 +765,26 @@
                 if(isLiberar && !liberados.includes(chaveLib)) liberados.push(chaveLib);
                 else if(!isLiberar) liberados = liberados.filter(m => m !== chaveLib);
                 await bancoDados.from('alunos_matriculados').update({ modulos_liberados: liberados }).eq('id', alunoId);
+                // Recarrega para gerar o painel de aulas novamente
+                carregarGestaoAlunosProf();
+            } catch(e) {}
+        }
+
+        async function toggleAulaBloqueada(alunoId, aulaIdCompleto, isLiberar) {
+            if(!bancoDados) return;
+            try {
+                const { data } = await bancoDados.from('alunos_matriculados').select('aulas_bloqueadas').eq('id', alunoId).single();
+                let bloqueadas = data.aulas_bloqueadas || [];
+                
+                if(isLiberar) {
+                    // Se a professora marcou (Liberou), removemos da lista negra de bloqueadas
+                    bloqueadas = bloqueadas.filter(a => a !== aulaIdCompleto);
+                } else {
+                    // Se a professora desmarcou (Bloqueou), adicionamos na lista negra
+                    if(!bloqueadas.includes(aulaIdCompleto)) bloqueadas.push(aulaIdCompleto);
+                }
+                
+                await bancoDados.from('alunos_matriculados').update({ aulas_bloqueadas: bloqueadas }).eq('id', alunoId);
             } catch(e) {}
         }
 
@@ -890,7 +927,7 @@
             cursoSelecionado = idCurso;
             document.getElementById('lista-cursos-principal').style.display = 'none';
             document.getElementById('area-modulos').style.display = 'block';
-            document.getElementById('btn-voltar-cursos-teste').style.display = 'block'; // Mostra botão voltar
+            document.getElementById('btn-voltar-cursos-teste').style.display = 'block'; 
             renderizarModulosEstudante();
         }
 
@@ -950,10 +987,27 @@
                 if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`]) nAula = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`].aula;
                 
                 const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
+                const isBloqueada = aulasBloqueadasAluno.includes(aulaIdCompleto);
                 const jaConcluida = aulasConcluidasAluno.includes(aulaIdCompleto);
-                const badgeExtra = jaConcluida ? `<div class="mod-badge" style="background:var(--success-light); color:var(--success);">✅ Concluída</div>` : `<div class="mod-badge" style="background:transparent;">▶</div>`;
                 
-                cont.innerHTML += `<div class="mod-item ativo" onclick="buscarAulaNuvem('aula_${a}')"><div class="mod-number" style="background:var(--primary-light); color:var(--primary); font-size: 1rem;">0${a}</div><div class="mod-info"><h4>${nAula}</h4></div>${badgeExtra}</div>`;
+                let badgeExtra = "";
+                let classesAula = "mod-item";
+                let onClickAttr = `onclick="buscarAulaNuvem('aula_${a}')"`;
+
+                // NOVO CÓDIGO DA AULA BLOQUEADA (OPÇÃO 3)
+                if (isBloqueada && alunoLogado !== 'professora_teste') {
+                    classesAula += " bloqueado";
+                    badgeExtra = `<div class="mod-badge" style="background:var(--danger-light); color:var(--danger);">🔒 Reposição</div>`;
+                    onClickAttr = `onclick="showToast('Aula bloqueada. Por favor, faça a reposição com a professora.', 'error')"`;
+                } else if (jaConcluida) {
+                    classesAula += " revendo";
+                    badgeExtra = `<div class="mod-badge" style="background:var(--success-light); color:var(--success);">✅ Concluída</div>`;
+                } else {
+                    classesAula += " ativo";
+                    badgeExtra = `<div class="mod-badge" style="background:transparent;">▶</div>`;
+                }
+                
+                cont.innerHTML += `<div class="${classesAula}" ${onClickAttr}><div class="mod-number" style="background:var(--primary-light); color:var(--primary); font-size: 1rem;">0${a}</div><div class="mod-info"><h4>${nAula}</h4></div>${badgeExtra}</div>`;
             }
         }
 
@@ -979,18 +1033,13 @@
             } catch (err) { showToast("Falha na conexão.", "error"); }
         }
 
-function mostrarPasso() {
+        function mostrarPasso() {
             const passo = passosAulaAtual[passoAtual];
             const galeria = document.getElementById('galeria-imagens-aluno');
             galeria.innerHTML = '';
-            
-            if (passo.imagem) passo.imagem.split(',').forEach(u => { 
-                if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; 
-            });
+            if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
 
             let textoFormatado = passo.texto;
-            
-            // FÓRMULA BLINDADA: Agora os atalhos mágicos ignoram os códigos de formatação do Editor Visual!
             textoFormatado = textoFormatado
                 .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
                 .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
