@@ -1,3 +1,4 @@
+<!-- Cole o seu código completo aqui e salve o arquivo -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -144,8 +145,10 @@
 
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
-        .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; color: #1e293b; }
-        .click-blue { background-color: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 8px; border: 2px solid #3b82f6; font-weight: bold; }
+        .click-target { background-color: #fef08a; padding: 4px 14px; border-radius: 8px; border: 2px dashed #ca8a04; font-weight: bold; color: #1e293b; display: inline-block; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
+        .click-target:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 5px 15px rgba(202, 138, 4, 0.4); }
+        .click-blue { background-color: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 8px; border: 2px solid #3b82f6; font-weight: bold; display: inline-block; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
+        .click-blue:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
         .text-danger-huge { color: var(--danger); font-size: 2.2rem; font-weight: 800; display: block; margin: 15px 0; }
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
         .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
@@ -182,6 +185,38 @@
         body:not(.dark-mode) .aluno-gerenciamento-card { background: white; }
         .aluno-gerenciamento-card h4 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
         .aluno-gerenciamento-card .curso-tag { background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+
+        /* Estilos do Quiz */
+        .quiz-question-card { background: var(--bg); border: 2px solid var(--gray-light); border-radius: 16px; padding: 25px; margin-bottom: 20px; transition: background 0.3s; }
+        body:not(.dark-mode) .quiz-question-card { background: white; }
+        .quiz-option { display: flex; align-items: center; padding: 16px 20px; margin-bottom: 12px; border: 2px solid var(--gray-light); border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 1.2rem; background: var(--bg); color: var(--text); font-weight: bold; }
+        body:not(.dark-mode) .quiz-option { background: white; }
+        .quiz-option:hover:not(.disabled) { border-color: var(--primary); background: var(--primary-light); transform: translateX(5px); }
+        .quiz-option.correct { border-color: var(--success); background: var(--success-light); color: var(--success); }
+        .quiz-option.wrong { border-color: var(--danger); background: var(--danger-light); color: var(--danger); animation: shakeX 0.4s; }
+        .quiz-option.disabled { cursor: not-allowed; opacity: 0.7; }
+        @keyframes shakeX { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        
+        .quiz-prof-item { background: var(--warning-light); border: 2px dashed var(--warning); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+
+        /* Abas do Professor */
+        .prof-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .prof-tab-btn { padding: 12px 20px; border-radius: 12px; border: 2px solid var(--gray-light); background: transparent; cursor: pointer; font-weight: bold; color: var(--text-light); transition: all 0.2s; white-space: nowrap; }
+        .prof-tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .prof-tab-content { display: none; animation: fadeInStep 0.4s ease-out forwards; }
+        .prof-tab-content.active { display: block; }
+
+        @keyframes fadeInStep { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in-step { animation: fadeInStep 0.4s ease-out forwards; }
+
+        /* Responsividade para Celulares */
+        @media (max-width: 768px) {
+            .step-text { font-size: 1.15rem; margin: 15px 0; }
+            .text-danger-huge { font-size: 1.5rem; }
+            .text-success-medium { font-size: 1.25rem; }
+            .btn-step { font-size: 1rem; padding: 12px; }
+            .step-viewer-card { padding: 15px; height: 70vh; }
+        }
     </style>
 </head>
 <body>
@@ -271,10 +306,11 @@
 
             <div id="estudante-passos" style="display:none;">
                 <button class="btn-action secondary" style="margin-bottom: 15px;" onclick="voltarParaAulas()">< Sair da Aula</button>
-                <h2 id="titulo-aula-atual" style="margin-bottom: 15px;">Aula</h2>
+                <h2 id="titulo-aula-atual" style="margin-bottom: 5px;">Aula</h2>
+                <p id="tempo-estimado-aula" style="color:var(--text-light); font-weight:bold; margin-top:0; margin-bottom:15px; font-size:0.95rem;">⏱️ Tempo estimado: 5 min</p>
                 
                 <div class="progress-wrapper">
-                    <div class="progress-header"><span id="progress-text-step">Passo 1</span><span id="progress-text-pct">10%</span></div>
+                    <div class="progress-header"><span id="progress-text-step">Passo 1</span><span><button id="btn-ler-audio" onclick="lerTextoPasso()" style="background:transparent; border:none; cursor:pointer; font-size:1.2rem; margin-right:10px; padding:0; transform:translateY(2px);" title="Ler em voz alta">🔊</button><span id="progress-text-pct">10%</span></span></div>
                     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 </div>
 
@@ -313,46 +349,66 @@
                 <button class="btn-action secondary" style="margin:0; background:var(--primary); color:white; border: 2px solid var(--primary-dark);" onclick="entrarModoTeste()">👁️ Testar Visão do Aluno</button>
             </div>
 
-            <div class="card" style="border-left: 5px solid var(--primary);">
-                <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
-                <p>Cadastre, edite senhas ou gerencie quais módulos estão destravados.</p>
-                
-                <div class="row-inputs" style="padding: 0; background: transparent; border: none; margin-bottom: 20px; align-items: stretch;">
-                    <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome (Ex: Gustavo)" style="margin:0; height:100%;"></div>
-                    <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="PIN (Ex: 1234)" style="margin:0; height:100%;"></div>
-                    <div style="flex:1;">
-                        <select id="novo-aluno-curso" style="margin:0; height:100%;">
-                            <option value="informatica">Informática 5.0</option>
-                            <option value="senior">Curso Sênior</option>
-                            <option value="ingles">Inglês 🌎</option>
-                            <option value="reposicao">Reposição 🔄</option>
+            <div class="prof-tabs">
+                <button class="prof-tab-btn active" onclick="alternarAbaProfessor('tab-prof-alunos', this)">👨‍🎓 Gestão de Alunos</button>
+                <button class="prof-tab-btn" onclick="alternarAbaProfessor('tab-prof-aulas', this)">📚 Gerenciador de Aulas</button>
+                <button class="prof-tab-btn" onclick="alternarAbaProfessor('tab-prof-analytics', this)">📊 Analytics e Ranking</button>
+            </div>
+
+            <!-- ABA 1: ALUNOS -->
+            <div id="tab-prof-alunos" class="prof-tab-content active">
+                <div class="card" style="border-left: 5px solid var(--primary);">
+                    <h2 style="margin-top:0;">👨‍🎓 Matrículas e Acessos</h2>
+                    <p>Cadastre, edite senhas e organize seus alunos por turmas/salas.</p>
+                    
+                    <div class="row-inputs" style="padding: 0; background: transparent; border: none; margin-bottom: 20px; align-items: stretch;">
+                        <div style="flex:1;"><input type="text" id="novo-aluno-nome" placeholder="Nome (Ex: Gustavo)" style="margin:0; height:100%;"></div>
+                        <div style="flex:1;"><input type="text" id="novo-aluno-senha" placeholder="PIN (Ex: 1234)" style="margin:0; height:100%;"></div>
+                        <div style="flex:1;"><input type="text" id="novo-aluno-sala" placeholder="Sala/Turma (Opc)" style="margin:0; height:100%;"></div>
+                        <div style="flex:1;">
+                            <select id="novo-aluno-curso" style="margin:0; height:100%;">
+                                <option value="informatica">Informática 5.0</option>
+                                <option value="senior">Curso Sênior</option>
+                                <option value="ingles">Inglês 🌎</option>
+                                <option value="reposicao">Reposição 🔄</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-direction: column; flex:1;">
+                            <button id="btn-salvar-aluno" class="btn-action" style="margin: 0; height: 100%; padding: 15px 10px;" onclick="matricularNovoAluno()">💾 Salvar</button>
+                            <button id="btn-cancelar-edicao" class="btn-action secondary" style="margin: 0; padding: 10px; display: none;" onclick="cancelarEdicaoAluno()">Cancelar</button>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:15px;">
+                        <h3 style="margin:0;">Alunos Matriculados:</h3>
+                        <select id="filtro-sala" onchange="renderizarListaAlunosProfessor()" style="padding:8px; border-radius:8px; max-width:200px;">
+                            <option value="todas">Todas as Salas</option>
                         </select>
                     </div>
-                    <div style="display: flex; gap: 10px; flex-direction: column; flex:1;">
-                        <button id="btn-salvar-aluno" class="btn-action" style="margin: 0; height: 100%; padding: 15px 10px;" onclick="matricularNovoAluno()">💾 Salvar Aluno</button>
-                        <button id="btn-cancelar-edicao" class="btn-action secondary" style="margin: 0; padding: 10px; display: none;" onclick="cancelarEdicaoAluno()">Cancelar</button>
+                    <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
+                </div>
+            </div>
+
+            <!-- ABA 3: ANALYTICS -->
+            <div id="tab-prof-analytics" class="prof-tab-content">
+                <div class="card" style="background:var(--primary-light);">
+                    <h2 style="margin-top:0;">📊 Analytics Geral</h2>
+                    <div class="dashboard-grid">
+                        <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><div class="stat-value" id="analytics-alunos">0</div><div class="stat-label">Alunos Ativos</div></div></div>
+                        <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
+                        <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div><div class="stat-label">Top Aluno</div></div></div>
                     </div>
                 </div>
 
-                <h3>Alunos Matriculados:</h3>
-                <div id="lista-gestao-alunos"><p style="color:var(--text-light)">Carregando alunos...</p></div>
-            </div>
-
-            <div class="card" style="background:var(--primary-light);">
-                <h2 style="margin-top:0;">📊 Analytics Geral</h2>
-                <div class="dashboard-grid">
-                    <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><div class="stat-value" id="analytics-alunos">0</div><div class="stat-label">Alunos Ativos</div></div></div>
-                    <div class="stat-card"><div class="stat-icon">🎓</div><div><div class="stat-value" id="analytics-aulas">0</div><div class="stat-label">Aulas Concluídas</div></div></div>
-                    <div class="stat-card"><div class="stat-icon">🏆</div><div><div class="stat-value" id="analytics-ranking" style="font-size: 1.2rem;">-</div><div class="stat-label">Top Aluno</div></div></div>
+                <div class="card">
+                    <h2 style="margin-top:0;">🏆 Ranking Geral dos Alunos</h2>
+                    <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
                 </div>
             </div>
 
-            <div class="card">
-                <h2 style="margin-top:0;">🏆 Ranking Geral dos Alunos</h2>
-                <div id="ranking-alunos"><p style="color:var(--text-light)">Carregando ranking...</p></div>
-            </div>
-
-            <div class="card">
+            <!-- ABA 2: AULAS -->
+            <div id="tab-prof-aulas" class="prof-tab-content">
+                <div class="card">
                 <h2 style="margin-top:0;">Gerenciador de Aulas Multimídia</h2>
                 <p>Crie e edite os conteúdos usando o editor visual avançado.</p>
                 <hr style="border:1px solid var(--gray-light); margin:20px 0;">
@@ -379,8 +435,16 @@
                 <h3>Passos do Roteiro</h3>
                 <div id="editor-passos-container"></div>
                 <button class="btn-action secondary" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
+                
+                <hr style="border:1px solid var(--gray-light); margin:30px 0;">
+                <h3>🎯 Desafio Final (Quiz Opcional)</h3>
+                <p style="margin-top:0;">Adicione até 5 perguntas para o aluno responder no final da aula.</p>
+                <div id="editor-quiz-container"></div>
+                <button class="btn-action secondary" onclick="adicionarPerguntaQuiz()" style="background: var(--warning-light); color: var(--warning); border: 2px dashed var(--warning); width:100%;">+ Adicionar Pergunta de Quiz</button>
+
                 <br><br>
                 <button class="btn-action" style="width:100%; padding:20px; font-size:1.4rem;" onclick="salvadDadosNovoFormato()">💾 SALVAR AULA COMPLETA</button>
+                </div>
             </div>
         </section>
 
@@ -451,7 +515,7 @@
                 
                 alunoLogadoDados = data;
                 alunoLogado = data.nome_aluno;
-                cursoSelecionado = data.curso;
+                cursoSelecionado = data.curso && data.curso.includes('|||') ? data.curso.split('|||')[0] : data.curso;
                 modulosLiberadosAluno = data.modulos_liberados || [];
                 aulasConcluidasAluno = data.aulas_concluidas || [];
                 aulasBloqueadasAluno = data.aulas_bloqueadas || []; // Carrega bloqueios de reposição
@@ -634,32 +698,47 @@
             if(!bancoDados) return;
             const nome = document.getElementById('novo-aluno-nome').value.trim().toLowerCase();
             const senha = document.getElementById('novo-aluno-senha').value.trim();
-            const curso = document.getElementById('novo-aluno-curso').value;
+            const cursoBruto = document.getElementById('novo-aluno-curso').value;
+            let salaBruta = document.getElementById('novo-aluno-sala').value.trim();
+            
+            salaBruta = salaBruta.replace(/\|/g, '').substring(0, 20);
+            const cursoESala = salaBruta ? `${cursoBruto}|||${salaBruta}` : cursoBruto;
             
             if(!nome || !senha) { showToast("Preencha o Nome e o PIN!", "warning"); return; }
             
             try {
                 if (alunoEmEdicaoId) {
-                    await bancoDados.from('alunos_matriculados').update({ nome_aluno: nome, senha: senha, curso: curso }).eq('id', alunoEmEdicaoId);
+                    await bancoDados.from('alunos_matriculados').update({ nome_aluno: nome, senha: senha, curso: cursoESala }).eq('id', alunoEmEdicaoId);
                     showToast(`Dados atualizados!`, "success");
                     cancelarEdicaoAluno();
                 } else {
                     const idUnico = `${nome}_${Date.now()}`;
-                    await bancoDados.from('alunos_matriculados').insert({ id: idUnico, nome_aluno: nome, senha: senha, curso: curso });
+                    await bancoDados.from('alunos_matriculados').insert({ id: idUnico, nome_aluno: nome, senha: senha, curso: cursoESala });
                     showToast(`Aluno matriculado!`, "success");
                     document.getElementById('novo-aluno-nome').value = '';
                     document.getElementById('novo-aluno-senha').value = '';
+                    document.getElementById('novo-aluno-sala').value = '';
                 }
                 carregarGestaoAlunosProf();
             } catch(e) { showToast("Erro ao salvar.", "error"); }
         }
 
-        function prepararEdicaoAluno(id, nome, senha, curso) {
+        function prepararEdicaoAluno(id, nome, senha, cursoCompleto) {
             alunoEmEdicaoId = id;
             document.getElementById('novo-aluno-nome').value = nome;
             document.getElementById('novo-aluno-senha').value = senha;
+            
+            let curso = cursoCompleto;
+            let sala = '';
+            if (cursoCompleto && cursoCompleto.includes('|||')) {
+                let parts = cursoCompleto.split('|||');
+                curso = parts[0];
+                sala = parts[1];
+            }
+            
             document.getElementById('novo-aluno-curso').value = curso;
-            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Aluno";
+            document.getElementById('novo-aluno-sala').value = sala;
+            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar";
             document.getElementById('btn-cancelar-edicao').style.display = "block";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -668,7 +747,8 @@
             alunoEmEdicaoId = null;
             document.getElementById('novo-aluno-nome').value = '';
             document.getElementById('novo-aluno-senha').value = '';
-            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar Aluno";
+            document.getElementById('novo-aluno-sala').value = '';
+            document.getElementById('btn-salvar-aluno').innerText = "💾 Salvar";
             document.getElementById('btn-cancelar-edicao').style.display = "none";
         }
 
@@ -681,12 +761,16 @@
             } catch(e) { showToast("Erro ao excluir.", "error"); }
         }
 
+        let alunosMatriculadosGeral = [];
+
         async function carregarGestaoAlunosProf() {
             if(!bancoDados) return;
             try {
                 const { data } = await bancoDados.from('alunos_matriculados').select('*').order('nome_aluno', {ascending: true});
                 const listDiv = document.getElementById('lista-gestao-alunos');
                 if(!data || data.length === 0) { listDiv.innerHTML = "<p>Nenhum aluno matriculado ainda.</p>"; return; }
+                
+                alunosMatriculadosGeral = data;
                 
                 document.getElementById('analytics-alunos').innerText = data.length;
                 let totalAulas = 0; data.forEach(d => { if(d.aulas_concluidas) totalAulas += d.aulas_concluidas.length; });
@@ -702,35 +786,71 @@
                     } else { rankDiv.innerHTML = "<p style='color:var(--text-light)'>Nenhum dado de conclusão ainda.</p>"; }
                 }
 
-                listDiv.innerHTML = data.map(aluno => {
-                    let maxMod = aluno.curso === 'ingles' ? 9 : 10;
+                const filtroSala = document.getElementById('filtro-sala');
+                const valorAtual = filtroSala ? filtroSala.value : 'todas';
+                let salasUnicas = new Set();
+                data.forEach(aluno => {
+                    if (aluno.curso && aluno.curso.includes('|||')) salasUnicas.add(aluno.curso.split('|||')[1]);
+                });
+                if (filtroSala) {
+                    filtroSala.innerHTML = '<option value="todas">Todas as Salas</option>';
+                    [...salasUnicas].sort().forEach(sala => {
+                        filtroSala.innerHTML += `<option value="${sala}">${sala}</option>`;
+                    });
+                    if([...salasUnicas].includes(valorAtual)) filtroSala.value = valorAtual;
+                }
+
+                renderizarListaAlunosProfessor();
+            } catch(e){}
+        }
+
+        function renderizarListaAlunosProfessor() {
+            const listDiv = document.getElementById('lista-gestao-alunos');
+            const filtroSala = document.getElementById('filtro-sala') ? document.getElementById('filtro-sala').value : 'todas';
+            
+            let dataParaRenderizar = alunosMatriculadosGeral;
+            if (filtroSala !== 'todas') {
+                dataParaRenderizar = alunosMatriculadosGeral.filter(a => a.curso && a.curso.includes(`|||${filtroSala}`));
+            }
+
+            if(dataParaRenderizar.length === 0) {
+                listDiv.innerHTML = "<p style='color:var(--text-light)'>Nenhum aluno nesta sala.</p>";
+                return;
+            }
+
+            listDiv.innerHTML = dataParaRenderizar.map(aluno => {
+                    let cursoReal = aluno.curso;
+                    let salaDisplay = '';
+                    if (aluno.curso && aluno.curso.includes('|||')) {
+                        let parts = aluno.curso.split('|||');
+                        cursoReal = parts[0];
+                        salaDisplay = ` <span style="background:var(--warning-light); color:var(--warning); font-size:0.8rem; padding:3px 8px; border-radius:8px; margin-left:5px;">${parts[1]}</span>`;
+                    }
+
+                    let maxMod = cursoReal === 'ingles' ? 9 : 10;
                     let checkboxesHTML = '';
                     let liberados = aluno.modulos_liberados || [];
                     let aulasBloqueadas = aluno.aulas_bloqueadas || [];
                     
-                    // Renderiza os Módulos Liberados (Raiz)
                     for(let m=1; m<=maxMod; m++) {
-                        let chaveLib = `${aluno.curso}_${m}`;
+                        let chaveLib = `${cursoReal}_${m}`;
                         let isChecked = liberados.includes(chaveLib) ? 'checked' : '';
-                        let labelMod = aluno.curso === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
+                        let labelMod = cursoReal === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
                         checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${chaveLib}', this.checked)" ${isChecked}> ${labelMod}</label>`;
                     }
 
-                    // Renderiza as Aulas Específicas de Reposição dentro do Módulo
                     let painelAulasHTML = `<div id="painel-aulas-${aluno.id}" style="display:none; margin-top: 15px; border-top: 1px dashed var(--gray-light); padding-top: 15px;">`;
                     if(liberados.length === 0) {
                         painelAulasHTML += `<p style="font-size:0.9rem; color:var(--text-light);">Nenhum módulo liberado para exibir as aulas.</p>`;
                     } else {
-                        // Ordena os modulos para exibir bonito (ex: informatica_1, informatica_2)
                         liberados.sort((a,b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1])).forEach(chaveMod => {
                             let modNum = parseInt(chaveMod.split('_')[1]);
-                            let nomeModStr = aluno.curso === 'ingles' ? nomesModulosIngles[modNum-1] : `Módulo ${modNum}`;
-                            let maxAulasDentro = (aluno.curso === 'ingles') ? (modNum === 1 ? 5 : 15) : 8;
+                            let nomeModStr = cursoReal === 'ingles' ? nomesModulosIngles[modNum-1] : `Módulo ${modNum}`;
+                            let maxAulasDentro = (cursoReal === 'ingles') ? (modNum === 1 ? 5 : 15) : 8;
                             
                             painelAulasHTML += `<div style="margin-bottom: 10px;"><strong>${nomeModStr}</strong><div class="modulos-checkbox-grid">`;
                             for(let a=1; a<=maxAulasDentro; a++) {
-                                let aulaIdCompleto = `${aluno.curso}_modulo_${modNum}_aula_${a}`;
-                                // Se ESTÁ na lista de bloqueadas, checkbox fica DESMARCADO. Se NÃO ESTÁ, fica MARCADO (Liberada).
+                                let aulaIdCompleto = `${cursoReal}_modulo_${modNum}_aula_${a}`;
                                 let isChecked = aulasBloqueadas.includes(aulaIdCompleto) ? '' : 'checked';
                                 painelAulasHTML += `<label><input type="checkbox" onchange="toggleAulaBloqueada('${aluno.id}', '${aulaIdCompleto}', this.checked)" ${isChecked}> Aula ${a}</label>`;
                             }
@@ -742,7 +862,7 @@
                     const labelsCursos = { informatica: "Informática", senior: "Sênior", ingles: "Inglês", reposicao: "Reposição" };
                     return `<div class="aluno-gerenciamento-card">
                                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                                    <h4>${aluno.nome_aluno.toUpperCase()} <span class="curso-tag">${labelsCursos[aluno.curso]}</span></h4>
+                                    <h4>${aluno.nome_aluno.toUpperCase()} ${salaDisplay} <span class="curso-tag">${labelsCursos[cursoReal] || 'Curso'}</span></h4>
                                     <div style="display:flex; gap:10px;">
                                         <button style="background:transparent; border:none; cursor:pointer; font-size:1.4rem;" onclick="prepararEdicaoAluno('${aluno.id}', '${aluno.nome_aluno}', '${aluno.senha}', '${aluno.curso}')" title="Editar">✏️</button>
                                         <button style="background:transparent; border:none; cursor:pointer; font-size:1.4rem;" onclick="excluirAluno('${aluno.id}', '${aluno.nome_aluno}')" title="Excluir">🗑️</button>
@@ -754,7 +874,13 @@
                                 ${painelAulasHTML}
                             </div>`;
                 }).join('');
-            } catch(e){}
+        }
+
+        function alternarAbaProfessor(idAba, btn) {
+            document.querySelectorAll('.prof-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.prof-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(idAba).classList.add('active');
+            btn.classList.add('active');
         }
 
         async function toggleModuloAluno(alunoId, chaveLib, isLiberar) {
@@ -851,6 +977,7 @@
             const editorId = 'quill-' + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <div class="step-editor-header"><strong class="step-label">Passo</strong><div class="step-move-buttons"><button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button><button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button></div></div>
+                <div style="background:var(--gray-light); padding: 5px 20px; display: flex; justify-content: flex-end;"><button class="btn-action secondary" style="padding: 5px 10px; font-size: 0.85rem; margin: 0;" onclick="colarHTMLNaQuill(this)" title="Cole o código fornecido pela Inteligência Artificial">📝 Inserir Código da IA</button></div>
                 <div id="${editorId}" class="quill-editor-container"></div>
                 <div class="row-inputs">
                     <input type="text" class="edit-img" placeholder="Link Imagem Externa (Opc)" value="${urlImg}">
@@ -863,6 +990,17 @@
             if (textoHtml) { quill.clipboard.dangerouslyPasteHTML(textoHtml); }
             div.quillInstance = quill;
             reordenarNumeracaoEditor();
+        }
+
+        function colarHTMLNaQuill(btn) {
+            const html = prompt("Cole o código gerado pela Inteligência Artificial aqui:");
+            if (html) {
+                const item = btn.closest('.step-editor-item');
+                if (item && item.quillInstance) {
+                    item.quillInstance.clipboard.dangerouslyPasteHTML(html);
+                    showToast("Código da IA inserido com sucesso!", "success");
+                }
+            }
         }
 
         function moverPassoElemento(botao, direcao) {
@@ -886,13 +1024,56 @@
                     let titulo = data.nome_aula || ''; if (titulo.includes('|||')) titulo = titulo.split('|||')[0].trim();
                     document.getElementById('prof-nome-aula').value = titulo;
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
-                    if (data.passos_midia) data.passos_midia.forEach(p => adicionarPassoAoEditor(p.texto, p.imagem, p.link));
+                    document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
+                    if (data.passos_midia) {
+                        data.passos_midia.forEach(p => {
+                            if (p.tipo === 'quiz') adicionarPerguntaQuiz(p);
+                            else adicionarPassoAoEditor(p.texto, p.imagem, p.link);
+                        });
+                    }
                 } else {
                     document.getElementById('prof-nome-modulo').value = '';
                     document.getElementById('prof-nome-aula').value = '';
+                    document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
                     adicionarPassoAoEditor();
                 }
             } catch (err) {}
+        }
+
+        function adicionarPerguntaQuiz(dados = null) {
+            if (dados instanceof Event) dados = null;
+            const container = document.getElementById('editor-quiz-container');
+            if (container.children.length >= 5) { showToast("Máximo de 5 perguntas atingido.", "warning"); return; }
+            
+            const div = document.createElement('div');
+            div.className = 'quiz-prof-item';
+            const num = container.children.length + 1;
+            
+            let p = dados ? dados.pergunta : '';
+            let o = dados ? dados.opcoes : ['', '', '', ''];
+            let c = dados ? dados.correta : 0;
+
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><strong style="color:var(--warning); font-size:1.2rem;">Pergunta ${num}</strong> <button class="btn-remove" onclick="this.parentElement.parentElement.remove(); reordenarQuizProf();" style="padding:4px 10px; border-radius:8px; cursor:pointer; background:var(--danger); color:white; border:none;">Remover</button></div>
+                <input type="text" class="quiz-p" placeholder="Digite a pergunta (Ex: O que é HTML?)" value="${p}" style="border-color:var(--warning);">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div><label style="font-size:0.9rem;">A <input type="radio" class="quiz-r" value="0" ${c===0?'checked':''}></label><input type="text" class="quiz-o" placeholder="Opção A" value="${o[0]}"></div>
+                    <div><label style="font-size:0.9rem;">B <input type="radio" class="quiz-r" value="1" ${c===1?'checked':''}></label><input type="text" class="quiz-o" placeholder="Opção B" value="${o[1]}"></div>
+                    <div><label style="font-size:0.9rem;">C <input type="radio" class="quiz-r" value="2" ${c===2?'checked':''}></label><input type="text" class="quiz-o" placeholder="Opção C" value="${o[2]}"></div>
+                    <div><label style="font-size:0.9rem;">D <input type="radio" class="quiz-r" value="3" ${c===3?'checked':''}></label><input type="text" class="quiz-o" placeholder="Opção D" value="${o[3]}"></div>
+                </div>
+            `;
+            container.appendChild(div);
+            reordenarQuizProf();
+        }
+
+        function reordenarQuizProf() {
+            Array.from(document.getElementById('editor-quiz-container').children).forEach((div, idx) => {
+                div.querySelector('strong').innerText = `Pergunta ${idx + 1}`;
+                const radios = div.querySelectorAll('.quiz-r');
+                const groupName = `correta_q${idx}_${Math.random()}`; // unique group per question
+                radios.forEach(r => r.name = groupName);
+            });
         }
 
         async function salvadDadosNovoFormato() {
@@ -910,7 +1091,17 @@
                 if(quill && quill.getText().trim() !== '') { pacotePassos.push({ texto: txtHtml, imagem: item.querySelector('.edit-img').value.trim(), link: item.querySelector('.edit-link').value.trim() }); }
             });
 
-            if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo!", "warning"); return; }
+            document.querySelectorAll('.quiz-prof-item').forEach(item => {
+                const p = item.querySelector('.quiz-p').value.trim();
+                const opcoes = Array.from(item.querySelectorAll('.quiz-o')).map(input => input.value.trim());
+                let correta = 0;
+                item.querySelectorAll('.quiz-r').forEach((r, idx) => { if(r.checked) correta = idx; });
+                if (p && opcoes[0] && opcoes[1]) {
+                    pacotePassos.push({ tipo: 'quiz', pergunta: p, opcoes: opcoes, correta: correta });
+                }
+            });
+
+            if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo ou adicione uma pergunta!", "warning"); return; }
             let dMod = c === 'reposicao' ? `Ficha ${m.split('_')[1].padStart(2, '0')}` : `Módulo ${m.split('_')[1].padStart(2, '0')}`;
             if(c === 'ingles') dMod = nomesModulosIngles[parseInt(m.split('_')[1])-1];
             let dAula = c === 'ingles' ? `Lesson ${a.split('_')[1].padStart(2, '0')}` : `Aula ${a.split('_')[1].padStart(2, '0')}`;
@@ -1024,6 +1215,8 @@
                     document.getElementById('estudante-passos').style.display = 'block';
                     const nCru = data.nome_aula ? data.nome_aula.split('|||')[0].trim() : "Atividade";
                     document.getElementById('titulo-aula-atual').innerText = nCru;
+                    const tempoEst = Math.max(1, Math.ceil(data.passos_midia.length * 1.5));
+                    document.getElementById('tempo-estimado-aula').innerText = `⏱️ Tempo estimado: ${tempoEst} min`;
                     
                     registrarHistorico(nCru); 
                     salvarUltimaAula(); 
@@ -1037,28 +1230,111 @@
             const passo = passosAulaAtual[passoAtual];
             const galeria = document.getElementById('galeria-imagens-aluno');
             galeria.innerHTML = '';
-            if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
+            const contPasso = document.getElementById('conteudo-passo');
+            const linkCont = document.getElementById('link-passo-container');
+            const btnNext = document.getElementById('btnNext');
+            const btnPrev = document.getElementById('btnPrev');
 
-            let textoFormatado = passo.texto;
-            textoFormatado = textoFormatado
-                .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
-                .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
-                .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
-                .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
-                .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
-                .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">');
+            linkCont.innerHTML = '';
+            contPasso.classList.remove('fade-in-step');
+            void contPasso.offsetWidth; // Trigger reflow
+            contPasso.classList.add('fade-in-step');
 
-            document.getElementById('conteudo-passo').innerHTML = textoFormatado;
-            document.getElementById('link-passo-container').innerHTML = passo.link ? `<a href="${passo.link.trim()}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-top:20px;">🔗 ABRIR MATERIAL EXTERNO</a>` : '';
+            if (passo.tipo === 'quiz') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                
+                let opcoesHtml = passo.opcoes.map((op, idx) => {
+                    if (!op) return '';
+                    return `<div class="quiz-option" onclick="verificarRespostaQuiz(this, ${idx}, ${passo.correta})">
+                                <span style="display:inline-block; width:30px; height:30px; border-radius:50%; background:var(--gray-light); text-align:center; line-height:30px; margin-right:15px; font-weight:bold;">${String.fromCharCode(65+idx)}</span> 
+                                <span>${op}</span>
+                            </div>`;
+                }).join('');
+
+                contPasso.innerHTML = `
+                    <div class="quiz-question-card">
+                        <div style="font-size:3rem; margin-bottom:10px;">🎯</div>
+                        <h3 style="font-size:1.8rem; margin-top:0; color:var(--primary);">${passo.pergunta}</h3>
+                        <div style="margin-top: 25px;">${opcoesHtml}</div>
+                    </div>
+                `;
+                
+                btnNext.style.display = 'none'; // Esconde até acertar
+                btnPrev.disabled = passoAtual === 0;
+            } else {
+                document.getElementById('btn-ler-audio').style.display = 'inline-block';
+                if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
+
+                let textoFormatado = passo.texto || '';
+                textoFormatado = textoFormatado
+                    .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
+                    .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
+                    .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
+                    .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
+                    .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
+                    .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">');
+
+                contPasso.innerHTML = textoFormatado;
+                linkCont.innerHTML = passo.link ? `<a href="${passo.link.trim()}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-top:20px;">🔗 ABRIR MATERIAL EXTERNO</a>` : '';
+                
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                
+                if (passoAtual === passosAulaAtual.length - 1) {
+                    btnNext.innerHTML = "🎉 CONCLUIR AULA";
+                    btnNext.style.background = "var(--warning)";
+                    btnNext.style.color = "var(--text)";
+                    btnNext.style.transform = "scale(1.05)";
+                    btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
+                } else {
+                    btnNext.innerHTML = "AVANÇAR ▶";
+                    btnNext.style.background = "var(--success)";
+                    btnNext.style.color = "white";
+                    btnNext.style.transform = "scale(1)";
+                    btnNext.style.boxShadow = "none";
+                }
+            }
 
             const pct = Math.round(((passoAtual + 1) / passosAulaAtual.length) * 100);
             document.getElementById('progressBar').style.width = `${pct}%`;
             document.getElementById('progress-text-step').innerText = `Passo ${passoAtual + 1} de ${passosAulaAtual.length}`;
             document.getElementById('progress-text-pct').innerText = `${pct}%`;
 
-            document.getElementById('btnPrev').disabled = passoAtual === 0;
-            document.getElementById('btnNext').innerText = (passoAtual === passosAulaAtual.length - 1) ? "FINALIZAR 🏁" : "AVANÇAR ▶";
             document.getElementById('area-rolagem-aluno').scrollTop = 0;
+        }
+
+        function verificarRespostaQuiz(elemento, escolhida, correta) {
+            if (elemento.parentElement.classList.contains('respondido')) return;
+            
+            const opcoes = elemento.parentElement.querySelectorAll('.quiz-option');
+            
+            if (escolhida === correta) {
+                elemento.classList.add('correct');
+                elemento.parentElement.classList.add('respondido');
+                opcoes.forEach(op => { if(op !== elemento) op.classList.add('disabled'); });
+                showToast("Resposta Certa! Muito bem! 🎉", "success");
+                
+                const btnNext = document.getElementById('btnNext');
+                btnNext.style.display = 'block';
+                btnNext.style.animation = 'fadeInStep 0.5s';
+                
+                if (passoAtual === passosAulaAtual.length - 1) {
+                    btnNext.innerHTML = "🎉 CONCLUIR AULA";
+                    btnNext.style.background = "var(--warning)";
+                    btnNext.style.color = "var(--text)";
+                    btnNext.style.transform = "scale(1.05)";
+                    btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
+                } else {
+                    btnNext.innerHTML = "CONTINUAR ▶";
+                    btnNext.style.background = "var(--success)";
+                    btnNext.style.color = "white";
+                    btnNext.style.transform = "scale(1)";
+                    btnNext.style.boxShadow = "none";
+                }
+            } else {
+                elemento.classList.add('wrong');
+                setTimeout(() => elemento.classList.remove('wrong'), 400);
+            }
         }
 
         function mudarPasso(direcao) {
@@ -1083,6 +1359,17 @@
 
         function voltarParaAulas() { document.getElementById('estudante-passos').style.display = 'none'; document.getElementById('estudante-aulas').style.display = 'block'; }
 
+        function lerTextoPasso() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const texto = document.getElementById('conteudo-passo').innerText;
+                const msg = new SpeechSynthesisUtterance(texto);
+                msg.lang = 'pt-BR';
+                window.speechSynthesis.speak(msg);
+            } else {
+                showToast("Seu navegador não suporta leitura de áudio.", "error");
+            }
+        }
     </script>
 </body>
 </html>
