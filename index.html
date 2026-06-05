@@ -219,6 +219,55 @@
             .btn-step { font-size: 1rem; padding: 12px; }
             .step-viewer-card { padding: 15px; height: 70vh; }
         }
+        /* Pop-up de Explicação (Dicionário) */
+        .term-highlight {
+            color: var(--primary);
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 2px dashed var(--primary);
+            padding-bottom: 2px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .term-highlight:hover {
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            border-radius: 4px;
+        }
+        #definition-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        #definition-modal {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            animation: fadeInStep 0.3s ease-out forwards;
+            text-align: center;
+        }
+        #definition-modal h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        #definition-modal p {
+            font-size: 1.1rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -229,6 +278,15 @@
     </div>
 
     <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modal de Explicação (Dicionário) -->
+    <div id="definition-modal-overlay" onclick="fecharExplicacao()">
+        <div id="definition-modal" onclick="event.stopPropagation()">
+            <h3><span id="def-title">Termo</span> 💡</h3>
+            <p id="def-text">Explicação aqui.</p>
+            <button class="btn-action" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem;" onclick="fecharExplicacao()">Entendi!</button>
+        </div>
+    </div>
 
     <header style="display:flex; justify-content:space-between; align-items:center;">
         <h1 style="margin:0;"><i style="font-style:normal">🎓</i> Portal Educacional</h1>
@@ -980,7 +1038,10 @@
             const editorId = 'quill-' + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <div class="step-editor-header"><strong class="step-label">Passo</strong><div class="step-move-buttons"><button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button><button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button></div></div>
-                <div style="background:var(--gray-light); padding: 5px 20px; display: flex; justify-content: flex-end;"><button class="btn-action secondary" style="padding: 5px 10px; font-size: 0.85rem; margin: 0;" onclick="colarHTMLNaQuill(this)" title="Cole o código fornecido pela Inteligência Artificial">📝 Inserir Código da IA</button></div>
+                <div style="background:var(--gray-light); padding: 5px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button class="btn-action secondary" style="padding: 5px 10px; font-size: 0.85rem; margin: 0; background: var(--warning-light); color: var(--text); border: 1px solid var(--warning);" onclick="inserirPopUpExplicacao(this)" title="Cria um termo interativo que abre explicação">💬 Criar Pop-up de Explicação</button>
+                    <button class="btn-action secondary" style="padding: 5px 10px; font-size: 0.85rem; margin: 0;" onclick="colarHTMLNaQuill(this)" title="Cole o código fornecido pela Inteligência Artificial">📝 Inserir Código da IA</button>
+                </div>
                 <div id="${editorId}" class="quill-editor-container"></div>
                 <div class="row-inputs">
                     <input type="text" class="edit-img" placeholder="Link Imagem Externa (Opc)" value="${urlImg}">
@@ -1004,6 +1065,32 @@
                     showToast("Código da IA inserido com sucesso!", "success");
                 }
             }
+        }
+
+        function inserirPopUpExplicacao(btn) {
+            const termo = prompt("Qual a expressão ou palavra que você quer explicar? (Ex: Hardware)");
+            if (!termo) return;
+            const explicacao = prompt(`Qual a explicação para '${termo}'? (Ex: É a parte física do computador)`);
+            if (!explicacao) return;
+            
+            const item = btn.closest('.step-editor-item');
+            if (item && item.quillInstance) {
+                const quill = item.quillInstance;
+                const range = quill.getSelection(true) || { index: quill.getLength() };
+                const textoInjetar = ` [[${termo} :: ${explicacao}]] `;
+                quill.insertText(range.index, textoInjetar, 'user');
+                showToast("Pop-up criado! Os alunos verão a palavra destacada.", "success");
+            }
+        }
+
+        function abrirExplicacao(termo, texto) {
+            document.getElementById('def-title').innerText = termo;
+            document.getElementById('def-text').innerText = texto;
+            document.getElementById('definition-modal-overlay').style.display = 'flex';
+        }
+
+        function fecharExplicacao() {
+            document.getElementById('definition-modal-overlay').style.display = 'none';
         }
 
         function moverPassoElemento(botao, direcao) {
@@ -1275,7 +1362,8 @@
                     .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
                     .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
                     .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
-                    .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">');
+                    .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">')
+                    .replace(/\[\[(.*?)\s*::\s*(.*?)\]\]/g, '<span class="term-highlight" onclick="abrirExplicacao(\'$1\', \'$2\')">$1 💡</span>');
 
                 contPasso.innerHTML = textoFormatado;
                 linkCont.innerHTML = passo.link ? `<a href="${passo.link.trim()}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-top:20px;">🔗 ABRIR MATERIAL EXTERNO</a>` : '';
