@@ -1221,21 +1221,36 @@
             const idAntigo = `${c}_${m}_${a}`;
             const idNovo = `${c}_modulo_${novoM}_aula_${novaA}`;
             
+            if (idAntigo === idNovo) {
+                showToast("A aula já está nessa posição!", "warning");
+                return;
+            }
+            
             try {
-                const { data } = await bancoDados.from('roteiros_aulas').select('*').eq('id', idAntigo).maybeSingle();
-                if(!data) {
+                const { data: aulaAtual } = await bancoDados.from('roteiros_aulas').select('*').eq('id', idAntigo).maybeSingle();
+                if(!aulaAtual) {
                     showToast("Aula atual não está salva para ser movida. Salve primeiro.", "error");
                     return;
                 }
                 
-                data.id = idNovo;
-                data.modulo_id = `${c}_modulo_${novoM}`;
-                data.aula_id = `aula_${novaA}`;
+                const { data: aulaDestino } = await bancoDados.from('roteiros_aulas').select('*').eq('id', idNovo).maybeSingle();
                 
-                await bancoDados.from('roteiros_aulas').upsert(data);
-                await bancoDados.from('roteiros_aulas').delete().eq('id', idAntigo);
+                aulaAtual.id = idNovo;
+                aulaAtual.modulo_id = `${c}_modulo_${novoM}`;
+                aulaAtual.aula_id = `aula_${novaA}`;
                 
-                showToast("Aula movida com sucesso!", "success");
+                if (aulaDestino) {
+                    aulaDestino.id = idAntigo;
+                    aulaDestino.modulo_id = `${c}_${m}`;
+                    aulaDestino.aula_id = a;
+                    
+                    await bancoDados.from('roteiros_aulas').upsert([aulaAtual, aulaDestino]);
+                    showToast("As aulas trocaram de lugar com sucesso!", "success");
+                } else {
+                    await bancoDados.from('roteiros_aulas').upsert(aulaAtual);
+                    await bancoDados.from('roteiros_aulas').delete().eq('id', idAntigo);
+                    showToast("Aula movida com sucesso!", "success");
+                }
                 
                 // Mudar selects para a nova posição
                 const modSelect = document.getElementById('prof-modulo');
