@@ -504,7 +504,10 @@
                 <button class="btn-action secondary" onclick="adicionarPerguntaQuiz()" style="background: var(--warning-light); color: var(--warning); border: 2px dashed var(--warning); width:100%;">+ Adicionar Pergunta de Quiz</button>
 
                 <br><br>
-                <button class="btn-action" style="width:100%; padding:20px; font-size:1.4rem;" onclick="salvadDadosNovoFormato()">💾 SALVAR AULA COMPLETA</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-action" style="flex:2; padding:20px; font-size:1.4rem;" onclick="salvadDadosNovoFormato()">💾 SALVAR AULA COMPLETA</button>
+                    <button class="btn-action secondary" style="flex:1; padding:20px; font-size:1.2rem; background:var(--warning-light); color:var(--warning); border:2px dashed var(--warning);" onclick="moverAulaAtual()">🔄 Mover/Trocar Aula</button>
+                </div>
                 </div>
             </div>
         </section>
@@ -1201,6 +1204,54 @@
                 showToast("Aula salva com sucesso! 🚀", "success");
                 await baixarNomesCustomizados();
             } catch (err) { showToast("Erro ao salvar", "error"); }
+        }
+
+        async function moverAulaAtual() {
+            if (!bancoDados) return;
+            const c = document.getElementById('prof-curso').value;
+            const m = document.getElementById('prof-modulo').value;
+            const a = document.getElementById('prof-aula').value;
+            
+            const novoM = prompt("Para qual Módulo você deseja mover esta aula? (Digite apenas o número, ex: 9)");
+            if(!novoM) return;
+            
+            const novaA = prompt("Para qual Aula você deseja mover? (Digite apenas o número, ex: 2)");
+            if(!novaA) return;
+            
+            const idAntigo = `${c}_${m}_${a}`;
+            const idNovo = `${c}_modulo_${novoM}_aula_${novaA}`;
+            
+            try {
+                const { data } = await bancoDados.from('roteiros_aulas').select('*').eq('id', idAntigo).maybeSingle();
+                if(!data) {
+                    showToast("Aula atual não está salva para ser movida. Salve primeiro.", "error");
+                    return;
+                }
+                
+                data.id = idNovo;
+                data.modulo_id = `${c}_modulo_${novoM}`;
+                data.aula_id = `aula_${novaA}`;
+                
+                await bancoDados.from('roteiros_aulas').upsert(data);
+                await bancoDados.from('roteiros_aulas').delete().eq('id', idAntigo);
+                
+                showToast("Aula movida com sucesso!", "success");
+                
+                // Mudar selects para a nova posição
+                const modSelect = document.getElementById('prof-modulo');
+                if(modSelect.querySelector(`option[value="modulo_${novoM}"]`)) {
+                    modSelect.value = `modulo_${novoM}`;
+                }
+                atualizarSelectAulasProf();
+                const aulaSelect = document.getElementById('prof-aula');
+                if(aulaSelect.querySelector(`option[value="aula_${novaA}"]`)) {
+                    aulaSelect.value = `aula_${novaA}`;
+                }
+                carregarTextoExistente();
+                
+            } catch(e) {
+                showToast("Erro ao mover aula.", "error");
+            }
         }
 
         // --- NAVEGAÇÃO ENTRE CURSOS E AULAS DO ALUNO ---
