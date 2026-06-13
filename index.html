@@ -139,7 +139,7 @@
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
         .mod-item.bloqueado .mod-badge { background: var(--gray-light); color: var(--text-light); }
 
-        .progress-wrapper { background: var(--bg); padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--gray-light); }
+        .progress-wrapper { background: var(--bg); padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--gray-light); position: sticky; top: var(--header-h, 72px); z-index: 50; box-shadow: 0 8px 16px -10px rgba(10,60,45,.4); }
         body:not(.dark-mode) .progress-wrapper { background: white; }
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--text-light); }
         .progress-container { width: 100%; background-color: var(--gray-light); border-radius: 10px; height: 12px; overflow: hidden; }
@@ -664,10 +664,18 @@
             setTimeout(() => { toast.style.animation = 'fadeOut 0.3s ease-out forwards'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
+        function ajustarAlturaHeader() {
+            const h = document.querySelector('header');
+            if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+        }
+        window.addEventListener('resize', ajustarAlturaHeader);
+
         window.addEventListener("load", () => {
             setTimeout(() => { const tela = document.getElementById("loading-screen"); if(tela) tela.style.opacity = '0'; setTimeout(()=> {if(tela) tela.remove();}, 400); }, 800);
             inicializarPainel();
             carregarTema();
+            ajustarAlturaHeader();
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarAlturaHeader);
         });
 
         const SUPABASE_URL = "https://kokwxawasollyqblcuwz.supabase.co";
