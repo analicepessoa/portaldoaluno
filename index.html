@@ -273,10 +273,10 @@
         .pergunta-aberta-item { border-left-color: var(--success) !important; }
         .resposta-aberta-textarea { min-height: 150px; font-size: 1.2rem; resize: vertical; margin-top: 10px; }
         .conclusao-acoes-box { margin-top: 25px; padding: 22px; border-radius: 16px; background: var(--success-light); border: 2px dashed var(--success); text-align: center; }
-        .conclusao-acoes-box .btn-conclusao { display: block; width: 100%; margin: 12px 0 0 0; padding: 16px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
-        .conclusao-acoes-box .btn-conclusao:hover { opacity: 0.9; }
-        .conclusao-acoes-box .btn-conclusao.alt { background: var(--success); }
-        .conclusao-acoes-box .btn-conclusao.txt { background: var(--gray-light); color: var(--text); }
+        .btn-conclusao { display: block; width: 100%; margin: 12px 0 0 0; padding: 16px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
+        .btn-conclusao:hover { opacity: 0.9; }
+        .btn-conclusao.alt { background: var(--success); }
+        .btn-conclusao.txt { background: var(--gray-light); color: var(--text); }
 
         /* Impressão / PDF da aula (aparece só ao salvar) */
         #area-impressao { display: none; }
@@ -309,6 +309,17 @@
             <h3><span id="def-title">Termo</span> 💡</h3>
             <p id="def-text">Explicação aqui.</p>
             <button class="btn-action" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem;" onclick="fecharExplicacao()">Entendi!</button>
+        </div>
+    </div>
+
+    <!-- Modal de Aula Concluída (opções de guardar a aula) -->
+    <div id="conclusao-modal-overlay" onclick="fecharModalConclusao()" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
+        <div onclick="event.stopPropagation()" style="background:#fff; padding:28px; border-radius:20px; max-width:430px; width:90%; box-shadow:0 15px 30px rgba(0,0,0,0.25); text-align:center;">
+            <div style="font-size:3.5rem;">🎉</div>
+            <h2 style="color:#16a34a; margin:8px 0;">Aula Concluída!</h2>
+            <p style="color:#475569; margin-top:0;">Quer guardar esta aula ou suas respostas?</p>
+            <div id="conclusao-modal-botoes"></div>
+            <button style="display:block; width:100%; margin-top:14px; padding:14px; font-size:1rem; font-weight:bold; border:none; border-radius:14px; cursor:pointer; background:transparent; color:#64748b;" onclick="fecharModalConclusao()">Fechar</button>
         </div>
     </div>
 
@@ -1560,20 +1571,9 @@
             // Ações de fim de aula (PDF / copiar respostas) — só no último passo
             const acoesFim = document.getElementById('conclusao-acoes');
             if (passoAtual === passosAulaAtual.length - 1) {
-                const temPerguntas = passosAulaAtual.some(p => p.tipo === 'pergunta');
-                let botoesResp = '';
-                if (temPerguntas) {
-                    botoesResp = `
-                        <button class="btn-conclusao" onclick="copiarRespostas()">📋 Copiar respostas (para o prompt)</button>
-                        <button class="btn-conclusao txt" onclick="exportarRespostasTxt()">📥 Baixar respostas (.txt)</button>`;
-                }
                 acoesFim.className = 'conclusao-acoes-box';
                 acoesFim.style.display = 'block';
-                acoesFim.innerHTML = `
-                    <strong style="font-size:1.1rem;">🎁 Guarde esta aula</strong>
-                    <button class="btn-conclusao alt" onclick="salvarAulaPDF()">📄 Salvar aula em PDF</button>
-                    ${botoesResp}
-                `;
+                acoesFim.innerHTML = `<strong style="font-size:1.1rem;">🎁 Guarde esta aula</strong>${htmlBotoesConclusao()}`;
             } else {
                 acoesFim.style.display = 'none';
                 acoesFim.innerHTML = '';
@@ -1638,9 +1638,10 @@
                 verificarConquistas();
                 atualizarDashboard();
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
-                avancarParaAulasModulo(); 
+                avancarParaAulasModulo();
                 document.getElementById('estudante-passos').style.display = 'none';
                 document.getElementById('estudante-aulas').style.display = 'block';
+                abrirModalConclusao();
 
             } else mostrarPasso();
         }
@@ -1676,6 +1677,25 @@
                 btnNext.style.transform = "scale(1)";
                 btnNext.style.boxShadow = "none";
             }
+        }
+
+        function htmlBotoesConclusao() {
+            const temPerguntas = passosAulaAtual.some(p => p.tipo === 'pergunta');
+            let h = `<button class="btn-conclusao alt" onclick="salvarAulaPDF()">📄 Salvar aula em PDF</button>`;
+            if (temPerguntas) {
+                h += `<button class="btn-conclusao" onclick="copiarRespostas()">📋 Copiar respostas (para o prompt)</button>`;
+                h += `<button class="btn-conclusao txt" onclick="exportarRespostasTxt()">📥 Baixar respostas (.txt)</button>`;
+            }
+            return h;
+        }
+
+        function abrirModalConclusao() {
+            document.getElementById('conclusao-modal-botoes').innerHTML = htmlBotoesConclusao();
+            document.getElementById('conclusao-modal-overlay').style.display = 'flex';
+        }
+
+        function fecharModalConclusao() {
+            document.getElementById('conclusao-modal-overlay').style.display = 'none';
         }
 
         function formatarTextoPasso(texto) {
