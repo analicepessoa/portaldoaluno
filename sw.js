@@ -1,5 +1,5 @@
-// O nome do nosso "armazém" de memória
-const CACHE_NAME = 'portal-educacional-v1';
+// O nome do nosso "armazém" de memória (mude a versão quando atualizar o site)
+const CACHE_NAME = 'portal-educacional-v2';
 
 // Ficheiros que queremos guardar no telemóvel do aluno
 const urlsToCache = [
@@ -10,24 +10,44 @@ const urlsToCache = [
   './icone-512.png'
 ];
 
-// Instalação do motor: Guarda os ficheiros base
+// Instalação: guarda os ficheiros base e ativa logo a nova versão
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Ficheiros guardados na cache com sucesso!');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// A magia a acontecer: Quando o aluno abre a app, tentamos dar a versão rápida da cache primeiro
+// Ativação: apaga caches antigos para que a nova versão apareça
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(nomes => Promise.all(
+      nomes.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))
+    )).then(() => self.clients.claim())
+  );
+});
+
+// Estratégia: a página (index.html) tenta a internet primeiro (para ter sempre
+// a versão mais nova) e usa a cache só se estiver offline. Os outros ficheiros
+// usam a cache primeiro para abrir rápido.
 self.addEventListener('fetch', event => {
+  const req = event.request;
+  const isPagina = req.mode === 'navigate' || (req.destination === 'document');
+
+  if (isPagina) {
+    event.respondWith(
+      fetch(req)
+        .then(resp => {
+          const copia = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copia));
+          return resp;
+        })
+        .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Se encontrou na cache, devolve imediatamente. Se não, vai buscar à internet.
-        return response || fetch(event.request);
-      })
+    caches.match(req).then(resp => resp || fetch(req))
   );
 });

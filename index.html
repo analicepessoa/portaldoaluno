@@ -268,6 +268,30 @@
             color: var(--text);
             line-height: 1.6;
         }
+
+        /* Pergunta Aberta (resposta do aluno) */
+        .pergunta-aberta-item { border-left-color: var(--success) !important; }
+        .resposta-aberta-textarea { min-height: 150px; font-size: 1.2rem; resize: vertical; margin-top: 10px; }
+        .conclusao-acoes-box { margin-top: 25px; padding: 22px; border-radius: 16px; background: var(--success-light); border: 2px dashed var(--success); text-align: center; }
+        .conclusao-acoes-box .btn-conclusao { display: block; width: 100%; margin: 12px 0 0 0; padding: 16px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; background: var(--primary); color: #fff; transition: opacity 0.2s; }
+        .conclusao-acoes-box .btn-conclusao:hover { opacity: 0.9; }
+        .conclusao-acoes-box .btn-conclusao.alt { background: var(--success); }
+        .conclusao-acoes-box .btn-conclusao.txt { background: var(--gray-light); color: var(--text); }
+
+        /* Impressão / PDF da aula (aparece só ao salvar) */
+        #area-impressao { display: none; }
+        @media print {
+            body > * { display: none !important; }
+            #area-impressao { display: block !important; color: #000; background: #fff; font-family: 'Segoe UI', Roboto, Arial, sans-serif; padding: 0 6px; }
+            #area-impressao .print-header { text-align: center; border-bottom: 3px solid #2563eb; padding-bottom: 12px; margin-bottom: 22px; }
+            #area-impressao .print-header h1 { color: #2563eb; margin: 0 0 6px 0; font-size: 22pt; }
+            #area-impressao .print-header p { margin: 0; color: #444; font-size: 11pt; }
+            #area-impressao .print-bloco { margin-bottom: 16px; page-break-inside: avoid; font-size: 12pt; line-height: 1.5; color: #111; }
+            #area-impressao .print-pergunta { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; }
+            #area-impressao .print-resposta { margin-top: 8px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fff; min-height: 22px; white-space: pre-wrap; }
+            #area-impressao img.print-img { max-width: 100%; max-height: 360px; object-fit: contain; display: block; margin: 8px auto; }
+            @page { margin: 1.4cm; }
+        }
     </style>
 </head>
 <body>
@@ -380,6 +404,7 @@
                         <div id="galeria-imagens-aluno" class="images-gallery"></div>
                         <div id="conteudo-passo" class="step-text ql-editor" style="padding:0;"></div>
                         <div id="link-passo-container" style="margin-bottom: 10px;"></div>
+                        <div id="conclusao-acoes" style="display:none;"></div>
                     </div>
                     <div class="nav-steps">
                         <button class="btn-step" style="background:var(--gray-light); color:var(--text);" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
@@ -413,6 +438,7 @@
             <div class="prof-tabs">
                 <button class="prof-tab-btn active" onclick="alternarAbaProfessor('tab-prof-alunos', this)">👨‍🎓 Gestão de Alunos</button>
                 <button class="prof-tab-btn" onclick="alternarAbaProfessor('tab-prof-aulas', this)">📚 Gerenciador de Aulas</button>
+                <button class="prof-tab-btn" onclick="alternarAbaProfessor('tab-prof-respostas', this); carregarRespostasAlunos();">📝 Respostas dos Alunos</button>
                 <button class="prof-tab-btn" onclick="alternarAbaProfessor('tab-prof-analytics', this)">📊 Analytics e Ranking</button>
             </div>
 
@@ -467,6 +493,18 @@
                 </div>
             </div>
 
+            <!-- ABA 4: RESPOSTAS DOS ALUNOS -->
+            <div id="tab-prof-respostas" class="prof-tab-content">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <h2 style="margin:0;">📝 Respostas Enviadas</h2>
+                        <button class="btn-action secondary" style="margin:0;" onclick="carregarRespostasAlunos()">🔄 Atualizar</button>
+                    </div>
+                    <p>Respostas que os alunos enviaram nas <strong>Perguntas Abertas</strong> das aulas (mais recentes primeiro).</p>
+                    <div id="lista-respostas-alunos"><p style="color:var(--text-light)">Clique em Atualizar para carregar.</p></div>
+                </div>
+            </div>
+
             <!-- ABA 2: AULAS -->
             <div id="tab-prof-aulas" class="prof-tab-content">
                 <div class="card">
@@ -495,13 +533,21 @@
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
                 <h3>Passos do Roteiro</h3>
                 <div id="editor-passos-container"></div>
-                <button class="btn-action secondary" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
-                
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-action secondary" style="flex:1; min-width:220px;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:220px; background: var(--success-light); color: var(--success); border: 2px dashed var(--success);" onclick="adicionarPerguntaAberta()">+ Adicionar Pergunta Aberta (Resposta do Aluno)</button>
+                </div>
+
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
                 <h3>🎯 Desafio Final (Quiz Opcional)</h3>
                 <p style="margin-top:0;">Adicione até 5 perguntas para o aluno responder no final da aula.</p>
                 <div id="editor-quiz-container"></div>
                 <button class="btn-action secondary" onclick="adicionarPerguntaQuiz()" style="background: var(--warning-light); color: var(--warning); border: 2px dashed var(--warning); width:100%;">+ Adicionar Pergunta de Quiz</button>
+
+                <hr style="border:1px solid var(--gray-light); margin:30px 0;">
+                <h3>🤖 Texto do Prompt (junto com as Perguntas Abertas)</h3>
+                <p style="margin-top:0;">Opcional. Esse texto é colado <strong>antes</strong> das respostas do aluno quando ele clicar em "Copiar respostas". Ex: <em>"Aja como um tutor e analise as respostas abaixo:"</em></p>
+                <textarea id="prof-prompt-template" placeholder="Escreva aqui a instrução do prompt (opcional)..." style="min-height: 110px;"></textarea>
 
                 <br><br>
                 <div style="display:flex; gap:10px;">
@@ -513,6 +559,9 @@
         </section>
 
     </div>
+
+    <!-- Área usada apenas para gerar o PDF da aula (fica invisível na tela) -->
+    <div id="area-impressao"></div>
 
     <!-- Navegação Inferior -->
     <div class="bottom-nav" id="nav-container" style="display:none;">
@@ -555,6 +604,8 @@
         let aulaSelecionada = '';
         let passosAulaAtual = [];
         let passoAtual = 0;
+        let respostasAbertas = {};
+        let promptTemplateAtual = '';
         let nomesCustomizados = {};
         const nomesModulosIngles = ["Preparation", "Basic 01 - Mid Term", "Basic 01 - End Term", "Basic 02 - Mid Term", "Basic 02 - End Term", "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"];
         let professorAutenticado = false;
@@ -1104,7 +1155,39 @@
             reordenarNumeracaoEditor();
         }
 
-        function reordenarNumeracaoEditor() { Array.from(document.getElementById('editor-passos-container').children).forEach((div, idx) => { div.querySelector('.step-label').innerText = `Passo ${idx + 1}`; }); }
+        function reordenarNumeracaoEditor() {
+            Array.from(document.getElementById('editor-passos-container').children).forEach((div, idx) => {
+                const lbl = div.querySelector('.step-label');
+                if (!lbl) return;
+                if (div.dataset.tipo === 'pergunta') lbl.innerText = `Passo ${idx + 1} • Pergunta Aberta`;
+                else lbl.innerText = `Passo ${idx + 1}`;
+            });
+        }
+
+        function adicionarPerguntaAberta(dados = null) {
+            if (dados instanceof Event) dados = null;
+            const container = document.getElementById('editor-passos-container');
+            const div = document.createElement('div');
+            div.className = 'step-editor-item pergunta-aberta-item';
+            div.dataset.tipo = 'pergunta';
+            const pergunta = dados && dados.pergunta ? dados.pergunta.replace(/"/g, '&quot;') : '';
+            const dica = dados && dados.dica ? dados.dica.replace(/"/g, '&quot;') : '';
+            div.innerHTML = `
+                <div class="step-editor-header" style="background: var(--success-light);">
+                    <strong class="step-label">Passo</strong>
+                    <div class="step-move-buttons"><button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button><button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button></div>
+                </div>
+                <div class="row-inputs" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                    <label style="font-weight:bold; color:var(--success); margin:0;">✍️ Pergunta para o aluno responder:</label>
+                    <input type="text" class="pergunta-aberta-texto" placeholder="Ex: Qual é o tema do seu projeto?" value="${pergunta}" style="margin:0;">
+                    <label style="font-size:0.9rem; color:var(--text-light); margin:0;">Dica dentro do campo (opcional):</label>
+                    <input type="text" class="pergunta-aberta-dica" placeholder="Ex: Responda em uma frase" value="${dica}" style="margin:0;">
+                    <button class="btn-remove" style="align-self:flex-end;" onclick="this.closest('.step-editor-item').remove(); reordenarNumeracaoEditor();">Remover</button>
+                </div>
+            `;
+            container.appendChild(div);
+            reordenarNumeracaoEditor();
+        }
 
         async function carregarTextoExistente() {
             const c = document.getElementById('prof-curso').value;
@@ -1118,9 +1201,12 @@
                     document.getElementById('prof-nome-aula').value = titulo;
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
                     document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
+                    document.getElementById('prof-prompt-template').value = '';
                     if (data.passos_midia) {
                         data.passos_midia.forEach(p => {
                             if (p.tipo === 'quiz') adicionarPerguntaQuiz(p);
+                            else if (p.tipo === 'pergunta') adicionarPerguntaAberta(p);
+                            else if (p.tipo === 'config_respostas') document.getElementById('prof-prompt-template').value = p.prompt_template || '';
                             else adicionarPassoAoEditor(p.texto, p.imagem, p.link);
                         });
                     }
@@ -1128,6 +1214,7 @@
                     document.getElementById('prof-nome-modulo').value = '';
                     document.getElementById('prof-nome-aula').value = '';
                     document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
+                    document.getElementById('prof-prompt-template').value = '';
                     adicionarPassoAoEditor();
                 }
             } catch (err) {}
@@ -1178,10 +1265,16 @@
             const nAula = document.getElementById('prof-nome-aula').value.trim();
 
             let pacotePassos = [];
-            document.querySelectorAll('.step-editor-item').forEach(item => {
-                const quill = item.quillInstance;
-                const txtHtml = quill ? quill.root.innerHTML : '';
-                if(quill && quill.getText().trim() !== '') { pacotePassos.push({ texto: txtHtml, imagem: item.querySelector('.edit-img').value.trim(), link: item.querySelector('.edit-link').value.trim() }); }
+            document.querySelectorAll('#editor-passos-container .step-editor-item').forEach(item => {
+                if (item.dataset.tipo === 'pergunta') {
+                    const pTxt = item.querySelector('.pergunta-aberta-texto').value.trim();
+                    const dica = item.querySelector('.pergunta-aberta-dica').value.trim();
+                    if (pTxt) pacotePassos.push({ tipo: 'pergunta', pergunta: pTxt, dica: dica });
+                } else {
+                    const quill = item.quillInstance;
+                    const txtHtml = quill ? quill.root.innerHTML : '';
+                    if(quill && quill.getText().trim() !== '') { pacotePassos.push({ texto: txtHtml, imagem: item.querySelector('.edit-img').value.trim(), link: item.querySelector('.edit-link').value.trim() }); }
+                }
             });
 
             document.querySelectorAll('.quiz-prof-item').forEach(item => {
@@ -1195,6 +1288,12 @@
             });
 
             if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo ou adicione uma pergunta!", "warning"); return; }
+
+            const promptTemplate = (document.getElementById('prof-prompt-template').value || '').trim();
+            const temPerguntaAberta = pacotePassos.some(p => p.tipo === 'pergunta');
+            if (promptTemplate || temPerguntaAberta) {
+                pacotePassos.push({ tipo: 'config_respostas', prompt_template: promptTemplate });
+            }
             let dMod = c === 'reposicao' ? `Ficha ${m.split('_')[1].padStart(2, '0')}` : `Módulo ${m.split('_')[1].padStart(2, '0')}`;
             if(c === 'ingles') dMod = nomesModulosIngles[parseInt(m.split('_')[1])-1];
             let dAula = c === 'ingles' ? `Lesson ${a.split('_')[1].padStart(2, '0')}` : `Aula ${a.split('_')[1].padStart(2, '0')}`;
@@ -1365,13 +1464,24 @@
             try {
                 const { data } = await bancoDados.from('roteiros_aulas').select('passos_midia, nome_aula').eq('id', `${cursoSelecionado}_${modSelecionado}_${aId}`).maybeSingle();
                 if (data && data.passos_midia && data.passos_midia.length > 0) {
-                    passosAulaAtual = data.passos_midia;
+                    promptTemplateAtual = '';
+                    passosAulaAtual = data.passos_midia.filter(p => {
+                        if (p.tipo === 'config_respostas') { promptTemplateAtual = p.prompt_template || ''; return false; }
+                        return true;
+                    });
                     passoAtual = 0;
+
+                    const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aId}`;
+                    respostasAbertas = {};
+                    if (alunoLogado !== 'professora_teste') {
+                        try { respostasAbertas = JSON.parse(localStorage.getItem('respostas_' + aulaIdCompleto)) || {}; } catch(e) { respostasAbertas = {}; }
+                    }
+
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
                     const nCru = data.nome_aula ? data.nome_aula.split('|||')[0].trim() : "Atividade";
                     document.getElementById('titulo-aula-atual').innerText = nCru;
-                    const tempoEst = Math.max(1, Math.ceil(data.passos_midia.length * 1.5));
+                    const tempoEst = Math.max(1, Math.ceil(passosAulaAtual.length * 1.5));
                     document.getElementById('tempo-estimado-aula').innerText = `⏱️ Tempo estimado: ${tempoEst} min`;
                     
                     registrarHistorico(nCru); 
@@ -1398,11 +1508,11 @@
 
             if (passo.tipo === 'quiz') {
                 document.getElementById('btn-ler-audio').style.display = 'none';
-                
+
                 let opcoesHtml = passo.opcoes.map((op, idx) => {
                     if (!op) return '';
                     return `<div class="quiz-option" onclick="verificarRespostaQuiz(this, ${idx}, ${passo.correta})">
-                                <span style="display:inline-block; width:30px; height:30px; border-radius:50%; background:var(--gray-light); text-align:center; line-height:30px; margin-right:15px; font-weight:bold;">${String.fromCharCode(65+idx)}</span> 
+                                <span style="display:inline-block; width:30px; height:30px; border-radius:50%; background:var(--gray-light); text-align:center; line-height:30px; margin-right:15px; font-weight:bold;">${String.fromCharCode(65+idx)}</span>
                                 <span>${op}</span>
                             </div>`;
                 }).join('');
@@ -1414,42 +1524,59 @@
                         <div style="margin-top: 25px;">${opcoesHtml}</div>
                     </div>
                 `;
-                
+
                 btnNext.style.display = 'none'; // Esconde até acertar
                 btnPrev.disabled = passoAtual === 0;
+            } else if (passo.tipo === 'pergunta') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                const salva = (respostasAbertas[passoAtual] || '');
+                const dica = passo.dica ? passo.dica.replace(/"/g, '&quot;') : 'Escreva sua resposta aqui...';
+                contPasso.innerHTML = `
+                    <div class="quiz-question-card" style="text-align:left;">
+                        <div style="font-size:2.8rem; margin-bottom:10px; text-align:center;">✍️</div>
+                        <h3 style="font-size:1.6rem; margin-top:0; color:var(--success);">${passo.pergunta}</h3>
+                        <textarea id="resposta-aberta-input" class="resposta-aberta-textarea" placeholder="${dica}" oninput="salvarRespostaAberta(${passoAtual}, this.value)"></textarea>
+                        <p style="color:var(--text-light); font-size:0.9rem; margin:6px 0 0 0;">💾 Sua resposta é salva automaticamente neste aparelho.</p>
+                    </div>
+                `;
+                const ta = document.getElementById('resposta-aberta-input');
+                if (ta) ta.value = salva;
+
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
             } else {
                 document.getElementById('btn-ler-audio').style.display = 'inline-block';
                 if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
 
-                let textoFormatado = passo.texto || '';
-                textoFormatado = textoFormatado
-                    .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
-                    .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
-                    .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
-                    .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
-                    .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
-                    .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">')
-                    .replace(/\[\[(.*?)\s*::\s*(.*?)\]\]/g, '<span class="term-highlight" onclick="abrirExplicacao(\'$1\', \'$2\')">$1 💡</span>');
-
-                contPasso.innerHTML = textoFormatado;
+                contPasso.innerHTML = formatarTextoPasso(passo.texto || '');
                 linkCont.innerHTML = passo.link ? `<a href="${passo.link.trim()}" target="_blank" class="btn-action" style="text-decoration:none; display:inline-block; margin-top:20px;">🔗 ABRIR MATERIAL EXTERNO</a>` : '';
-                
+
                 btnNext.style.display = 'block';
                 btnPrev.disabled = passoAtual === 0;
-                
-                if (passoAtual === passosAulaAtual.length - 1) {
-                    btnNext.innerHTML = "🎉 CONCLUIR AULA";
-                    btnNext.style.background = "var(--warning)";
-                    btnNext.style.color = "var(--text)";
-                    btnNext.style.transform = "scale(1.05)";
-                    btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
-                } else {
-                    btnNext.innerHTML = "AVANÇAR ▶";
-                    btnNext.style.background = "var(--success)";
-                    btnNext.style.color = "white";
-                    btnNext.style.transform = "scale(1)";
-                    btnNext.style.boxShadow = "none";
+                aplicarEstiloBotaoFinal(btnNext);
+            }
+
+            // Ações de fim de aula (PDF / copiar respostas) — só no último passo
+            const acoesFim = document.getElementById('conclusao-acoes');
+            if (passoAtual === passosAulaAtual.length - 1) {
+                const temPerguntas = passosAulaAtual.some(p => p.tipo === 'pergunta');
+                let botoesResp = '';
+                if (temPerguntas) {
+                    botoesResp = `
+                        <button class="btn-conclusao" onclick="copiarRespostas()">📋 Copiar respostas (para o prompt)</button>
+                        <button class="btn-conclusao txt" onclick="exportarRespostasTxt()">📥 Baixar respostas (.txt)</button>`;
                 }
+                acoesFim.className = 'conclusao-acoes-box';
+                acoesFim.style.display = 'block';
+                acoesFim.innerHTML = `
+                    <strong style="font-size:1.1rem;">🎁 Guarde esta aula</strong>
+                    <button class="btn-conclusao alt" onclick="salvarAulaPDF()">📄 Salvar aula em PDF</button>
+                    ${botoesResp}
+                `;
+            } else {
+                acoesFim.style.display = 'none';
+                acoesFim.innerHTML = '';
             }
 
             const pct = Math.round(((passoAtual + 1) / passosAulaAtual.length) * 100);
@@ -1504,6 +1631,10 @@
                     salvarProgressoAlunoNuvem();
                 }
 
+                if (passosAulaAtual.some(p => p.tipo === 'pergunta')) {
+                    salvarRespostasNuvem(gerarTextoRespostas());
+                }
+
                 verificarConquistas();
                 atualizarDashboard();
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
@@ -1525,6 +1656,163 @@
                 window.speechSynthesis.speak(msg);
             } else {
                 showToast("Seu navegador não suporta leitura de áudio.", "error");
+            }
+        }
+
+        // --- PERGUNTAS ABERTAS, PROMPT, EXPORTAÇÃO E PDF ---
+        function escHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        function aplicarEstiloBotaoFinal(btnNext) {
+            if (passoAtual === passosAulaAtual.length - 1) {
+                btnNext.innerHTML = "🎉 CONCLUIR AULA";
+                btnNext.style.background = "var(--warning)";
+                btnNext.style.color = "var(--text)";
+                btnNext.style.transform = "scale(1.05)";
+                btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
+            } else {
+                btnNext.innerHTML = "AVANÇAR ▶";
+                btnNext.style.background = "var(--success)";
+                btnNext.style.color = "white";
+                btnNext.style.transform = "scale(1)";
+                btnNext.style.boxShadow = "none";
+            }
+        }
+
+        function formatarTextoPasso(texto) {
+            return (texto || '')
+                .replace(/\*([^\*<>"]+)\*/g, '<span class="click-target">$1</span>')
+                .replace(/\|([^\|<>"]+)\|/g, '<span class="click-blue">$1</span>')
+                .replace(/!([^!<>"]+)!/g, '<span class="text-danger-huge">$1</span>')
+                .replace(/\+([^\+<>"]+)\+/g, '<span class="text-success-medium">$1</span>')
+                .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
+                .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">')
+                .replace(/\[\[(.*?)\s*::\s*(.*?)\]\]/g, '<span class="term-highlight" onclick="abrirExplicacao(\'$1\', \'$2\')">$1 💡</span>');
+        }
+
+        function salvarRespostaAberta(index, valor) {
+            respostasAbertas[index] = valor;
+            if (alunoLogado === 'professora_teste') return;
+            const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
+            try { localStorage.setItem('respostas_' + aulaIdCompleto, JSON.stringify(respostasAbertas)); } catch(e) {}
+        }
+
+        function gerarTextoRespostas() {
+            let blocos = [];
+            let n = 0;
+            passosAulaAtual.forEach((p, idx) => {
+                if (p.tipo === 'pergunta') {
+                    n++;
+                    const r = (respostasAbertas[idx] || '').trim();
+                    blocos.push(`${n}. ${p.pergunta}\nResposta: ${r || '(em branco)'}`);
+                }
+            });
+            const corpo = blocos.join('\n\n');
+            return promptTemplateAtual ? `${promptTemplateAtual}\n\n${corpo}` : corpo;
+        }
+
+        function mostrarTextoParaCopiar(texto) {
+            document.getElementById('def-title').innerText = "Copie o texto abaixo";
+            const p = document.getElementById('def-text');
+            p.innerHTML = `<textarea readonly style="width:100%; min-height:200px; font-size:0.95rem;">${escHtml(texto)}</textarea>`;
+            document.getElementById('definition-modal-overlay').style.display = 'flex';
+            const ta = p.querySelector('textarea');
+            if (ta) { ta.focus(); ta.select(); }
+        }
+
+        function copiarTexto(texto, msgOk) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(() => showToast(msgOk, "success")).catch(() => mostrarTextoParaCopiar(texto));
+            } else {
+                mostrarTextoParaCopiar(texto);
+            }
+        }
+
+        function copiarRespostas() {
+            const texto = gerarTextoRespostas();
+            copiarTexto(texto, "Respostas copiadas! Agora é só colar no seu assistente de IA. 🤖");
+            salvarRespostasNuvem(texto);
+        }
+
+        function exportarRespostasTxt() {
+            const texto = gerarTextoRespostas();
+            const nomeAula = (document.getElementById('titulo-aula-atual').innerText || 'aula').replace(/[^a-z0-9]/gi, '_');
+            const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `respostas_${nomeAula}.txt`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            salvarRespostasNuvem(texto);
+            showToast("Arquivo de respostas baixado!", "success");
+        }
+
+        async function salvarRespostasNuvem(textoGerado) {
+            if (!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
+            const lista = [];
+            passosAulaAtual.forEach((p, idx) => {
+                if (p.tipo === 'pergunta') lista.push({ pergunta: p.pergunta, resposta: (respostasAbertas[idx] || '').trim() });
+            });
+            if (lista.length === 0) return;
+            const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
+            try {
+                await bancoDados.from('respostas_alunos').upsert({
+                    id: `${alunoLogadoDados.id}__${aulaIdCompleto}`,
+                    aluno_id: String(alunoLogadoDados.id),
+                    aluno_nome: alunoLogado,
+                    aula_id: aulaIdCompleto,
+                    nome_aula: document.getElementById('titulo-aula-atual').innerText,
+                    respostas: lista,
+                    prompt_gerado: textoGerado,
+                    criado_em: new Date().toISOString()
+                });
+            } catch(e) {}
+        }
+
+        function salvarAulaPDF() {
+            const area = document.getElementById('area-impressao');
+            const nomeAula = document.getElementById('titulo-aula-atual').innerText;
+            const nomeAluno = (alunoLogado === 'professora_teste') ? 'Visão de Teste' : (alunoLogado.charAt(0).toUpperCase() + alunoLogado.slice(1));
+            let html = `<div class="print-header"><h1>${escHtml(nomeAula)}</h1><p>Aluno(a): ${escHtml(nomeAluno)} &nbsp;•&nbsp; ${new Date().toLocaleDateString('pt-BR')}</p></div>`;
+            let nPerg = 0;
+            passosAulaAtual.forEach((p, idx) => {
+                if (p.tipo === 'pergunta') {
+                    nPerg++;
+                    const r = (respostasAbertas[idx] || '').trim();
+                    html += `<div class="print-bloco print-pergunta"><strong>✍️ ${nPerg}. ${escHtml(p.pergunta)}</strong><div class="print-resposta">${escHtml(r) || '(sem resposta)'}</div></div>`;
+                } else if (p.tipo === 'quiz') {
+                    html += `<div class="print-bloco"><strong>🎯 ${escHtml(p.pergunta)}</strong><div>Resposta correta: ${escHtml(p.opcoes[p.correta] || '')}</div></div>`;
+                } else {
+                    let imgs = '';
+                    if (p.imagem) p.imagem.split(',').forEach(u => { if(u.trim()) imgs += `<img src="${u.trim()}" class="print-img">`; });
+                    html += `<div class="print-bloco">${imgs}<div class="print-texto">${formatarTextoPasso(p.texto || '')}</div></div>`;
+                }
+            });
+            area.innerHTML = html;
+            showToast("Abrindo opção de salvar... escolha 'Salvar como PDF'.", "info");
+            setTimeout(() => window.print(), 300);
+        }
+
+        async function carregarRespostasAlunos() {
+            const div = document.getElementById('lista-respostas-alunos');
+            if (!bancoDados) { div.innerHTML = "<p style='color:var(--text-light)'>Sem conexão.</p>"; return; }
+            div.innerHTML = "<p style='color:var(--text-light)'>Carregando...</p>";
+            try {
+                const { data, error } = await bancoDados.from('respostas_alunos').select('*').order('criado_em', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) { div.innerHTML = "<p style='color:var(--text-light)'>Nenhuma resposta enviada ainda.</p>"; return; }
+                div.innerHTML = data.map(r => {
+                    const qa = (r.respostas || []).map(item => `<div style="margin-bottom:8px;"><strong>${escHtml(item.pergunta)}</strong><br><span style="color:var(--text-light);">${escHtml(item.resposta) || '(em branco)'}</span></div>`).join('');
+                    const dataFmt = r.criado_em ? new Date(r.criado_em).toLocaleString('pt-BR') : '';
+                    const promptAttr = (r.prompt_gerado || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    return `<div class="aluno-gerenciamento-card">
+                        <h4>${escHtml((r.aluno_nome || '').toUpperCase())} <span class="curso-tag">${escHtml(r.nome_aula || '')}</span></h4>
+                        <p style="margin:0 0 10px 0; font-size:0.85rem; color:var(--text-light);">${dataFmt}</p>
+                        ${qa}
+                        <button class="btn-action secondary" style="margin-top:10px; padding:8px 14px; font-size:0.9rem;" data-prompt="${promptAttr}" onclick="copiarTexto(this.dataset.prompt, 'Prompt copiado!')">📋 Copiar prompt</button>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                div.innerHTML = "<p style='color:var(--danger)'>Não foi possível carregar. Verifique se a tabela <strong>respostas_alunos</strong> foi criada no Supabase.</p>";
             }
         }
 
