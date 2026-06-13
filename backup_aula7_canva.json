@@ -1,0 +1,172 @@
+{
+  "id": "informatica_modulo_9_aula_7",
+  "modulo_id": "informatica_modulo_9",
+  "aula_id": "aula_7",
+  "passos": [
+    "html_rich_text"
+  ],
+  "nome_modulo": "MÓDULO 09 E-commerce e Vendas Online",
+  "nome_aula": "Desenvolvimento",
+  "passos_midia": [
+    {
+      "link": "",
+      "texto": "<p>O que é uma *LANDING PAGE?* ABRA SEU LIVRO VOLUME 02 NA !PÁGINA 178!</p>",
+      "imagem": "https://i.postimg.cc/9fwyQbd1/Captura-de-tela-2026-05-29-101444.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>💡 *O que é??* Se vocês quisessem montar uma lojinha ou um sistema para receber encomendas de bolos, costuras ou artesanatos antigamente, precisariam pagar muito caro para alguém construir um sistema de computador.</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Hoje, com as tecnologias modernas que conversam conosco, como as *I.A*, nós conseguimos criar uma página interativa onde o cliente clica no produto, digita o nome e o e-mail dele, e a lista de pedidos chega organizada para você em uma tabelinha, igual a um caderno de anotações eletrônico !Vamos aprender a comandar o computador para fazer isso para nós!</p>",
+      "imagem": ""
+    },
+    {
+      "link": "https://www.canva.com",
+      "texto": "<p>=Preparação= Vamos abrir o site do *Canva* na página inicial. Acesse o Link Abaixo 👇</p>",
+      "imagem": "https://i.postimg.cc/bwjDpP6b/Sem-titulo.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Na página inicial, vamos clicar no botão chamado Canva IA</p>",
+      "imagem": "https://i.postimg.cc/RCjPwPCP/codeseta2.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Vamos Escolher a Opção *Programação*</p>",
+      "imagem": "https://i.postimg.cc/BbtC2KR9/codeseta3.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Uma outra alternativa é Na página inicial, clicar no botão \"CODE\"</p>",
+      "imagem": "https://i.postimg.cc/CMt5F8MM/codeseta.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Vamos começar a criar o Nosso *PROMPT* {https://media1.tenor.com/m/nb9yRj8rHo4AAAAC/excited-ah.gif}</p>",
+      "imagem": "https://i.postimg.cc/0NbmWscG/paginaia.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Vamos Relembrar o que é um *PROMPT* Um prompt é, basicamente, o comando ou a instrução que você dá para essa IA. {https://media.tenor.com/spSgkqK707kAAAAM/ok-all.gif}</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>No mundo do design e do e-commerce, saber fazer bons prompts é a habilidade que separa quem perde tempo tentando adivinhar como usar uma ferramenta de quem obtém resultados profissionais em segundos. Não é \"falar com o computador\", é programar o comportamento da máquina através da linguagem natural. {https://gifdb.com/images/thumbnail/man-touching-forehead-with-smart-text-6wxk9lhbapwuso4p.gif} !Então Vamos Começar a Criar Nosso Prompt!</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>*Preparação do Terreno (Pré-requisitos)* Um navegador aberto com o |ChatGPT Gemini ou Claude| logado. Se não Souber como abrir uma nova aba, é só clicar o botão control + T com o navegador chrome aberto. Ou Vá no seu navegador e clique no mais para abrir uma nova aba {https://i.postimg.cc/cHGW46sy/novaguia.gif}</p>",
+      "imagem": "https://i0.wp.com/castudynotes.com/wp-content/uploads/2025/12/20251228_093534.jpg?fit=1080%2C2220&ssl=1"
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Abra seu livro na Página !180 Volume 02! Vamos fazer anotações... Será a nossa forma de colocar os pensamentos na ponta do lápis ✏️📝</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>=Pergunta????= Porque não colocamos nosso prompt na I.A e começamos a construir??? Bom, a I.A |Gratuita| tem limitações, quanto mais a usamos, menos podemos usá-las, então vamos utilizar apenas quando tivermos algo sólido construido. Até porque não queremos gastar nossos créditos e continuar a usufruir gratuitamente!. {https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyZHNqNXhlN2R1NGY5ZHJ2cXByaHNuZmNzaGJ0cHUwMnh3NDJqYWF0YiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/yIxNOXEMpqkqA/giphy.gif}</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Vamos aprender a conversar com o computador de um jeito que ele entenda exatamente o que queremos. Pensem na Inteligência Artificial como um ajudante de cozinha robô ou um montador de blocos de Lego. Se você disser apenas \"faça um bolo\" ou \"monte um carro\", ele pode fazer de qualquer jeito. Mas, se você der a receita exata ou o manual de instruções com as cores certas, o resultado fica perfeito!</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Para criar nosso site de vendas, vamos usar uma \"receita\" chamada !COSTAR.! Aprender isso é incrível porque dá a todos nós a independência de tirar nossas ideias da cabeça e colocá-las na tela. Para quem gosta de ir rápido, essa é a lógica de programação por trás das máquinas.</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>!COSTAR! é um mapa visual seguro que garante que nada vai sair do controle. Nossa aula terá pouca explicação minha e muita participação de vocês!</p>",
+      "imagem": "https://miro.medium.com/v2/resize:fit:1400/1*bk4MFnCG32XUUhwEmySanw.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Passo 1:!Contexto e Objetivo! A Base do Prompt Nós precisamos dar um crachá para a Inteligência Artificial e dizer qual é a missão dela. No seu livro em anotações, escreva: 1. Quem você é: (Vamos mostrar para máquina qual é o papel que ela vai exercer para poder trabalhar) Exemplo: \"Você é um vendedor muito simpático\". Perceba que não pedimos apenas \"faça um site\". Nós dissemos: \"Você é um assistente especialista... \"Lembrando que aqui, nós vamos pedir para ela criar um prompt para uma página de e-commerce online.\" {https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmRhNXdoMXZieGc0ZDB4dXk5Ym1tbjFueHQ1dGcwZWJqOGgwM3F1aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/CJnqOd3DGGYP6/giphy.gif}</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora, continue a anotar a próxima etapa 2. O que vamos fazer:. Exemplo: \"Crie um texto para vender meu [Nome do seu Produto]\". {https://i.pinimg.com/originals/81/03/b8/8103b872fbb44b31610cbf98289bd2bb.gif}</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Passo 2: !Estilo, Tom, Audiência! Pintando o nosso Site 3. Como deve ser o visual do texto: (Estilo). Exemplo: \"Use frases curtas e coloque emojis (carinhas)\". Escreva: 4. A emoção do texto: (Tom). Exemplo: \"Alegre e animado!\". É a emoção do texto. Pode ser \"Urgente\", \"Acolhedor\", \"Profissional\" ou \"Bem-humorado\". Escolha um que combine com seu produto. 5. Para quem estamos falando: (Audiência). Exemplo: \"Para crianças que gostam de jogos\". Quem vai comprar? Descreva o público-alvo (ex: \"Jovens universitários\" ou \"Mães de pet\").</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Passo 3: !Resposta! O Botão Mágico (CTA) Este é o bloco onde você lista exatamente o que quer receber de volta. É aqui que entra um conceito fundamental: o Call to Action (CTA). O CTA, ou \"Chamada para a Ação\", é aquele botão ou frase final que diz ao cliente exatamente o que fazer em seguida (ex: \"Clique aqui e garanta sua vaga\", \"Compre agora com 50% de desconto\"). Um site de vendas sem CTA é como um vendedor que apresenta o produto, mas esquece de cobrar.</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Digite Resposta: e faça uma lista numerada do que a IA deve gerar para você. Peça uma \"Headline\" (o título principal da página). Peça \"3 benefícios do produto usando gatilhos de desejo\". Peça explicitamente a criação de um \"Call to Action (CTA) forte e urgente\".</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Pronto! Agora vamos conversar com I.A que escolhemos e trabalhar na construção do prompt. \"Não esqueça, pode ser feito ajustes a qualquer momento, mude ou substitua o que não gostou\" {https://i.pinimg.com/originals/f0/b1/f2/f0b1f28bffd5b9c2fc49fd3ffc35211b.gif}</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>!Pausa para a Explicação! UX (Experiência do Usuário) e UI (Interface do Usuário) são áreas focadas no design de produtos digitais (apps e sites). O UX estuda a utilidade e a facilidade de uso, enquanto o UI cuida da estética e da parte visual com que o usuário interage</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>!Exemplo final de um Prompt Pronto.! Você é um assistente especialista em criação de landing pages impactantes, com foco em UX/UI, copywriting e marketing digital. Objective Crie uma landing page profissional e altamente persuasiva para a venda de um (produto). Edição limitada com apenas 20 unidades disponíveis. A página deve ser visualmente impactante, transmitir autoridade da marca e gerar desejo imediato de compra. Style Para o estilo visual, use cores escuras com toques vibrantes inspiradas na identidade visual da marca (cor de fundo rgb(informar cores se deseja usar uma cor já da sua marca)). A estética deve ser moderna, limpa, responsiva, com animações sutis e de alto impacto, transmitindo exclusividade e desejo de compra. Tone Persuasivo, direto e envolvente, transmitindo exclusividade e urgência. Audience (Aqui você informa quem seria as pessoas que comprariam no seu site) Apaixonados por informática e tecnologia, criadores de conteúdo jovens e antenados. Response Requisitos de estrutura: Menu de navegação fixo no topo com rolagem suave, contendo links para: Sobre o produto, Detalhes, FAQ e Comprar Agora. Seção principal (hero): destaque do (produto) com imagem, slogan chamativo e botão de CTA “Garanta o Seu Agora”. Seção de detalhes: benefícios do produto, descrição clara, materiais de alta qualidade e carrossel de imagens em diferentes ângulos. Seção de exclusividade/urgência: destaque de edição limitada, apenas 20 unidades e chamada de ação para gerar escassez. FAQ com respostas curtas para dúvidas comuns (material, envio, pagamento, devoluções). Use respostas genéricas para poder ser alteradas depois. Seção de compra: botão de destaque com preço (R$ 99,00), opções de pagamento (em até 2x sem juros) e frete grátis para todo Brasil. Rodapé com links para redes sociais (editáveis depois): YouTube (https://youtube.com/ e Instagram (https://instagram.com/) Página extra na rota \"/obrigado\" informando que assim que o pagamento for confirmado, o cliente deve enviar um email. Página extra na rota \"/esgotado\" para que possa ser redirecionado quando o total de produtos já estiver sido vendido (sold out). Requisitos de design: Design responsivo para todos os dispositivos. Animações sutis para gerar engajamento (hover em botões, fade-in das imagens). Tipografia profissional, legível e moderna. Botões CTA bem destacados e sempre visíveis em momentos estratégicos. Layout otimizado para alta taxa de conversão, com foco em destacar benefícios e escassez.</p>",
+      "imagem": ""
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Vamos abrir a nossa Aba do Canva, com o campo de Programação aberto e colar nosso prompt pronto.</p>",
+      "imagem": "https://i.postimg.cc/Y2b65sf2/prompt.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Agora Vamos Editar e Criar mudanças no nosso Site</p>",
+      "imagem": "https://i.postimg.cc/d31yQJmw/lanhead.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Quase tudo que você clicar, abrirá opções de modificações no topo do site.</p>",
+      "imagem": "https://i.postimg.cc/PqJJ8SvD/edicao.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Quando você clica em textos, abre uma caixinha para você modificar no topo</p>",
+      "imagem": "https://i.postimg.cc/R02SJ4Bt/textos.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Clicando em cores (como no fundo) pode alterar também.</p>",
+      "imagem": "https://i.postimg.cc/DwZnC8vt/fundo.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Clicando nas imagens, elas podem ser alteradas apenas fazendo um upload de qualquer outra imagem que deseja.</p>",
+      "imagem": "https://i.postimg.cc/Wz2QhHh0/uploads.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Você também pode adicionar uma imagem diretamente do CANVA, acessando elementos --&gt;&gt; Fotos na barra esquerda.</p>",
+      "imagem": "https://i.postimg.cc/Mp8FsG7X/elementosfotos.png"
+    },
+    {
+      "link": "",
+      "texto": "<p>Você Sempre Pode Voltar e alterar o prompt da I.A do canva. OU para pedir alterações, mais páginas, tudo que o plano gratuito conseguir te fornecer.</p>",
+      "imagem": "https://caccioppoli.com/2008%20gifs/gifs/New074.gif"
+    }
+  ]
+}

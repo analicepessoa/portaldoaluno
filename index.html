@@ -51,10 +51,10 @@
             --danger-light: #7f1d1d;
         }
 
-        body { font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 80px; line-height: 1.6; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+        body { font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
         h1, h2, h3, h4 { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; letter-spacing: -0.01em; }
 
-        .toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; color: var(--text); padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; font-weight: bold; animation: slideIn 0.3s ease-out forwards; border-left: 6px solid var(--primary); font-size: 1.1rem; }
         .toast.success { border-left-color: var(--success); }
         .toast.error { border-left-color: var(--danger); }
@@ -66,8 +66,8 @@
         .loader { width:70px; height:70px; border:6px solid var(--gray-light); border-top:6px solid var(--primary); border-radius:50%; animation:girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 100%{ transform:rotate(360deg); } }
 
-        header { background-color: var(--primary-light); color: var(--primary); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; transition: background 0.3s, color 0.3s; }
-        header h1 { margin: 0; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        header { background-color: var(--primary-light); color: var(--primary); padding: 12px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; transition: background 0.3s, color 0.3s; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 
         .container { max-width: 900px; margin: 20px auto; padding: 0 20px; }
         .view-section { display: none; animation: fadeIn 0.4s ease-out; }
@@ -139,25 +139,28 @@
         .mod-item.bloqueado .mod-number { background: var(--gray-light); color: var(--text-light); }
         .mod-item.bloqueado .mod-badge { background: var(--gray-light); color: var(--text-light); }
 
-        .progress-wrapper { background: var(--bg); padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--gray-light); position: sticky; top: var(--header-h, 72px); z-index: 50; box-shadow: 0 8px 16px -10px rgba(10,60,45,.4); }
+        .progress-wrapper { background: var(--bg); padding: 15px 25px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--gray-light); position: sticky; top: var(--header-h, 60px); z-index: 50; box-shadow: 0 8px 16px -10px rgba(10,60,45,.4); }
         body:not(.dark-mode) .progress-wrapper { background: white; }
         .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--text-light); }
         .progress-container { width: 100%; background-color: var(--gray-light); border-radius: 10px; height: 12px; overflow: hidden; }
         .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--coral)); transition: width 0.4s ease; border-radius: 10px; }
         #progress-text-step { background: var(--primary); color: #fff; padding: 4px 13px; border-radius: 999px; font-family: 'Bricolage Grotesque', 'Inter', sans-serif; font-weight: 800; font-size: 0.9rem; letter-spacing: 0; }
         
-        .step-viewer-card { display: block; padding: 28px; }
+        .step-viewer-card { display: block; padding: 28px; padding-bottom: 8px; }
         .step-scroll-area { margin-bottom: 18px; }
 
-        .nav-steps { display: flex; gap: 15px; margin-top: 4px; }
-        .btn-step { flex: 1; padding: 18px; font-size: 1.2rem; font-weight: 700; border-radius: 14px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: transform 0.2s, box-shadow 0.2s; }
-        .btn-step:active { transform: scale(0.98); }
+        /* Botões VOLTAR/AVANÇAR fixos no rodapé — compactos e elegantes */
+        .nav-steps { position: fixed; bottom: 0; left: 0; right: 0; display: flex; gap: 10px; padding: 10px 20px; background: var(--bg); border-top: 1px solid var(--gray-light); z-index: 90; box-shadow: 0 -2px 10px rgba(0,0,0,0.04); }
+        body:not(.dark-mode) .nav-steps { background: #fff; }
+        .nav-steps-spacer { height: 62px; flex-shrink: 0; }
+        .btn-step { flex: 1; padding: 11px 16px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: transform 0.15s, box-shadow 0.15s, background 0.15s; max-width: 50%; letter-spacing: 0.02em; }
+        .btn-step:active { transform: scale(0.97); }
         .btn-step.prev { background: transparent; color: var(--text-light); border: 1px solid var(--gray-light); }
-        .btn-step.prev:hover { background: var(--bg); }
-        .btn-step.next { background: var(--coral); color: #fff; box-shadow: 0 10px 22px -10px rgba(255,90,60,.7); }
-        .btn-step.next:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -10px rgba(255,90,60,.8); }
-        .btn-step.next.finish { box-shadow: 0 0 0 4px var(--warning-light), 0 14px 26px -10px rgba(255,90,60,.85); }
-        .btn-step:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-step.prev:hover { background: var(--primary-light); color: var(--primary); }
+        .btn-step.next { background: var(--coral); color: #fff; box-shadow: 0 4px 12px -4px rgba(255,90,60,.5); }
+        .btn-step.next:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(255,90,60,.6); }
+        .btn-step.next.finish { box-shadow: 0 0 0 3px var(--warning-light), 0 4px 12px -4px rgba(255,90,60,.6); }
+        .btn-step:disabled { opacity: .4; cursor: not-allowed; }
 
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
@@ -169,11 +172,12 @@
         .text-success-medium { color: var(--success); font-size: 1.6rem; font-weight: bold; display: block; margin: 10px 0; }
         .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--gray-light); transition: background 0.3s; }
-        body:not(.dark-mode) .bottom-nav { background: white; }
-        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.85rem; font-weight: bold; cursor: pointer; background: none; border: none; }
-        .bottom-nav-item.active { color: var(--primary); }
-        .bottom-nav-item i { font-size: 1.6rem; font-style: normal; }
+        /* Navegação Dashboard/Professora — dentro do header */
+        .header-nav { display: flex; gap: 6px; align-items: center; }
+        .header-nav-item { display: flex; align-items: center; gap: 5px; color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; background: none; border: 1.5px solid transparent; border-radius: 10px; padding: 7px 14px; transition: all 0.2s; white-space: nowrap; }
+        .header-nav-item:hover { background: rgba(14,107,83,0.1); }
+        .header-nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .header-nav-item i { font-size: 1rem; font-style: normal; }
 
         #editor-passos-container { max-height: 55vh; overflow-y: auto; background: var(--bg); padding: 15px; border-radius: 16px; border: 2px solid var(--gray-light); margin-bottom: 20px; transition: background 0.3s; }
         .step-editor-item { background: var(--bg); border-radius: 16px; margin-bottom: 25px; border-left: 6px solid var(--primary); border-top: 1px solid var(--gray-light); border-right: 1px solid var(--gray-light); border-bottom: 1px solid var(--gray-light); display: flex; flex-direction: column; transition: background 0.3s; }
@@ -230,8 +234,12 @@
             .step-text { font-size: 1.15rem; margin: 15px 0; }
             .text-danger-huge { font-size: 1.5rem; }
             .text-success-medium { font-size: 1.25rem; }
-            .btn-step { font-size: 1rem; padding: 14px; }
+            .btn-step { font-size: 0.9rem; padding: 10px 12px; }
             .step-viewer-card { padding: 18px; }
+            .nav-steps { padding: 8px 12px; gap: 8px; }
+            .nav-steps-spacer { height: 56px; }
+            .header-nav-item { padding: 5px 10px; font-size: 0.8rem; }
+            header h1 { font-size: 1.2rem; }
         }
         /* Pop-up de Explicação (Dicionário) */
         .term-highlight {
@@ -380,9 +388,15 @@
         </div>
     </div>
 
-    <header style="display:flex; justify-content:space-between; align-items:center;">
+    <header>
         <h1 style="margin:0;"><i style="font-style:normal">🎓</i> Portal Educacional</h1>
-        <button id="btn-install-pwa" class="btn-action" style="display:none; padding:8px 16px; font-size:0.9rem; margin:0; box-shadow:none;">📲 Instalar App</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div class="header-nav" id="nav-container" style="display:none;">
+                <button class="header-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
+                <button class="header-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
+            </div>
+            <button id="btn-install-pwa" class="btn-action" style="display:none; padding:6px 12px; font-size:0.85rem; margin:0; box-shadow:none;">📲 Instalar</button>
+        </div>
     </header>
 
     <div class="container">
@@ -474,10 +488,11 @@
                         <div id="link-passo-container" style="margin-bottom: 10px;"></div>
                         <div id="conclusao-acoes" style="display:none;"></div>
                     </div>
-                    <div class="nav-steps">
-                        <button class="btn-step prev" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
-                        <button class="btn-step next" id="btnNext" onclick="mudarPasso(1)">AVANÇAR ▶</button>
-                    </div>
+                </div>
+                <div class="nav-steps-spacer"></div>
+                <div class="nav-steps">
+                    <button class="btn-step prev" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
+                    <button class="btn-step next" id="btnNext" onclick="mudarPasso(1)">AVANÇAR ▶</button>
                 </div>
             </div>
 
@@ -643,12 +658,6 @@
 
     <!-- Área usada apenas para gerar o PDF da aula (fica invisível na tela) -->
     <div id="area-impressao"></div>
-
-    <!-- Navegação Inferior -->
-    <div class="bottom-nav" id="nav-container" style="display:none;">
-        <button class="bottom-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
-        <button class="bottom-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
-    </div>
 
     <script>
         function showToast(message, type = 'info') {
@@ -867,7 +876,7 @@
                 return;
             }
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.header-nav-item').forEach(b => b.classList.remove('active'));
             const btnNav = document.getElementById(`nav-bottom-${aba}`);
             if(btnNav) btnNav.classList.add('active');
 
@@ -895,6 +904,7 @@
                     document.getElementById('area-modulos').style.display = 'block';
                 }
             }
+            setTimeout(ajustarAlturaHeader, 50);
         }
 
         // --- GESTÃO DE ALUNOS E REPOSIÇÕES ---
