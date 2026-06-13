@@ -557,8 +557,12 @@
 
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
                 <h3>🤖 Texto do Prompt (junto com as Perguntas Abertas)</h3>
-                <p style="margin-top:0;">Opcional. Esse texto é colado <strong>antes</strong> das respostas do aluno quando ele clicar em "Copiar respostas". Ex: <em>"Aja como um tutor e analise as respostas abaixo:"</em></p>
-                <textarea id="prof-prompt-template" placeholder="Escreva aqui a instrução do prompt (opcional)..." style="min-height: 110px;"></textarea>
+                <p style="margin-top:0;">Opcional. Quando o aluno clicar em "Copiar respostas", ele leva este texto pronto para colar na IA. Há 2 jeitos:</p>
+                <ul style="margin-top:0; color:var(--text-light); line-height:1.6;">
+                    <li><strong>Prompt pronto (recomendado):</strong> escreva o prompt completo e coloque <code style="background:var(--gray-light); padding:1px 5px; border-radius:4px;">{{codigo}}</code> onde a resposta do aluno deve entrar — usando o <em>Código da variável</em> que você definiu em cada pergunta. Ex.: <em>"...uma landing page para a {{nome_negocio}}, do ramo de {{nicho}}, em {{cidade}}."</em> Também funciona por número: <code style="background:var(--gray-light); padding:1px 5px; border-radius:4px;">{{1}}</code>, <code style="background:var(--gray-light); padding:1px 5px; border-radius:4px;">{{2}}</code>...</li>
+                    <li><strong>Simples:</strong> se você não usar nenhum <code style="background:var(--gray-light); padding:1px 5px; border-radius:4px;">{{ }}</code>, este texto entra antes de uma lista com as perguntas e respostas.</li>
+                </ul>
+                <textarea id="prof-prompt-template" placeholder="Cole aqui o prompt e troque os [colchetes] por {{codigo_da_variavel}}..." style="min-height: 130px;"></textarea>
 
                 <br><br>
                 <div style="display:flex; gap:10px;">
@@ -1183,6 +1187,7 @@
             div.dataset.tipo = 'pergunta';
             const pergunta = dados && dados.pergunta ? dados.pergunta.replace(/"/g, '&quot;') : '';
             const dica = dados && dados.dica ? dados.dica.replace(/"/g, '&quot;') : '';
+            const variavel = dados && dados.var ? dados.var.replace(/"/g, '&quot;') : '';
             div.innerHTML = `
                 <div class="step-editor-header" style="background: var(--success-light);">
                     <strong class="step-label">Passo</strong>
@@ -1190,9 +1195,11 @@
                 </div>
                 <div class="row-inputs" style="flex-direction: column; align-items: stretch; gap: 8px;">
                     <label style="font-weight:bold; color:var(--success); margin:0;">✍️ Pergunta para o aluno responder:</label>
-                    <input type="text" class="pergunta-aberta-texto" placeholder="Ex: Qual é o tema do seu projeto?" value="${pergunta}" style="margin:0;">
+                    <input type="text" class="pergunta-aberta-texto" placeholder="Ex: Qual é o nome do seu negócio?" value="${pergunta}" style="margin:0;">
                     <label style="font-size:0.9rem; color:var(--text-light); margin:0;">Dica dentro do campo (opcional):</label>
                     <input type="text" class="pergunta-aberta-dica" placeholder="Ex: Responda em uma frase" value="${dica}" style="margin:0;">
+                    <label style="font-size:0.9rem; color:var(--primary); margin:0;">🏷️ Código da variável p/ encaixar no prompt (opcional):</label>
+                    <input type="text" class="pergunta-aberta-var" placeholder="Ex: nome_negocio  →  no prompt você usa {{nome_negocio}}" value="${variavel}" style="margin:0;">
                     <button class="btn-remove" style="align-self:flex-end;" onclick="this.closest('.step-editor-item').remove(); reordenarNumeracaoEditor();">Remover</button>
                 </div>
             `;
@@ -1280,7 +1287,9 @@
                 if (item.dataset.tipo === 'pergunta') {
                     const pTxt = item.querySelector('.pergunta-aberta-texto').value.trim();
                     const dica = item.querySelector('.pergunta-aberta-dica').value.trim();
-                    if (pTxt) pacotePassos.push({ tipo: 'pergunta', pergunta: pTxt, dica: dica });
+                    const vEl = item.querySelector('.pergunta-aberta-var');
+                    const variavel = vEl ? vEl.value.trim() : '';
+                    if (pTxt) pacotePassos.push({ tipo: 'pergunta', pergunta: pTxt, dica: dica, var: variavel });
                 } else {
                     const quill = item.quillInstance;
                     const txtHtml = quill ? quill.root.innerHTML : '';
@@ -1717,15 +1726,27 @@
         }
 
         function gerarTextoRespostas() {
-            let blocos = [];
-            let n = 0;
+            // Junta as perguntas com as respostas do aluno
+            const perguntas = [];
             passosAulaAtual.forEach((p, idx) => {
-                if (p.tipo === 'pergunta') {
-                    n++;
-                    const r = (respostasAbertas[idx] || '').trim();
-                    blocos.push(`${n}. ${p.pergunta}\nResposta: ${r || '(em branco)'}`);
-                }
+                if (p.tipo === 'pergunta') perguntas.push({ p: p, resposta: (respostasAbertas[idx] || '').trim() });
             });
+
+            // MODO PROMPT PRONTO: se o texto do prompt tem placeholders {{...}},
+            // encaixa as respostas nos lugares certos e devolve o prompt completo.
+            if (promptTemplateAtual && /\{\{\s*[^}]+\s*\}\}/.test(promptTemplateAtual)) {
+                return promptTemplateAtual.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (m, token) => {
+                    token = token.trim();
+                    const porNome = perguntas.find(q => (q.p.var || '').trim().toLowerCase() === token.toLowerCase());
+                    if (porNome) return porNome.resposta || '...';
+                    const num = parseInt(token, 10);
+                    if (!isNaN(num) && perguntas[num - 1]) return perguntas[num - 1].resposta || '...';
+                    return m; // não encontrou variável: deixa o {{...}} como está
+                });
+            }
+
+            // MODO PADRÃO: instrução do prompt + lista de perguntas e respostas
+            const blocos = perguntas.map((q, i) => `${i + 1}. ${q.p.pergunta}\nResposta: ${q.resposta || '(em branco)'}`);
             const corpo = blocos.join('\n\n');
             return promptTemplateAtual ? `${promptTemplateAtual}\n\n${corpo}` : corpo;
         }
