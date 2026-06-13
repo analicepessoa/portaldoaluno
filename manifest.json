@@ -4,8 +4,8 @@
   "description": "Aprenda Informática e Inglês de forma simples e direta.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "background_color": "#F4F7F6",
+  "theme_color": "#0E6B53",
   "icons": [
     {
       "src": "icone-192.png",
