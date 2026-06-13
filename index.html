@@ -545,8 +545,9 @@
                 <h3>Passos do Roteiro</h3>
                 <div id="editor-passos-container"></div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn-action secondary" style="flex:1; min-width:220px;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
-                    <button class="btn-action secondary" style="flex:1; min-width:220px; background: var(--success-light); color: var(--success); border: 2px dashed var(--success);" onclick="adicionarPerguntaAberta()">+ Adicionar Pergunta Aberta (Resposta do Aluno)</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:200px;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:200px; background: var(--success-light); color: var(--success); border: 2px dashed var(--success);" onclick="adicionarPerguntaAberta()">+ Adicionar Pergunta Aberta (Resposta do Aluno)</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:200px; background: var(--primary-light); color: var(--primary); border: 2px dashed var(--primary);" onclick="adicionarBlocoPrompt()">+ Adicionar Bloco de Prompt (pronto pra copiar)</button>
                 </div>
 
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
@@ -1175,8 +1176,35 @@
                 const lbl = div.querySelector('.step-label');
                 if (!lbl) return;
                 if (div.dataset.tipo === 'pergunta') lbl.innerText = `Passo ${idx + 1} • Pergunta Aberta`;
+                else if (div.dataset.tipo === 'prompt') lbl.innerText = `Passo ${idx + 1} • Bloco de Prompt`;
                 else lbl.innerText = `Passo ${idx + 1}`;
             });
+        }
+
+        function adicionarBlocoPrompt(dados = null) {
+            if (dados instanceof Event) dados = null;
+            const container = document.getElementById('editor-passos-container');
+            const div = document.createElement('div');
+            div.className = 'step-editor-item bloco-prompt-item';
+            div.dataset.tipo = 'prompt';
+            const titulo = dados && dados.titulo ? dados.titulo.replace(/"/g, '&quot;') : '';
+            const template = dados && dados.template ? dados.template : '';
+            div.innerHTML = `
+                <div class="step-editor-header" style="background: var(--primary-light);">
+                    <strong class="step-label">Passo</strong>
+                    <div class="step-move-buttons"><button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button><button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button></div>
+                </div>
+                <div class="row-inputs" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                    <label style="font-weight:bold; color:var(--primary); margin:0;">🤖 Título do bloco (o aluno vê):</label>
+                    <input type="text" class="bloco-prompt-titulo" placeholder="Ex: Prompt 1 - Criar a página" value="${titulo}" style="margin:0;">
+                    <label style="font-size:0.9rem; color:var(--text-light); margin:0;">Texto do prompt (use {{codigo}} onde entram as respostas do aluno):</label>
+                    <textarea class="bloco-prompt-template" placeholder="Ex: Crie uma landing page para a {{nome_negocio}}..." style="margin:0; min-height:140px;"></textarea>
+                    <button class="btn-remove" style="align-self:flex-end;" onclick="this.closest('.step-editor-item').remove(); reordenarNumeracaoEditor();">Remover</button>
+                </div>
+            `;
+            container.appendChild(div);
+            div.querySelector('.bloco-prompt-template').value = template;
+            reordenarNumeracaoEditor();
         }
 
         function adicionarPerguntaAberta(dados = null) {
@@ -1224,6 +1252,7 @@
                         data.passos_midia.forEach(p => {
                             if (p.tipo === 'quiz') adicionarPerguntaQuiz(p);
                             else if (p.tipo === 'pergunta') adicionarPerguntaAberta(p);
+                            else if (p.tipo === 'prompt') adicionarBlocoPrompt(p);
                             else if (p.tipo === 'config_respostas') document.getElementById('prof-prompt-template').value = p.prompt_template || '';
                             else adicionarPassoAoEditor(p.texto, p.imagem, p.link);
                         });
@@ -1290,6 +1319,10 @@
                     const vEl = item.querySelector('.pergunta-aberta-var');
                     const variavel = vEl ? vEl.value.trim() : '';
                     if (pTxt) pacotePassos.push({ tipo: 'pergunta', pergunta: pTxt, dica: dica, var: variavel });
+                } else if (item.dataset.tipo === 'prompt') {
+                    const titulo = item.querySelector('.bloco-prompt-titulo').value.trim();
+                    const template = item.querySelector('.bloco-prompt-template').value.trim();
+                    if (template) pacotePassos.push({ tipo: 'prompt', titulo: titulo, template: template });
                 } else {
                     const quill = item.quillInstance;
                     const txtHtml = quill ? quill.root.innerHTML : '';
@@ -1565,6 +1598,24 @@
                 btnNext.style.display = 'block';
                 btnPrev.disabled = passoAtual === 0;
                 aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'prompt') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                const textoPronto = aplicarTemplate(passo.template);
+                contPasso.innerHTML = `
+                    <div class="quiz-question-card" style="text-align:left;">
+                        <div style="font-size:2.8rem; margin-bottom:10px; text-align:center;">🤖</div>
+                        <h3 style="font-size:1.5rem; margin-top:0; color:var(--primary);">${passo.titulo || 'Seu prompt está pronto'}</h3>
+                        <p style="color:var(--text-light); margin:0 0 8px 0;">Copie o texto abaixo e cole no ChatGPT ou no Gemini:</p>
+                        <textarea id="bloco-prompt-texto" readonly class="resposta-aberta-textarea" style="min-height:220px; background:var(--primary-light);"></textarea>
+                        <button class="btn-conclusao" onclick="copiarTexto(document.getElementById('bloco-prompt-texto').value, 'Prompt copiado! Agora cole na IA. 🤖')">📋 Copiar este prompt</button>
+                    </div>
+                `;
+                const tp = document.getElementById('bloco-prompt-texto');
+                if (tp) tp.value = textoPronto;
+
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
             } else {
                 document.getElementById('btn-ler-audio').style.display = 'inline-block';
                 if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
@@ -1725,27 +1776,33 @@
             try { localStorage.setItem('respostas_' + aulaIdCompleto, JSON.stringify(respostasAbertas)); } catch(e) {}
         }
 
-        function gerarTextoRespostas() {
-            // Junta as perguntas com as respostas do aluno
+        // Encaixa as respostas do aluno nos placeholders {{variavel}} ou {{numero}} de um texto
+        function aplicarTemplate(template) {
+            if (!template) return '';
             const perguntas = [];
             passosAulaAtual.forEach((p, idx) => {
                 if (p.tipo === 'pergunta') perguntas.push({ p: p, resposta: (respostasAbertas[idx] || '').trim() });
             });
+            return template.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (m, token) => {
+                token = token.trim();
+                const porNome = perguntas.find(q => (q.p.var || '').trim().toLowerCase() === token.toLowerCase());
+                if (porNome) return porNome.resposta || '...';
+                const num = parseInt(token, 10);
+                if (!isNaN(num) && perguntas[num - 1]) return perguntas[num - 1].resposta || '...';
+                return m; // não encontrou variável: deixa o {{...}} como está
+            });
+        }
 
-            // MODO PROMPT PRONTO: se o texto do prompt tem placeholders {{...}},
-            // encaixa as respostas nos lugares certos e devolve o prompt completo.
+        function gerarTextoRespostas() {
+            // MODO PROMPT PRONTO: se o texto do prompt tem placeholders {{...}}, devolve o prompt completo
             if (promptTemplateAtual && /\{\{\s*[^}]+\s*\}\}/.test(promptTemplateAtual)) {
-                return promptTemplateAtual.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (m, token) => {
-                    token = token.trim();
-                    const porNome = perguntas.find(q => (q.p.var || '').trim().toLowerCase() === token.toLowerCase());
-                    if (porNome) return porNome.resposta || '...';
-                    const num = parseInt(token, 10);
-                    if (!isNaN(num) && perguntas[num - 1]) return perguntas[num - 1].resposta || '...';
-                    return m; // não encontrou variável: deixa o {{...}} como está
-                });
+                return aplicarTemplate(promptTemplateAtual);
             }
-
             // MODO PADRÃO: instrução do prompt + lista de perguntas e respostas
+            const perguntas = [];
+            passosAulaAtual.forEach((p, idx) => {
+                if (p.tipo === 'pergunta') perguntas.push({ p: p, resposta: (respostasAbertas[idx] || '').trim() });
+            });
             const blocos = perguntas.map((q, i) => `${i + 1}. ${q.p.pergunta}\nResposta: ${q.resposta || '(em branco)'}`);
             const corpo = blocos.join('\n\n');
             return promptTemplateAtual ? `${promptTemplateAtual}\n\n${corpo}` : corpo;
@@ -1822,6 +1879,8 @@
                     html += `<div class="print-bloco print-pergunta"><strong>✍️ ${nPerg}. ${escHtml(p.pergunta)}</strong><div class="print-resposta">${escHtml(r) || '(sem resposta)'}</div></div>`;
                 } else if (p.tipo === 'quiz') {
                     html += `<div class="print-bloco"><strong>🎯 ${escHtml(p.pergunta)}</strong><div>Resposta correta: ${escHtml(p.opcoes[p.correta] || '')}</div></div>`;
+                } else if (p.tipo === 'prompt') {
+                    html += `<div class="print-bloco print-pergunta"><strong>🤖 ${escHtml(p.titulo || 'Prompt')}</strong><div class="print-resposta">${escHtml(aplicarTemplate(p.template))}</div></div>`;
                 } else {
                     let imgs = '';
                     if (p.imagem) p.imagem.split(',').forEach(u => { if(u.trim()) imgs += `<img src="${u.trim()}" class="print-img">`; });
