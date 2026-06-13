@@ -146,15 +146,18 @@
         .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--coral)); transition: width 0.4s ease; border-radius: 10px; }
         #progress-text-step { background: var(--primary); color: #fff; padding: 4px 13px; border-radius: 999px; font-family: 'Bricolage Grotesque', 'Inter', sans-serif; font-weight: 800; font-size: 0.9rem; letter-spacing: 0; }
         
-        .step-viewer-card { display: flex; flex-direction: column; height: 65vh; min-height: 450px; padding: 25px; overflow: hidden; }
-        .step-scroll-area { flex: 1 1 auto; overflow-y: auto; padding-right: 15px; margin-bottom: 15px; min-height: 0; }
-        .step-scroll-area::-webkit-scrollbar { width: 8px; }
-        .step-scroll-area::-webkit-scrollbar-track { background: var(--gray-light); border-radius: 4px; }
-        .step-scroll-area::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-        
-        .nav-steps { display: flex; gap: 15px; margin-top: 0; flex-shrink: 0; }
-        .btn-step { flex: 1; padding: 20px; font-size: 1.3rem; font-weight: bold; border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s; }
+        .step-viewer-card { display: block; padding: 28px; }
+        .step-scroll-area { margin-bottom: 18px; }
+
+        .nav-steps { display: flex; gap: 15px; margin-top: 4px; }
+        .btn-step { flex: 1; padding: 18px; font-size: 1.2rem; font-weight: 700; border-radius: 14px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: transform 0.2s, box-shadow 0.2s; }
         .btn-step:active { transform: scale(0.98); }
+        .btn-step.prev { background: transparent; color: var(--text-light); border: 1px solid var(--gray-light); }
+        .btn-step.prev:hover { background: var(--bg); }
+        .btn-step.next { background: var(--coral); color: #fff; box-shadow: 0 10px 22px -10px rgba(255,90,60,.7); }
+        .btn-step.next:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -10px rgba(255,90,60,.8); }
+        .btn-step.next.finish { box-shadow: 0 0 0 4px var(--warning-light), 0 14px 26px -10px rgba(255,90,60,.85); }
+        .btn-step:disabled { opacity: .45; cursor: not-allowed; }
 
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
@@ -227,8 +230,8 @@
             .step-text { font-size: 1.15rem; margin: 15px 0; }
             .text-danger-huge { font-size: 1.5rem; }
             .text-success-medium { font-size: 1.25rem; }
-            .btn-step { font-size: 1rem; padding: 12px; }
-            .step-viewer-card { padding: 15px; height: 70vh; }
+            .btn-step { font-size: 1rem; padding: 14px; }
+            .step-viewer-card { padding: 18px; }
         }
         /* Pop-up de Explicação (Dicionário) */
         .term-highlight {
@@ -288,6 +291,49 @@
         .btn-conclusao:hover { opacity: 0.9; }
         .btn-conclusao.alt { background: var(--success); }
         .btn-conclusao.txt { background: var(--gray-light); color: var(--text); }
+
+        /* ===== Blocos estilo e-book (caixas especiais nas aulas) ===== */
+        .lesson-block { background: var(--bg); border: 1px solid var(--gray-light); border-radius: var(--radius); padding: 24px 26px; margin: 0; box-shadow: var(--shadow-soft); text-align: left; }
+        body:not(.dark-mode) .lesson-block { background: #fff; }
+        .lesson-block h3 { font-size: 1.35rem; margin: 0 0 12px; color: var(--ink); }
+        body.dark-mode .lesson-block h3 { color: var(--text); }
+        ul.ticks { list-style: none; margin: 0; padding: 0; }
+        ul.ticks li { position: relative; padding: 8px 0 8px 36px; font-size: 1.15rem; line-height: 1.5; }
+        ul.ticks li::before { content: "✅"; position: absolute; left: 0; top: 7px; }
+
+        .call { border-radius: var(--radius); padding: 22px 24px 22px 58px; margin: 0; position: relative; font-size: 1.15rem; text-align: left; line-height: 1.6; color: var(--text); }
+        .call .ic { position: absolute; left: 18px; top: 20px; font-size: 24px; }
+        .call h4 { font-size: 1rem; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; }
+        .call.tip  { background: var(--warning-light); border: 1px solid #efd9a8; }
+        .call.tip h4 { color: #9a6b15; }
+        .call.warn { background: var(--danger-light); border: 1px solid #ffc8bb; }
+        .call.warn h4 { color: #c23a1f; }
+        .call.fact { background: var(--primary-light); border: 1px solid #bfe2d6; }
+        .call.fact h4 { color: var(--primary-dark); }
+        .call.do   { background: var(--success-light); border: 1px solid #cfe7d8; }
+        .call.do h4 { color: var(--primary-dark); }
+
+        .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--gray-light); border-radius: var(--radius); overflow: hidden; margin: 0; background: var(--bg); box-shadow: var(--shadow-soft); text-align: left; }
+        body:not(.dark-mode) .vs { background: #fff; }
+        .vs .vs-head { padding: 16px 20px; color: #fff; font-family: 'Bricolage Grotesque','Inter',sans-serif; font-weight: 800; font-size: 1.2rem; }
+        .vs .vs-head.a { background: var(--primary); }
+        .vs .vs-head.b { background: var(--coral); }
+        .vs .vs-col { padding: 4px 20px 16px; }
+        .vs ul { list-style: none; margin: 10px 0 0; padding: 0; }
+        .vs ul li { padding: 9px 0 9px 24px; position: relative; border-top: 1px solid var(--gray-light); font-size: 1.05rem; }
+        .vs ul li:first-child { border-top: none; }
+        .vs ul li::before { content: "▸"; position: absolute; left: 2px; color: var(--primary); font-weight: 700; }
+        .vs .vs-col.b ul li::before { color: var(--coral); }
+        @media (max-width:600px){ .vs { grid-template-columns: 1fr; } .vs .vs-head.b, .vs .vs-col.b { border-top: 1px solid var(--gray-light); } }
+
+        .lesson-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; margin: 0; }
+        @media (max-width:600px){ .lesson-grid { grid-template-columns: 1fr; } }
+        .lesson-card { background: var(--bg); border: 1px solid var(--gray-light); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-soft); text-align: left; }
+        body:not(.dark-mode) .lesson-card { background: #fff; }
+        .lesson-card .ico { font-size: 30px; display: block; margin-bottom: 10px; }
+        .lesson-card h4 { font-size: 1.2rem; margin: 0 0 6px; color: var(--ink); }
+        body.dark-mode .lesson-card h4 { color: var(--text); }
+        .lesson-card p { font-size: 1.05rem; color: var(--text-light); margin: 0; line-height: 1.5; }
 
         /* Impressão / PDF da aula (aparece só ao salvar) */
         #area-impressao { display: none; }
@@ -429,8 +475,8 @@
                         <div id="conclusao-acoes" style="display:none;"></div>
                     </div>
                     <div class="nav-steps">
-                        <button class="btn-step" style="background:var(--gray-light); color:var(--text);" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
-                        <button class="btn-step" style="background:var(--success); color:white;" id="btnNext" onclick="mudarPasso(1)">AVANÇAR ▶</button>
+                        <button class="btn-step prev" id="btnPrev" onclick="mudarPasso(-1)">◀ VOLTAR</button>
+                        <button class="btn-step next" id="btnNext" onclick="mudarPasso(1)">AVANÇAR ▶</button>
                     </div>
                 </div>
             </div>
@@ -559,6 +605,14 @@
                     <button class="btn-action secondary" style="flex:1; min-width:200px;" onclick="adicionarPassoAoEditor('', '', '')">+ Adicionar Novo Passo Visual</button>
                     <button class="btn-action secondary" style="flex:1; min-width:200px; background: var(--success-light); color: var(--success); border: 2px dashed var(--success);" onclick="adicionarPerguntaAberta()">+ Adicionar Pergunta Aberta (Resposta do Aluno)</button>
                     <button class="btn-action secondary" style="flex:1; min-width:200px; background: var(--primary-light); color: var(--primary); border: 2px dashed var(--primary);" onclick="adicionarBlocoPrompt()">+ Adicionar Bloco de Prompt (pronto pra copiar)</button>
+                </div>
+
+                <p style="margin: 18px 0 8px; font-weight: bold; color: var(--text-light);">✨ Blocos bonitos (estilo e-book):</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-action secondary" style="flex:1; min-width:150px;" onclick="adicionarBlocoDestaque()">💡 Caixa de Destaque</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:150px;" onclick="adicionarBlocoComparacao()">⚖️ Comparação</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:150px;" onclick="adicionarBlocoLista()">✅ Lista</button>
+                    <button class="btn-action secondary" style="flex:1; min-width:150px;" onclick="adicionarBlocoCartoes()">🃏 Cartões</button>
                 </div>
 
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
@@ -1188,6 +1242,10 @@
                 if (!lbl) return;
                 if (div.dataset.tipo === 'pergunta') lbl.innerText = `Passo ${idx + 1} • Pergunta Aberta`;
                 else if (div.dataset.tipo === 'prompt') lbl.innerText = `Passo ${idx + 1} • Bloco de Prompt`;
+                else if (div.dataset.tipo === 'destaque') lbl.innerText = `Passo ${idx + 1} • Caixa de Destaque`;
+                else if (div.dataset.tipo === 'comparacao') lbl.innerText = `Passo ${idx + 1} • Comparação`;
+                else if (div.dataset.tipo === 'lista') lbl.innerText = `Passo ${idx + 1} • Lista`;
+                else if (div.dataset.tipo === 'cartoes') lbl.innerText = `Passo ${idx + 1} • Cartões`;
                 else lbl.innerText = `Passo ${idx + 1}`;
             });
         }
@@ -1216,6 +1274,74 @@
             container.appendChild(div);
             div.querySelector('.bloco-prompt-template').value = template;
             reordenarNumeracaoEditor();
+        }
+
+        // ----- Blocos estilo e-book -----
+        function splitLinhas(v) { return (v || '').split('\n').map(s => s.trim()).filter(Boolean); }
+
+        function criarItemBloco(tipo, headerBg, corpoHtml) {
+            const container = document.getElementById('editor-passos-container');
+            const div = document.createElement('div');
+            div.className = 'step-editor-item';
+            div.dataset.tipo = tipo;
+            div.innerHTML = `
+                <div class="step-editor-header" style="background:${headerBg};">
+                    <strong class="step-label">Passo</strong>
+                    <div class="step-move-buttons"><button class="btn-move" onclick="moverPassoElemento(this, -1)">▲ Subir</button><button class="btn-move" onclick="moverPassoElemento(this, 1)">▼ Descer</button></div>
+                </div>
+                <div class="row-inputs" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                    ${corpoHtml}
+                    <button class="btn-remove" style="align-self:flex-end;" onclick="this.closest('.step-editor-item').remove(); reordenarNumeracaoEditor();">Remover</button>
+                </div>`;
+            container.appendChild(div);
+            reordenarNumeracaoEditor();
+            return div;
+        }
+
+        function adicionarBlocoDestaque(d = null) {
+            if (d instanceof Event) d = null;
+            const est = d ? (d.estilo || 'fato') : 'fato';
+            const opt = (v, l) => `<option value="${v}" ${est === v ? 'selected' : ''}>${l}</option>`;
+            const div = criarItemBloco('destaque', 'var(--warning-light)', `
+                <label style="font-weight:bold; color:var(--ink); margin:0;">💡 Caixa de Destaque</label>
+                <select class="bloco-destaque-estilo" style="margin:0;">${opt('dica', '💡 Dica (amarelo)')}${opt('atencao', '⚠️ Atenção (vermelho)')}${opt('fato', '📌 Importante (verde)')}${opt('feito', '✍️ Atividade (verde claro)')}</select>
+                <input type="text" class="bloco-destaque-titulo" placeholder="Título da caixa (opcional)" style="margin:0;">
+                <textarea class="bloco-destaque-texto" placeholder="Texto da caixa... use **negrito** para destacar palavras" style="margin:0; min-height:90px;"></textarea>`);
+            if (d) { div.querySelector('.bloco-destaque-titulo').value = d.titulo || ''; div.querySelector('.bloco-destaque-texto').value = d.texto || ''; }
+        }
+
+        function adicionarBlocoComparacao(d = null) {
+            if (d instanceof Event) d = null;
+            const div = criarItemBloco('comparacao', 'var(--primary-light)', `
+                <label style="font-weight:bold; color:var(--ink); margin:0;">⚖️ Comparação (2 colunas)</label>
+                <input type="text" class="bloco-comp-tituloA" placeholder="Título da coluna 1 (ex: Site)" style="margin:0;">
+                <textarea class="bloco-comp-itensA" placeholder="Itens da coluna 1 — um por linha" style="margin:0; min-height:80px;"></textarea>
+                <input type="text" class="bloco-comp-tituloB" placeholder="Título da coluna 2 (ex: Landing Page)" style="margin:0;">
+                <textarea class="bloco-comp-itensB" placeholder="Itens da coluna 2 — um por linha" style="margin:0; min-height:80px;"></textarea>`);
+            if (d) {
+                div.querySelector('.bloco-comp-tituloA').value = d.tituloA || '';
+                div.querySelector('.bloco-comp-tituloB').value = d.tituloB || '';
+                div.querySelector('.bloco-comp-itensA').value = (d.itensA || []).join('\n');
+                div.querySelector('.bloco-comp-itensB').value = (d.itensB || []).join('\n');
+            }
+        }
+
+        function adicionarBlocoLista(d = null) {
+            if (d instanceof Event) d = null;
+            const div = criarItemBloco('lista', 'var(--success-light)', `
+                <label style="font-weight:bold; color:var(--ink); margin:0;">✅ Lista com marcação</label>
+                <input type="text" class="bloco-lista-titulo" placeholder="Título (opcional)" style="margin:0;">
+                <textarea class="bloco-lista-itens" placeholder="Um item por linha (o ✅ aparece sozinho)" style="margin:0; min-height:110px;"></textarea>`);
+            if (d) { div.querySelector('.bloco-lista-titulo').value = d.titulo || ''; div.querySelector('.bloco-lista-itens').value = (d.itens || []).join('\n'); }
+        }
+
+        function adicionarBlocoCartoes(d = null) {
+            if (d instanceof Event) d = null;
+            const div = criarItemBloco('cartoes', 'var(--gray-light)', `
+                <label style="font-weight:bold; color:var(--ink); margin:0;">🃏 Cartões</label>
+                <p style="margin:0; font-size:0.85rem; color:var(--text-light);">Um cartão por linha, no formato: <strong>emoji | título | texto</strong></p>
+                <textarea class="bloco-cartoes-itens" placeholder="🔎 | Aparece no Google | Você surge nas buscas e nas respostas de IA.&#10;🛡️ | Passa credibilidade | Um site bonito gera mais confiança." style="margin:0; min-height:120px;"></textarea>`);
+            if (d) div.querySelector('.bloco-cartoes-itens').value = (d.cards || []).map(c => `${c.emoji || ''} | ${c.titulo || ''} | ${c.texto || ''}`).join('\n');
         }
 
         function adicionarPerguntaAberta(dados = null) {
@@ -1264,6 +1390,10 @@
                             if (p.tipo === 'quiz') adicionarPerguntaQuiz(p);
                             else if (p.tipo === 'pergunta') adicionarPerguntaAberta(p);
                             else if (p.tipo === 'prompt') adicionarBlocoPrompt(p);
+                            else if (p.tipo === 'destaque') adicionarBlocoDestaque(p);
+                            else if (p.tipo === 'comparacao') adicionarBlocoComparacao(p);
+                            else if (p.tipo === 'lista') adicionarBlocoLista(p);
+                            else if (p.tipo === 'cartoes') adicionarBlocoCartoes(p);
                             else if (p.tipo === 'config_respostas') document.getElementById('prof-prompt-template').value = p.prompt_template || '';
                             else adicionarPassoAoEditor(p.texto, p.imagem, p.link);
                         });
@@ -1334,6 +1464,19 @@
                     const titulo = item.querySelector('.bloco-prompt-titulo').value.trim();
                     const template = item.querySelector('.bloco-prompt-template').value.trim();
                     if (template) pacotePassos.push({ tipo: 'prompt', titulo: titulo, template: template });
+                } else if (item.dataset.tipo === 'destaque') {
+                    const texto = item.querySelector('.bloco-destaque-texto').value.trim();
+                    if (texto) pacotePassos.push({ tipo: 'destaque', estilo: item.querySelector('.bloco-destaque-estilo').value, titulo: item.querySelector('.bloco-destaque-titulo').value.trim(), texto: texto });
+                } else if (item.dataset.tipo === 'comparacao') {
+                    const itensA = splitLinhas(item.querySelector('.bloco-comp-itensA').value);
+                    const itensB = splitLinhas(item.querySelector('.bloco-comp-itensB').value);
+                    if (itensA.length || itensB.length) pacotePassos.push({ tipo: 'comparacao', tituloA: item.querySelector('.bloco-comp-tituloA').value.trim(), itensA: itensA, tituloB: item.querySelector('.bloco-comp-tituloB').value.trim(), itensB: itensB });
+                } else if (item.dataset.tipo === 'lista') {
+                    const itens = splitLinhas(item.querySelector('.bloco-lista-itens').value);
+                    if (itens.length) pacotePassos.push({ tipo: 'lista', titulo: item.querySelector('.bloco-lista-titulo').value.trim(), itens: itens });
+                } else if (item.dataset.tipo === 'cartoes') {
+                    const cards = splitLinhas(item.querySelector('.bloco-cartoes-itens').value).map(l => { const p = l.split('|').map(x => x.trim()); return { emoji: p[0] || '', titulo: p[1] || '', texto: p[2] || '' }; });
+                    if (cards.length) pacotePassos.push({ tipo: 'cartoes', cards: cards });
                 } else {
                     const quill = item.quillInstance;
                     const txtHtml = quill ? quill.root.innerHTML : '';
@@ -1627,6 +1770,39 @@
                 btnNext.style.display = 'block';
                 btnPrev.disabled = passoAtual === 0;
                 aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'destaque') {
+                document.getElementById('btn-ler-audio').style.display = 'inline-block';
+                const icones = { dica: '💡', atencao: '⚠️', fato: '📌', feito: '✍️' };
+                const classes = { dica: 'tip', atencao: 'warn', fato: 'fact', feito: 'do' };
+                const est = passo.estilo || 'fato';
+                const tituloHtml = passo.titulo ? `<h4>${escHtml(passo.titulo)}</h4>` : '';
+                contPasso.innerHTML = `<div class="call ${classes[est] || 'fact'}"><span class="ic">${icones[est] || '📌'}</span>${tituloHtml}${formatarBloco(passo.texto || '')}</div>`;
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'comparacao') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                const liA = (passo.itensA || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                const liB = (passo.itensB || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                contPasso.innerHTML = `<div class="vs"><div class="vs-head a">${escHtml(passo.tituloA || '')}</div><div class="vs-head b">${escHtml(passo.tituloB || '')}</div><div class="vs-col a"><ul>${liA}</ul></div><div class="vs-col b"><ul>${liB}</ul></div></div>`;
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'lista') {
+                document.getElementById('btn-ler-audio').style.display = 'inline-block';
+                const li = (passo.itens || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                const tituloHtml = passo.titulo ? `<h3>${escHtml(passo.titulo)}</h3>` : '';
+                contPasso.innerHTML = `<div class="lesson-block">${tituloHtml}<ul class="ticks">${li}</ul></div>`;
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'cartoes') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                const cards = (passo.cards || []).map(c => `<div class="lesson-card"><span class="ico">${c.emoji || '⭐'}</span><h4>${escHtml(c.titulo || '')}</h4><p>${formatarBloco(c.texto || '')}</p></div>`).join('');
+                contPasso.innerHTML = `<div class="lesson-grid">${cards}</div>`;
+                btnNext.style.display = 'block';
+                btnPrev.disabled = passoAtual === 0;
+                aplicarEstiloBotaoFinal(btnNext);
             } else {
                 document.getElementById('btn-ler-audio').style.display = 'inline-block';
                 if (passo.imagem) passo.imagem.split(',').forEach(u => { if(u.trim()) galeria.innerHTML += `<img src="${u.trim()}" class="step-image">`; });
@@ -1672,19 +1848,13 @@
                 const btnNext = document.getElementById('btnNext');
                 btnNext.style.display = 'block';
                 btnNext.style.animation = 'fadeInStep 0.5s';
-                
+
                 if (passoAtual === passosAulaAtual.length - 1) {
                     btnNext.innerHTML = "🎉 CONCLUIR AULA";
-                    btnNext.style.background = "var(--warning)";
-                    btnNext.style.color = "var(--text)";
-                    btnNext.style.transform = "scale(1.05)";
-                    btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
+                    btnNext.classList.add('finish');
                 } else {
                     btnNext.innerHTML = "CONTINUAR ▶";
-                    btnNext.style.background = "var(--success)";
-                    btnNext.style.color = "white";
-                    btnNext.style.transform = "scale(1)";
-                    btnNext.style.boxShadow = "none";
+                    btnNext.classList.remove('finish');
                 }
             } else {
                 elemento.classList.add('wrong');
@@ -1737,16 +1907,10 @@
         function aplicarEstiloBotaoFinal(btnNext) {
             if (passoAtual === passosAulaAtual.length - 1) {
                 btnNext.innerHTML = "🎉 CONCLUIR AULA";
-                btnNext.style.background = "var(--warning)";
-                btnNext.style.color = "var(--text)";
-                btnNext.style.transform = "scale(1.05)";
-                btnNext.style.boxShadow = "0 0 15px rgba(245, 158, 11, 0.5)";
+                btnNext.classList.add('finish');
             } else {
                 btnNext.innerHTML = "AVANÇAR ▶";
-                btnNext.style.background = "var(--success)";
-                btnNext.style.color = "white";
-                btnNext.style.transform = "scale(1)";
-                btnNext.style.boxShadow = "none";
+                btnNext.classList.remove('finish');
             }
         }
 
@@ -1778,6 +1942,13 @@
                 .replace(/=([^=<>"]+)=/g, '<div style="text-align: center; font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 15px 0;">$1</div>')
                 .replace(/\{([^\{\}<>"]+)\}/g, '<img src="$1" class="inline-gif">')
                 .replace(/\[\[(.*?)\s*::\s*(.*?)\]\]/g, '<span class="term-highlight" onclick="abrirExplicacao(\'$1\', \'$2\')">$1 💡</span>');
+        }
+
+        function formatarBloco(t) {
+            let s = escHtml(t || '');
+            s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            s = s.replace(/\[\[(.*?)\s*::\s*(.*?)\]\]/g, '<span class="term-highlight" onclick="abrirExplicacao(\'$1\', \'$2\')">$1 💡</span>');
+            return s.replace(/\n/g, '<br>');
         }
 
         function salvarRespostaAberta(index, valor) {
@@ -1892,6 +2063,20 @@
                     html += `<div class="print-bloco"><strong>🎯 ${escHtml(p.pergunta)}</strong><div>Resposta correta: ${escHtml(p.opcoes[p.correta] || '')}</div></div>`;
                 } else if (p.tipo === 'prompt') {
                     html += `<div class="print-bloco print-pergunta"><strong>🤖 ${escHtml(p.titulo || 'Prompt')}</strong><div class="print-resposta">${escHtml(aplicarTemplate(p.template))}</div></div>`;
+                } else if (p.tipo === 'destaque') {
+                    const t = p.titulo ? `<strong>${escHtml(p.titulo)}</strong><br>` : '';
+                    html += `<div class="print-bloco print-pergunta">${t}${formatarBloco(p.texto || '')}</div>`;
+                } else if (p.tipo === 'comparacao') {
+                    const liA = (p.itensA || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                    const liB = (p.itensB || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                    html += `<div class="print-bloco"><strong>${escHtml(p.tituloA || '')}</strong><ul>${liA}</ul><strong>${escHtml(p.tituloB || '')}</strong><ul>${liB}</ul></div>`;
+                } else if (p.tipo === 'lista') {
+                    const li = (p.itens || []).map(i => `<li>${formatarBloco(i)}</li>`).join('');
+                    const t = p.titulo ? `<strong>${escHtml(p.titulo)}</strong>` : '';
+                    html += `<div class="print-bloco">${t}<ul>${li}</ul></div>`;
+                } else if (p.tipo === 'cartoes') {
+                    const cs = (p.cards || []).map(c => `<div style="margin-bottom:8px;"><strong>${escHtml(c.emoji || '')} ${escHtml(c.titulo || '')}</strong><br>${formatarBloco(c.texto || '')}</div>`).join('');
+                    html += `<div class="print-bloco">${cs}</div>`;
                 } else {
                     let imgs = '';
                     if (p.imagem) p.imagem.split(',').forEach(u => { if(u.trim()) imgs += `<img src="${u.trim()}" class="print-img">`; });
