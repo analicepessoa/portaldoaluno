@@ -242,6 +242,11 @@
             .header-nav-item { padding: 5px 8px; font-size: 0.8rem; gap: 4px; }
             header h1 { font-size: 1.2rem; }
         }
+        @media (max-width: 560px) {
+            .header-nav-item span { display: none; }
+            .header-nav-item { padding: 7px 9px; gap: 0; }
+            .header-nav-item i { font-size: 1.3rem; }
+        }
         /* Pop-up de Explicação (Dicionário) */
         .term-highlight {
             color: var(--primary);
@@ -393,8 +398,8 @@
         <h1 style="margin:0;"><i style="font-style:normal">🎓</i> Portal Educacional</h1>
         <div style="display:flex; align-items:center; gap:8px;">
             <div class="header-nav" id="nav-container" style="display:none;">
-                <button class="header-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
-                <button class="header-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
+                <button class="header-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')" title="Dashboard"><i>🏠</i><span>Dashboard</span></button>
+                <button class="header-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')" title="Área da Professora"><i>👩‍🏫</i><span>Professora</span></button>
                 <button class="header-nav-item logout" onclick="sairDoPortal()" title="Sair do portal"><i>🚪</i><span>Sair</span></button>
             </div>
             <button id="btn-install-pwa" class="btn-action" style="display:none; padding:6px 12px; font-size:0.85rem; margin:0; box-shadow:none;">📲 Instalar</button>
