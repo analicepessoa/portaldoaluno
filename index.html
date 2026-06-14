@@ -150,17 +150,17 @@
         .step-scroll-area { margin-bottom: 18px; }
 
         /* Botões VOLTAR/AVANÇAR fixos no rodapé — compactos e elegantes */
-        .nav-steps { position: fixed; bottom: 0; left: 0; right: 0; display: flex; gap: 10px; padding: 10px 20px; background: var(--bg); border-top: 1px solid var(--gray-light); z-index: 90; box-shadow: 0 -2px 10px rgba(0,0,0,0.04); }
-        body:not(.dark-mode) .nav-steps { background: #fff; }
-        .nav-steps-spacer { height: 62px; flex-shrink: 0; }
-        .btn-step { flex: 1; padding: 11px 16px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: transform 0.15s, box-shadow 0.15s, background 0.15s; max-width: 50%; letter-spacing: 0.02em; }
+        .nav-steps { position: fixed; bottom: 16px; left: 0; right: 0; margin: 0 auto; max-width: 900px; box-sizing: border-box; display: flex; justify-content: space-between; gap: 12px; padding: 0 22px; z-index: 90; background: transparent; pointer-events: none; }
+        .nav-steps-spacer { height: 80px; flex-shrink: 0; }
+        .btn-step { pointer-events: auto; flex: 0 0 auto; padding: 11px 24px; font-size: 0.95rem; font-weight: 600; border-radius: 999px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s; letter-spacing: 0.02em; }
         .btn-step:active { transform: scale(0.97); }
-        .btn-step.prev { background: transparent; color: var(--text-light); border: 1px solid var(--gray-light); }
-        .btn-step.prev:hover { background: var(--primary-light); color: var(--primary); }
-        .btn-step.next { background: var(--coral); color: #fff; box-shadow: 0 4px 12px -4px rgba(255,90,60,.5); }
-        .btn-step.next:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(255,90,60,.6); }
-        .btn-step.next.finish { box-shadow: 0 0 0 3px var(--warning-light), 0 4px 12px -4px rgba(255,90,60,.6); }
-        .btn-step:disabled { opacity: .4; cursor: not-allowed; }
+        .btn-step.prev { background: var(--bg); color: var(--text-light); border: 1px solid var(--gray-light); box-shadow: 0 4px 14px -6px rgba(10,60,45,.3); }
+        body:not(.dark-mode) .btn-step.prev { background: #fff; }
+        .btn-step.prev:hover { color: var(--primary); border-color: var(--primary); }
+        .btn-step.next { background: var(--coral); color: #fff; box-shadow: 0 6px 18px -7px rgba(255,90,60,.6); }
+        .btn-step.next:hover { transform: translateY(-1px); box-shadow: 0 9px 22px -7px rgba(255,90,60,.7); }
+        .btn-step.next.finish { box-shadow: 0 0 0 3px var(--warning-light), 0 6px 18px -7px rgba(255,90,60,.6); }
+        .btn-step:disabled { opacity: 0; pointer-events: none; }
 
         .step-text { font-size: 1.6rem; line-height: 1.6; margin: 25px 0; color: var(--text); text-align: left; }
         .step-text img { max-width: 100%; height: auto; border-radius: 12px; margin: 15px 0; }
@@ -173,11 +173,12 @@
         .step-image { width: 100%; max-width: 800px; max-height: 350px; object-fit: contain; border-radius: 16px; border: 2px solid var(--gray-light); background: white; margin-bottom: 20px; }
 
         /* Navegação Dashboard/Professora — dentro do header */
-        .header-nav { display: flex; gap: 6px; align-items: center; }
-        .header-nav-item { display: flex; align-items: center; gap: 5px; color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; background: none; border: 1.5px solid transparent; border-radius: 10px; padding: 7px 14px; transition: all 0.2s; white-space: nowrap; }
-        .header-nav-item:hover { background: rgba(14,107,83,0.1); }
-        .header-nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .header-nav-item i { font-size: 1rem; font-style: normal; }
+        .header-nav { display: flex; gap: 2px; align-items: center; }
+        .header-nav-item { display: flex; align-items: center; gap: 6px; color: var(--text-light); font-size: 0.88rem; font-weight: 600; cursor: pointer; background: none; border: none; border-radius: 8px; padding: 6px 10px; transition: all 0.15s; white-space: nowrap; }
+        .header-nav-item:hover { color: var(--primary); background: var(--primary-light); }
+        .header-nav-item.active { color: var(--primary); background: var(--primary-light); }
+        .header-nav-item i { font-size: 1.05rem; font-style: normal; }
+        .header-nav-item.logout:hover { color: var(--danger); background: var(--danger-light); }
 
         #editor-passos-container { max-height: 55vh; overflow-y: auto; background: var(--bg); padding: 15px; border-radius: 16px; border: 2px solid var(--gray-light); margin-bottom: 20px; transition: background 0.3s; }
         .step-editor-item { background: var(--bg); border-radius: 16px; margin-bottom: 25px; border-left: 6px solid var(--primary); border-top: 1px solid var(--gray-light); border-right: 1px solid var(--gray-light); border-bottom: 1px solid var(--gray-light); display: flex; flex-direction: column; transition: background 0.3s; }
@@ -234,11 +235,11 @@
             .step-text { font-size: 1.15rem; margin: 15px 0; }
             .text-danger-huge { font-size: 1.5rem; }
             .text-success-medium { font-size: 1.25rem; }
-            .btn-step { font-size: 0.9rem; padding: 10px 12px; }
+            .btn-step { font-size: 0.9rem; padding: 10px 18px; }
             .step-viewer-card { padding: 18px; }
-            .nav-steps { padding: 8px 12px; gap: 8px; }
-            .nav-steps-spacer { height: 56px; }
-            .header-nav-item { padding: 5px 10px; font-size: 0.8rem; }
+            .nav-steps { padding: 0 14px; bottom: 12px; }
+            .nav-steps-spacer { height: 72px; }
+            .header-nav-item { padding: 5px 8px; font-size: 0.8rem; gap: 4px; }
             header h1 { font-size: 1.2rem; }
         }
         /* Pop-up de Explicação (Dicionário) */
@@ -394,6 +395,7 @@
             <div class="header-nav" id="nav-container" style="display:none;">
                 <button class="header-nav-item active" id="nav-bottom-estudante" onclick="mudarAba('estudante')"><i>🏠</i><span>Dashboard</span></button>
                 <button class="header-nav-item" id="nav-bottom-professor" onclick="mudarAba('professor')"><i>👩‍🏫</i><span>Professora</span></button>
+                <button class="header-nav-item logout" onclick="sairDoPortal()" title="Sair do portal"><i>🚪</i><span>Sair</span></button>
             </div>
             <button id="btn-install-pwa" class="btn-action" style="display:none; padding:6px 12px; font-size:0.85rem; margin:0; box-shadow:none;">📲 Instalar</button>
         </div>
@@ -472,7 +474,7 @@
             </div>
 
             <div id="estudante-passos" style="display:none;">
-                <button class="btn-action secondary" style="margin-bottom: 15px;" onclick="voltarParaAulas()">< Sair da Aula</button>
+                <button onclick="voltarParaAulas()" style="background:none; border:none; color:var(--text-light); padding:0; margin-bottom:12px; font-size:0.9rem; font-weight:600; cursor:pointer;">← Sair da aula</button>
                 <h2 id="titulo-aula-atual" style="margin-bottom: 5px;">Aula</h2>
                 <p id="tempo-estimado-aula" style="color:var(--text-light); font-weight:bold; margin-top:0; margin-bottom:15px; font-size:0.95rem;">⏱️ Tempo estimado: 5 min</p>
                 
@@ -866,6 +868,20 @@
             document.getElementById('estudante-painel-home').style.display = 'none';
             avancarParaAulasModulo();
             buscarAulaNuvem(aula.aula);
+        }
+
+        function sairDoPortal() {
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            alunoLogado = '';
+            alunoLogadoDados = null;
+            professorAutenticado = false;
+            document.getElementById('nav-container').style.display = 'none';
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            document.getElementById('view-login').style.display = 'block';
+            const n = document.getElementById('input-nome-aluno'); if (n) n.value = '';
+            const p = document.getElementById('input-senha-aluno-login'); if (p) p.value = '';
+            window.scrollTo(0, 0);
+            showToast('Você saiu do portal.', 'info');
         }
 
         // --- NAVEGAÇÃO ENTRE ABAS ---
