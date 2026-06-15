@@ -1,5 +1,5 @@
 // O nome do nosso "armazém" de memória (mude a versão quando atualizar o site)
-const CACHE_NAME = 'portal-educacional-v3';
+const CACHE_NAME = 'portal-educacional-v4';
 
 // Ficheiros que queremos guardar no telemóvel do aluno
 const urlsToCache = [
