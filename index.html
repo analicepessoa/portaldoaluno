@@ -715,6 +715,35 @@
         let promptTemplateAtual = '';
         let nomesCustomizados = {};
         const nomesModulosIngles = ["Preparation", "Basic 01 - Mid Term", "Basic 01 - End Term", "Basic 02 - Mid Term", "Basic 02 - End Term", "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"];
+        const configuracaoModulosSenior = [
+            { nome: "Start", aulas: 5 },
+            { nome: "Personalizando o Ambiente", aulas: 3 },
+            { nome: "Organizando o Sistema", aulas: 3 },
+            { nome: "Multimídia e Entretenimento Digital", aulas: 5 },
+            { nome: "Comunicação Virtual", aulas: 6 },
+            { nome: "Aplicativos Diversos", aulas: 9 },
+            { nome: "Aplicativos Pacote Office", aulas: 11 },
+            { nome: "Android", aulas: 6 }
+        ];
+
+        function obterMaxModulosCurso(curso) {
+            if (curso === 'ingles') return nomesModulosIngles.length;
+            if (curso === 'senior') return configuracaoModulosSenior.length;
+            return 10;
+        }
+
+        function obterNomeModuloCurso(curso, numero) {
+            if (curso === 'ingles') return nomesModulosIngles[numero - 1];
+            if (curso === 'senior') return configuracaoModulosSenior[numero - 1]?.nome || `Módulo ${numero}`;
+            if (curso === 'reposicao') return `Ficha ${String(numero).padStart(2, '0')}`;
+            return `Módulo ${numero}`;
+        }
+
+        function obterMaxAulasCurso(curso, numeroModulo) {
+            if (curso === 'ingles') return numeroModulo === 1 ? 5 : 15;
+            if (curso === 'senior') return configuracaoModulosSenior[numeroModulo - 1]?.aulas || 0;
+            return 8;
+        }
         let professorAutenticado = false;
         let adminPass = "admin123"; 
         let modAlvoClicado = 0;
@@ -1064,7 +1093,7 @@
                         salaDisplay = ` <span style="background:var(--warning-light); color:var(--warning); font-size:0.8rem; padding:3px 8px; border-radius:8px; margin-left:5px;">${parts[1]}</span>`;
                     }
 
-                    let maxMod = cursoReal === 'ingles' ? 9 : 10;
+                    let maxMod = obterMaxModulosCurso(cursoReal);
                     let checkboxesHTML = '';
                     let liberados = aluno.modulos_liberados || [];
                     let aulasBloqueadas = aluno.aulas_bloqueadas || [];
@@ -1072,7 +1101,7 @@
                     for(let m=1; m<=maxMod; m++) {
                         let chaveLib = `${cursoReal}_${m}`;
                         let isChecked = liberados.includes(chaveLib) ? 'checked' : '';
-                        let labelMod = cursoReal === 'ingles' ? `Mód ${m}` : `Módulo ${m}`;
+                        let labelMod = cursoReal === 'ingles' ? `Mód ${m}` : obterNomeModuloCurso(cursoReal, m);
                         checkboxesHTML += `<label><input type="checkbox" onchange="toggleModuloAluno('${aluno.id}', '${chaveLib}', this.checked)" ${isChecked}> ${labelMod}</label>`;
                     }
 
@@ -1082,8 +1111,8 @@
                     } else {
                         liberados.sort((a,b) => parseInt(a.split('_')[1]) - parseInt(b.split('_')[1])).forEach(chaveMod => {
                             let modNum = parseInt(chaveMod.split('_')[1]);
-                            let nomeModStr = cursoReal === 'ingles' ? nomesModulosIngles[modNum-1] : `Módulo ${modNum}`;
-                            let maxAulasDentro = (cursoReal === 'ingles') ? (modNum === 1 ? 5 : 15) : 8;
+                            let nomeModStr = obterNomeModuloCurso(cursoReal, modNum);
+                            let maxAulasDentro = obterMaxAulasCurso(cursoReal, modNum);
                             
                             painelAulasHTML += `<div style="margin-bottom: 10px;"><strong>${nomeModStr}</strong><div class="modulos-checkbox-grid">`;
                             for(let a=1; a<=maxAulasDentro; a++) {
@@ -1156,10 +1185,9 @@
             const c = document.getElementById('prof-curso').value;
             const selectMod = document.getElementById('prof-modulo');
             selectMod.innerHTML = '';
-            let maxMod = c === 'ingles' ? 9 : 10;
+            let maxMod = obterMaxModulosCurso(c);
             for (let m = 1; m <= maxMod; m++) {
-                let nomeOpt = c === 'reposicao' ? `Ficha ${String(m).padStart(2, '0')}` : `Módulo ${String(m).padStart(2, '0')}`;
-                if (c === 'ingles') nomeOpt = nomesModulosIngles[m-1];
+                let nomeOpt = obterNomeModuloCurso(c, m);
                 selectMod.innerHTML += `<option value="modulo_${m}">${nomeOpt}</option>`;
             }
             if (c === 'reposicao') { document.getElementById('label-nome-modulo').innerText = 'Nome do Aluno/Ficha:'; document.getElementById('prof-nome-aula').placeholder = 'Ex: Prática de Word'; } 
@@ -1175,8 +1203,9 @@
             const mNum = parseInt(mStr.replace('modulo_', '')) || 1;
             const selectAula = document.getElementById('prof-aula');
             selectAula.innerHTML = '';
-            let maxAulas = 8, labelPref = "Etapa";
-            if (c === 'ingles') { maxAulas = (mNum === 1) ? 5 : 15; labelPref = "Lesson"; }
+            let maxAulas = obterMaxAulasCurso(c, mNum), labelPref = "Etapa";
+            if (c === 'ingles') labelPref = "Lesson";
+            if (c === 'senior') labelPref = "Aula";
             for (let a = 1; a <= maxAulas; a++) { selectAula.innerHTML += `<option value="aula_${a}">${labelPref} ${String(a).padStart(2, '0')}</option>`; }
         }
 
@@ -1633,10 +1662,9 @@
         function renderizarModulosEstudante() {
             const container = document.getElementById('lista-modulos-estudante');
             container.innerHTML = '';
-            let maxMod = cursoSelecionado === 'ingles' ? 9 : 10;
+            let maxMod = obterMaxModulosCurso(cursoSelecionado);
             for (let m = 1; m <= maxMod; m++) {
-                let nExibir = cursoSelecionado === 'reposicao' ? `Ficha ${String(m).padStart(2, '0')}` : `Módulo ${String(m).padStart(2, '0')}`;
-                if(cursoSelecionado === 'ingles') nExibir = nomesModulosIngles[m-1];
+                let nExibir = obterNomeModuloCurso(cursoSelecionado, m);
                 let desc = cursoSelecionado === 'ingles' ? "Acesse o nível" : "Acesse o material";
                 
                 let cache = nomesCustomizados[`${cursoSelecionado}_modulo_${m}_aula_1`];
@@ -1663,21 +1691,19 @@
 
         function avancarParaAulasModulo() {
             modSelecionado = `modulo_${modAlvoClicado}`;
-            let nTemp = cursoSelecionado === 'reposicao' ? `Ficha ${String(modAlvoClicado).padStart(2, '0')}` : `Módulo ${String(modAlvoClicado).padStart(2, '0')}`;
-            if(cursoSelecionado === 'ingles') nTemp = nomesModulosIngles[modAlvoClicado-1];
+            let nTemp = obterNomeModuloCurso(cursoSelecionado, modAlvoClicado);
             if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`]) nTemp = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_1`].modulo;
 
             document.getElementById('estudante-painel-home').style.display = 'none';
             document.getElementById('estudante-aulas').style.display = 'block';
             document.getElementById('titulo-modulo-atual').innerText = nTemp;
             
-            let maxAulas = 8;
-            if(cursoSelecionado === 'ingles') maxAulas = (modAlvoClicado === 1) ? 5 : 15;
+            let maxAulas = obterMaxAulasCurso(cursoSelecionado, modAlvoClicado);
 
             const cont = document.getElementById('lista-aulas-estudante');
             cont.innerHTML = '';
             for (let a = 1; a <= maxAulas; a++) {
-                let nAula = cursoSelecionado === 'ingles' ? `Lesson ${String(a).padStart(2, '0')}` : `Atividade 0${a}`;
+                let nAula = cursoSelecionado === 'ingles' ? `Lesson ${String(a).padStart(2, '0')}` : cursoSelecionado === 'senior' ? `Aula ${String(a).padStart(2, '0')}` : `Atividade ${String(a).padStart(2, '0')}`;
                 if (nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`]) nAula = nomesCustomizados[`${cursoSelecionado}_${modSelecionado}_aula_${a}`].aula;
                 
                 const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_aula_${a}`;
@@ -1701,7 +1727,7 @@
                     badgeExtra = `<div class="mod-badge" style="background:transparent;">▶</div>`;
                 }
                 
-                cont.innerHTML += `<div class="${classesAula}" ${onClickAttr}><div class="mod-number" style="background:var(--primary-light); color:var(--primary); font-size: 1rem;">0${a}</div><div class="mod-info"><h4>${nAula}</h4></div>${badgeExtra}</div>`;
+                cont.innerHTML += `<div class="${classesAula}" ${onClickAttr}><div class="mod-number" style="background:var(--primary-light); color:var(--primary); font-size: 1rem;">${String(a).padStart(2, '0')}</div><div class="mod-info"><h4>${nAula}</h4></div>${badgeExtra}</div>`;
             }
         }
 
