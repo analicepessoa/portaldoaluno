@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N8N na Prática — Aula 1: Sheets, IA (Groq) e Telegram</title>
+<style>
+  :root{
+    --blue: #1e3a8a;
+    --blue-light: #3b5bdb;
+    --orange: #f97316;
+    --orange-light: #fed7aa;
+    --green: #15803d;
+    --green-light: #dcfce7;
+    --red: #b91c1c;
+    --red-light: #fee2e2;
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', 'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  header.hero{
+    background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    color:#fff;
+    padding:48px 20px 64px;
+    text-align:center;
+    position:relative;
+  }
+  header.hero h1{
+    font-size:2.2rem;
+    margin:0 0 8px;
+  }
+  header.hero p{
+    font-size:1.1rem;
+    opacity:0.9;
+    max-width:700px;
+    margin:0 auto;
+  }
+  .badge-top{
+    display:inline-block;
+    background:var(--orange);
+    color:#fff;
+    padding:6px 16px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:0.85rem;
+    letter-spacing:0.5px;
+    margin-bottom:14px;
+    text-transform:uppercase;
+  }
+  main{
+    max-width:820px;
+    margin:-36px auto 0;
+    padding:0 20px;
+  }
+  .intro-card{
+    background:var(--card);
+    border-radius:16px;
+    padding:26px 28px;
+    box-shadow:0 10px 30px rgba(30,58,138,0.12);
+    margin-bottom:34px;
+  }
+  .intro-card h2{margin-top:0;color:var(--blue);}
+  .objetivos li{margin-bottom:6px;}
+
+  .passo{
+    background:var(--card);
+    border-radius:16px;
+    padding:0;
+    margin-bottom:32px;
+    box-shadow:0 6px 18px rgba(30,41,59,0.08);
+    overflow:hidden;
+  }
+  .passo-header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:var(--blue);
+    color:#fff;
+    padding:18px 24px;
+  }
+  .passo-numero{
+    background:var(--orange);
+    min-width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:1.2rem;
+    flex-shrink:0;
+  }
+  .passo-header h2{margin:0;font-size:1.3rem;}
+  .passo-body{padding:24px 26px;}
+  .passo-body h3{color:var(--blue);font-size:1.05rem;margin-top:22px;}
+  .passo-body h3:first-child{margin-top:0;}
+
+  .dica{
+    background:var(--orange-light);
+    border-left:5px solid var(--orange);
+    padding:14px 18px;
+    border-radius:8px;
+    margin:16px 0;
+  }
+  .dica strong{color:#9a3412;}
+
+  .atencao{
+    background:var(--red-light);
+    border-left:5px solid var(--red);
+    padding:14px 18px;
+    border-radius:8px;
+    margin:16px 0;
+  }
+  .atencao strong{color:var(--red);}
+
+  .checkpoint{
+    background:var(--green-light);
+    border-left:5px solid var(--green);
+    padding:14px 18px;
+    border-radius:8px;
+    margin:16px 0;
+  }
+  .checkpoint strong{color:var(--green);}
+
+  .lista-passos{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:18px 22px;
+    margin:16px 0;
+  }
+  .lista-passos li{margin-bottom:8px;}
+
+  code, .codebox{
+    background:#0f172a;
+    color:#e2e8f0;
+    font-family:'Consolas','Courier New',monospace;
+  }
+  code{
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:0.92em;
+  }
+  .codebox{
+    display:block;
+    padding:14px 16px;
+    border-radius:8px;
+    margin:14px 0;
+    overflow-x:auto;
+    font-size:0.9rem;
+    white-space:pre-wrap;
+  }
+
+  .status-tag{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:6px;
+    font-weight:700;
+    font-size:0.85rem;
+  }
+  .status-aguardando{background:#fef3c7;color:#92400e;}
+  .status-enviado{background:var(--green-light);color:var(--green);}
+
+  table.exemplo{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.92rem;
+  }
+  table.exemplo th, table.exemplo td{
+    border:1px solid #e2e8f0;
+    padding:8px 10px;
+    text-align:left;
+  }
+  table.exemplo th{background:var(--blue);color:#fff;}
+  table.exemplo tr:nth-child(even){background:#f8fafc;}
+
+  .quiz{
+    background:#eef2ff;
+    border-radius:12px;
+    padding:20px 22px;
+    margin:20px 0;
+    border:2px dashed var(--blue-light);
+  }
+  .quiz p.pergunta{font-weight:700;margin-top:0;color:var(--blue);}
+  .click-target{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:#fff;
+    border:2px solid #cbd5e1;
+    border-radius:8px;
+    padding:10px 14px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:0.95rem;
+    transition:all 0.15s;
+  }
+  .click-target:hover{border-color:var(--blue-light);}
+  .click-blue{border-color:var(--blue-light);background:#e0e7ff;}
+  .resposta-feedback{
+    margin-top:10px;
+    font-weight:700;
+    display:none;
+  }
+  .text-danger-huge{color:var(--red);font-size:1.05rem;}
+  .text-success-medium{color:var(--green);font-size:1rem;}
+
+  .toggle-reveal{
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:9px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:0.9rem;
+    margin-top:6px;
+  }
+  .toggle-reveal:hover{background:var(--blue-light);}
+  .reveal-content{
+    display:none;
+    margin-top:12px;
+    background:#fff;
+    border-radius:8px;
+    padding:14px 16px;
+    border:1px solid #cbd5e1;
+  }
+
+  .checklist{list-style:none;padding-left:0;}
+  .checklist li{
+    padding:8px 10px 8px 34px;
+    position:relative;
+    margin-bottom:6px;
+    background:#f8fafc;
+    border-radius:6px;
+  }
+  .checklist li::before{
+    content:"☐";
+    position:absolute;
+    left:10px;
+    font-size:1.1rem;
+    color:var(--blue);
+  }
+
+  footer.fim{
+    max-width:820px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  .encerramento{
+    background:linear-gradient(135deg, var(--orange) 0%, #fb923c 100%);
+    color:#fff;
+    border-radius:16px;
+    padding:26px 28px;
+    text-align:center;
+  }
+  .encerramento h2{margin-top:0;}
+
+  .indice{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:16px 22px;
+    margin-bottom:30px;
+  }
+  .indice a{color:var(--blue);text-decoration:none;font-weight:700;}
+  .indice a:hover{text-decoration:underline;}
+  .indice li{margin-bottom:6px;}
+
+  @media (max-width:600px){
+    header.hero h1{font-size:1.6rem;}
+    .passo-header h2{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="badge-top">Informática 5.0 · Automação</span>
+  <h1>🤖 N8N na Prática</h1>
+  <p>Aula 1 — Conhecendo o n8n, conectando o Google Sheets, configurando uma Inteligência Artificial (Groq) e o Telegram</p>
+</header>
+
+<main>
+
+  <div class="intro-card">
+    <h2>📋 Sobre esta aula</h2>
+    <p>Hoje vamos conhecer o <strong>n8n</strong>, uma ferramenta de automação, e preparar cada peça que vamos usar mais para frente. <strong>Nesta aula não vamos conectar as ferramentas entre si</strong> — isso fica para a próxima aula. Hoje o objetivo é configurar cada uma, separadamente, e ter certeza de que todas estão funcionando.</p>
+    <p><strong>Objetivos da aula:</strong></p>
+    <ul class="objetivos">
+      <li>Entender o que é o n8n e para que ele serve</li>
+      <li>Conhecer a interface e o vocabulário básico (workflow, node, trigger)</li>
+      <li>Conectar o n8n a uma planilha do Google Sheets e aprender a filtrar apenas os contatos com status <span class="status-tag status-aguardando">aguardando</span></li>
+      <li>Criar uma conta na Groq e configurar uma IA dentro do n8n</li>
+      <li>Criar um bot no Telegram e conectá-lo ao n8n</li>
+    </ul>
+  </div>
+
+  <div class="indice">
+    <strong>Nesta aula:</strong>
+    <ol>
+      <li><a href="#passo1">O que é o n8n?</a></li>
+      <li><a href="#passo2">Criando sua conta e conhecendo a interface</a></li>
+      <li><a href="#passo3">Conectando o Google Sheets</a></li>
+      <li><a href="#passo4">Configurando a IA com Groq</a></li>
+      <li><a href="#passo5">Conectando o Telegram</a></li>
+    </ol>
+  </div>
+
+  <!-- PASSO 1 -->
+  <section class="passo" id="passo1">
+    <div class="passo-header">
+      <div class="passo-numero">1</div>
+      <h2>O que é o n8n?</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Uma linha de produção digital</h3>
+      <p>Pense numa fábrica: uma esteira vai passando por várias estações, e em cada estação alguém (ou alguma máquina) faz uma tarefa — corta, pinta, embala. O <strong>n8n</strong> funciona assim, só que com informação: dados entram, passam por várias "estações" (que chamamos de <strong>nodes</strong>, ou "nós"), e saem já prontos, sem que ninguém precise fazer aquele trabalho manualmente todo dia.</p>
+
+      <h3>Vocabulário básico</h3>
+      <div class="lista-passos">
+        <ul>
+          <li><strong>Workflow:</strong> o fluxo inteiro, do começo ao fim — é o nome que damos para cada "automação" que criamos.</li>
+          <li><strong>Node (nó):</strong> cada caixinha do fluxo. Cada node faz uma coisa: ler uma planilha, mandar uma mensagem, perguntar algo para uma IA, etc.</li>
+          <li><strong>Trigger (gatilho):</strong> o node que dá o pontapé inicial — o que faz o workflow começar a rodar (pode ser manual, um horário programado, ou um evento como "chegou uma mensagem nova").</li>
+          <li><strong>Credencial:</strong> a "chave de acesso" que autoriza o n8n a usar sua conta do Google, do Telegram, da Groq, etc.</li>
+        </ul>
+      </div>
+
+      <div class="dica">
+        <strong>💡 Por que isso é útil?</strong> Imagine que toda semana você precisa olhar uma planilha, ver quem ainda não recebeu uma mensagem, escrever essa mensagem e mandar no Telegram, uma pessoa de cada vez. Com o n8n, essas etapas viram um fluxo automático — o computador faz o trabalho repetitivo, e você cuida do que realmente importa.
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Rápido: qual é o nome que damos ao node que "dá o start" em um workflow?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">Credencial</button>
+        <button class="click-target" onclick="checarResposta(this, true)">Trigger</button>
+        <button class="click-target" onclick="checarResposta(this, false)">Workflow</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 2 -->
+  <section class="passo" id="passo2">
+    <div class="passo-header">
+      <div class="passo-numero">2</div>
+      <h2>Criando sua conta e conhecendo a interface</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Passo a passo para criar a conta</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Acesse <code>n8n.io</code> e clique em "Start for free" (ou "Comece grátis").</li>
+          <li>Cadastre-se com seu e-mail (ou conta Google).</li>
+          <li>Confirme o e-mail, se for solicitado.</li>
+          <li>Você vai cair direto no editor de workflows, com um espaço em branco chamado <strong>canvas</strong>.</li>
+        </ol>
+      </div>
+
+      <h3>Conhecendo o canvas</h3>
+      <div class="lista-passos">
+        <ul>
+          <li><strong>Área central (canvas):</strong> onde os nodes ficam e se conectam por linhas.</li>
+          <li><strong>Botão "+" ou "Add first step":</strong> usado para adicionar um novo node.</li>
+          <li><strong>Botão "Execute workflow" / "Test workflow":</strong> roda o fluxo manualmente, para testarmos.</li>
+          <li><strong>Painel de configuração do node:</strong> abre ao clicar duas vezes em um node, e é onde preenchemos os detalhes (qual planilha, qual mensagem, etc.).</li>
+        </ul>
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> antes de seguir, confirme que todos os alunos conseguem ver o canvas vazio e sabem localizar o botão de adicionar um node.
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 3 -->
+  <section class="passo" id="passo3">
+    <div class="passo-header">
+      <div class="passo-numero">3</div>
+      <h2>Conectando o Google Sheets e filtrando por status</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Nossa planilha de exemplo</h3>
+      <p>Vamos usar uma planilha de contatos parecida com esta:</p>
+      <table class="exemplo">
+        <tr><th>Nome</th><th>Telefone</th><th>Status</th></tr>
+        <tr><td>Maria Souza</td><td>(12) 99999-0001</td><td><span class="status-tag status-aguardando">aguardando</span></td></tr>
+        <tr><td>João Lima</td><td>(12) 99999-0002</td><td><span class="status-tag status-enviado">enviado</span></td></tr>
+        <tr><td>Ana Paula</td><td>(12) 99999-0003</td><td><span class="status-tag status-aguardando">aguardando</span></td></tr>
+      </table>
+      <p>O objetivo desta etapa é fazer o n8n <strong>ler essa planilha e trazer apenas as linhas com status "aguardando"</strong> — ou seja, só os contatos que ainda não receberam nada.</p>
+
+      <h3>Passo a passo</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>No canvas, clique em <strong>"+"</strong> e pesquise por <strong>"Google Sheets"</strong>.</li>
+          <li>Escolha a ação <strong>"Get row(s) in sheet"</strong> (buscar linhas na planilha).</li>
+          <li>Em <strong>Credential</strong>, clique em "Create new credential" e siga o login do Google, autorizando o n8n a acessar suas planilhas.</li>
+          <li>Em <strong>Document</strong>, cole o link da sua planilha (ou selecione na lista).</li>
+          <li>Em <strong>Sheet</strong>, selecione a aba correta (geralmente a primeira aba).</li>
+          <li>Ative a opção <strong>"Filters"</strong> (ou "Combine Filters", dependendo da versão) e adicione uma condição:
+            <br><code>Coluna: Status</code> &nbsp;|&nbsp; <code>Condição: igual a</code> &nbsp;|&nbsp; <code>Valor: aguardando</code>
+          </li>
+          <li>Clique em <strong>"Test step"</strong> para rodar só este node e conferir o resultado.</li>
+        </ol>
+      </div>
+
+      <div class="atencao">
+        <strong>⚠️ Atenção com maiúsculas e espaços:</strong> o filtro compara o texto exatamente como está escrito. Se na planilha estiver "Aguardando" (com A maiúsculo) ou " aguardando" (com espaço extra), o filtro pode não encontrar nada. Combine com a turma que todos vão escrever "aguardando" sempre da mesma forma.
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> ao clicar em "Test step", o resultado deve mostrar somente os contatos com status "aguardando". Se aparecer tudo, revise o filtro.
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Se a planilha tiver a palavra "Aguardando" com A maiúsculo e o filtro estiver configurado com "aguardando" minúsculo, o que acontece?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">O n8n corrige automaticamente e encontra a linha</button>
+        <button class="click-target" onclick="checarResposta(this, true)">O filtro pode não encontrar essa linha</button>
+        <button class="click-target" onclick="checarResposta(this, false)">O n8n apaga a linha da planilha</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 4 -->
+  <section class="passo" id="passo4">
+    <div class="passo-header">
+      <div class="passo-numero">4</div>
+      <h2>Configurando uma IA com a Groq</h2>
+    </div>
+    <div class="passo-body">
+      <h3>O que é a Groq?</h3>
+      <p>A Groq é uma empresa que oferece acesso a modelos de inteligência artificial (como o Llama) de um jeito extremamente rápido, e com um plano gratuito generoso — por isso é uma ótima opção para quem está aprendendo.</p>
+
+      <h3>Passo a passo: gerando a chave de API</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Acesse <code>console.groq.com</code> e crie sua conta (pode ser com o Google).</li>
+          <li>No menu, vá até <strong>"API Keys"</strong>.</li>
+          <li>Clique em <strong>"Create API Key"</strong>, dê um nome (por exemplo, "n8n") e confirme.</li>
+          <li>Copie a chave gerada — ela só aparece completa uma vez, então guarde em um lugar seguro.</li>
+        </ol>
+      </div>
+
+      <div class="atencao">
+        <strong>⚠️ Nunca compartilhe sua API Key.</strong> Ela funciona como uma senha: quem tiver essa chave pode usar seus créditos na Groq. Não cole a chave em grupos, prints ou vídeos.
+      </div>
+
+      <h3>Passo a passo: configurando no n8n</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>No canvas, clique em <strong>"+"</strong> e pesquise por <strong>"Groq"</strong>.</li>
+          <li>Selecione o node <strong>"Groq Chat Model"</strong>.</li>
+          <li>Em <strong>Credential</strong>, clique em "Create new credential" e cole a API Key copiada da Groq.</li>
+          <li>Em <strong>Model</strong>, escolha um modelo da lista (o n8n carrega automaticamente os modelos disponíveis na sua conta).</li>
+          <li>Para testar rapidamente, adicione também um node <strong>"Basic LLM Chain"</strong> conectado ao "Groq Chat Model", escreva uma pergunta simples no campo de prompt (por exemplo, "Diga oi em uma frase") e clique em <strong>"Test step"</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> ao testar, a IA deve responder com um texto. Se der erro de autenticação, confira se a API Key foi colada corretamente, sem espaços antes ou depois.
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Onde geramos a chave (API Key) que conecta o n8n à Groq?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">Dentro do Telegram</button>
+        <button class="click-target" onclick="checarResposta(this, true)">No site console.groq.com</button>
+        <button class="click-target" onclick="checarResposta(this, false)">Na planilha do Google Sheets</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 5 -->
+  <section class="passo" id="passo5">
+    <div class="passo-header">
+      <div class="passo-numero">5</div>
+      <h2>Conectando o Telegram</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Criando o bot no Telegram</h3>
+      <p>No Telegram, todo robô (bot) precisa ser criado através de outro bot especial, chamado <strong>@BotFather</strong>.</p>
+      <div class="lista-passos">
+        <ol>
+          <li>Abra o Telegram e pesquise por <strong>@BotFather</strong>.</li>
+          <li>Envie o comando <code>/newbot</code>.</li>
+          <li>Escolha um nome de exibição para o bot (ex: "Bot da All Net").</li>
+          <li>Escolha um nome de usuário único, que precisa terminar em <code>bot</code> (ex: <code>allnet_avisos_bot</code>).</li>
+          <li>O BotFather vai te enviar um <strong>token</strong> — uma sequência longa de letras e números. Copie esse token.</li>
+        </ol>
+      </div>
+
+      <div class="atencao">
+        <strong>⚠️ O token do bot também é uma senha.</strong> Quem tiver o token consegue controlar o bot inteiro. Guarde com o mesmo cuidado que a API Key da Groq.
+      </div>
+
+      <h3>Passo a passo: configurando no n8n</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>No canvas, clique em <strong>"+"</strong> e pesquise por <strong>"Telegram"</strong>.</li>
+          <li>Para testar o envio, escolha a ação <strong>"Send a text message"</strong>.</li>
+          <li>Em <strong>Credential</strong>, clique em "Create new credential" e cole o token recebido do BotFather.</li>
+          <li>Em <strong>Chat ID</strong>, informe o ID do seu chat com o bot (para descobrir, mande uma mensagem qualquer para o bot e depois use o node "Telegram Trigger" em modo de teste, que mostra o Chat ID recebido).</li>
+          <li>Escreva uma mensagem de teste no campo <strong>Text</strong> e clique em <strong>"Test step"</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> a mensagem de teste deve chegar no seu Telegram em poucos segundos. Se não chegar, confira se você já enviou pelo menos uma mensagem para o bot antes (bots não podem iniciar a conversa).
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Quem gera o token do bot no Telegram?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">O n8n gera automaticamente</button>
+        <button class="click-target" onclick="checarResposta(this, true)">O @BotFather, dentro do próprio Telegram</button>
+        <button class="click-target" onclick="checarResposta(this, false)">A Groq</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="passo">
+    <div class="passo-header">
+      <div class="passo-numero">✓</div>
+      <h2>Checklist final da aula</h2>
+    </div>
+    <div class="passo-body">
+      <p>Antes de encerrar, confirme com a turma que cada item abaixo está funcionando <strong>de forma isolada</strong> (ainda não conectados entre si):</p>
+      <ul class="checklist">
+        <li>Conta no n8n criada e canvas explorado</li>
+        <li>Node do Google Sheets testado, trazendo só os contatos com status "aguardando"</li>
+        <li>Conta na Groq criada, API Key gerada e node "Groq Chat Model" respondendo a uma pergunta de teste</li>
+        <li>Bot criado no BotFather e node do Telegram enviando uma mensagem de teste</li>
+      </ul>
+      <button class="toggle-reveal" onclick="toggleReveal('proxima-aula')">📌 O que vem na próxima aula?</button>
+      <div class="reveal-content" id="proxima-aula">
+        <p>Na próxima aula, vamos <strong>conectar os três nodes em um único workflow</strong>: o n8n vai ler a planilha, pegar cada contato "aguardando", pedir para a IA da Groq escrever uma mensagem personalizada, e enviar tudo automaticamente pelo Telegram — atualizando o status na planilha ao final.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="fim">
+  <div class="encerramento">
+    <h2>🎉 Muito bem!</h2>
+    <p>Você já sabe o que é o n8n, já leu uma planilha com filtro, já conversou com uma IA através da Groq e já mandou uma mensagem pelo seu próprio bot no Telegram. Na próxima aula, vamos juntar todas essas peças!</p>
+  </div>
+</footer>
+
+<script>
+function checarResposta(botao, correta){
+  const container = botao.parentElement;
+  const botoes = container.querySelectorAll('.click-target');
+  botoes.forEach(b => b.disabled = true);
+  botao.classList.add('click-blue');
+  const feedback = container.querySelector('.resposta-feedback');
+  feedback.style.display = 'block';
+  if(correta){
+    feedback.textContent = '✅ Isso mesmo!';
+    feedback.className = 'resposta-feedback text-success-medium';
+    botao.style.borderColor = '#15803d';
+  } else {
+    feedback.textContent = '❌ Não é essa. Reveja o passo acima e tente lembrar antes de seguir.';
+    feedback.className = 'resposta-feedback text-danger-huge';
+    botao.style.borderColor = '#b91c1c';
+  }
+}
+function toggleReveal(id){
+  const el = document.getElementById(id);
+  el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+
+</body>
+</html>
