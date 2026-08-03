@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N8N na Prática — Aula 2: Conectando tudo</title>
+<style>
+  :root{
+    --blue: #1e3a8a;
+    --blue-light: #3b5bdb;
+    --orange: #f97316;
+    --orange-light: #fed7aa;
+    --green: #15803d;
+    --green-light: #dcfce7;
+    --red: #b91c1c;
+    --red-light: #fee2e2;
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', 'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  header.hero{
+    background:linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    color:#fff;
+    padding:48px 20px 64px;
+    text-align:center;
+    position:relative;
+  }
+  header.hero h1{font-size:2.2rem;margin:0 0 8px;}
+  header.hero p{font-size:1.1rem;opacity:0.9;max-width:700px;margin:0 auto;}
+  .badge-top{
+    display:inline-block;background:var(--orange);color:#fff;padding:6px 16px;
+    border-radius:20px;font-weight:700;font-size:0.85rem;letter-spacing:0.5px;
+    margin-bottom:14px;text-transform:uppercase;
+  }
+  main{max-width:820px;margin:-36px auto 0;padding:0 20px;}
+  .intro-card{
+    background:var(--card);border-radius:16px;padding:26px 28px;
+    box-shadow:0 10px 30px rgba(30,58,138,0.12);margin-bottom:34px;
+  }
+  .intro-card h2{margin-top:0;color:var(--blue);}
+  .objetivos li{margin-bottom:6px;}
+
+  .passo{
+    background:var(--card);border-radius:16px;margin-bottom:32px;
+    box-shadow:0 6px 18px rgba(30,41,59,0.08);overflow:hidden;
+  }
+  .passo-header{display:flex;align-items:center;gap:16px;background:var(--blue);color:#fff;padding:18px 24px;}
+  .passo-numero{
+    background:var(--orange);min-width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:800;
+    font-size:1.2rem;flex-shrink:0;
+  }
+  .passo-header h2{margin:0;font-size:1.3rem;}
+  .passo-body{padding:24px 26px;}
+  .passo-body h3{color:var(--blue);font-size:1.05rem;margin-top:22px;}
+  .passo-body h3:first-child{margin-top:0;}
+
+  .dica{background:var(--orange-light);border-left:5px solid var(--orange);padding:14px 18px;border-radius:8px;margin:16px 0;}
+  .dica strong{color:#9a3412;}
+  .atencao{background:var(--red-light);border-left:5px solid var(--red);padding:14px 18px;border-radius:8px;margin:16px 0;}
+  .atencao strong{color:var(--red);}
+  .checkpoint{background:var(--green-light);border-left:5px solid var(--green);padding:14px 18px;border-radius:8px;margin:16px 0;}
+  .checkpoint strong{color:var(--green);}
+
+  .lista-passos{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 22px;margin:16px 0;}
+  .lista-passos li{margin-bottom:8px;}
+
+  code{background:#0f172a;color:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.92em;font-family:'Consolas','Courier New',monospace;}
+  .codebox{
+    display:block;background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;
+    margin:14px 0;overflow-x:auto;font-size:0.9rem;white-space:pre-wrap;font-family:'Consolas','Courier New',monospace;
+  }
+
+  .status-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-weight:700;font-size:0.85rem;}
+  .status-aguardando{background:#fef3c7;color:#92400e;}
+  .status-enviado{background:var(--green-light);color:var(--green);}
+
+  table.exemplo{width:100%;border-collapse:collapse;margin:14px 0;font-size:0.92rem;}
+  table.exemplo th, table.exemplo td{border:1px solid #e2e8f0;padding:8px 10px;text-align:left;}
+  table.exemplo th{background:var(--blue);color:#fff;}
+  table.exemplo tr:nth-child(even){background:#f8fafc;}
+
+  .fluxo{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;
+    background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:22px;margin:18px 0;
+  }
+  .fluxo-node{
+    background:#fff;border:2px solid var(--blue-light);border-radius:10px;
+    padding:12px 16px;text-align:center;font-weight:700;font-size:0.9rem;color:var(--blue);
+    min-width:120px;
+  }
+  .fluxo-seta{font-size:1.4rem;color:var(--orange);font-weight:800;}
+
+  .quiz{background:#eef2ff;border-radius:12px;padding:20px 22px;margin:20px 0;border:2px dashed var(--blue-light);}
+  .quiz p.pergunta{font-weight:700;margin-top:0;color:var(--blue);}
+  .click-target{
+    display:block;width:100%;text-align:left;background:#fff;border:2px solid #cbd5e1;
+    border-radius:8px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;
+    font-size:0.95rem;transition:all 0.15s;
+  }
+  .click-target:hover{border-color:var(--blue-light);}
+  .click-blue{border-color:var(--blue-light);background:#e0e7ff;}
+  .resposta-feedback{margin-top:10px;font-weight:700;display:none;}
+  .text-danger-huge{color:var(--red);font-size:1.05rem;}
+  .text-success-medium{color:var(--green);font-size:1rem;}
+
+  .toggle-reveal{
+    background:var(--blue);color:#fff;border:none;padding:9px 18px;border-radius:8px;
+    cursor:pointer;font-weight:700;font-size:0.9rem;margin-top:6px;
+  }
+  .toggle-reveal:hover{background:var(--blue-light);}
+  .reveal-content{display:none;margin-top:12px;background:#fff;border-radius:8px;padding:14px 16px;border:1px solid #cbd5e1;}
+
+  .checklist{list-style:none;padding-left:0;}
+  .checklist li{padding:8px 10px 8px 34px;position:relative;margin-bottom:6px;background:#f8fafc;border-radius:6px;}
+  .checklist li::before{content:"☐";position:absolute;left:10px;font-size:1.1rem;color:var(--blue);}
+
+  footer.fim{max-width:820px;margin:0 auto;padding:0 20px;}
+  .encerramento{
+    background:linear-gradient(135deg, var(--orange) 0%, #fb923c 100%);color:#fff;
+    border-radius:16px;padding:26px 28px;text-align:center;
+  }
+  .encerramento h2{margin-top:0;}
+
+  .indice{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 22px;margin-bottom:30px;}
+  .indice a{color:var(--blue);text-decoration:none;font-weight:700;}
+  .indice a:hover{text-decoration:underline;}
+  .indice li{margin-bottom:6px;}
+
+  @media (max-width:600px){
+    header.hero h1{font-size:1.6rem;}
+    .passo-header h2{font-size:1.1rem;}
+    .fluxo{flex-direction:column;}
+    .fluxo-seta{transform:rotate(90deg);}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="badge-top">Informática 5.0 · Automação</span>
+  <h1>🤖 N8N na Prática</h1>
+  <p>Aula 2 — Juntando tudo: Google Sheets + IA (Groq) + Telegram em um único workflow</p>
+</header>
+
+<main>
+
+  <div class="intro-card">
+    <h2>📋 Sobre esta aula</h2>
+    <p>Na aula passada, configuramos três peças separadas: a leitura da planilha, a IA da Groq e o bot do Telegram. Hoje vamos <strong>ligar essas três peças em um único workflow</strong>, para que o n8n faça tudo sozinho: leia os contatos com status "Aguardando", peça pra IA escrever uma mensagem pra cada um, envie pelo Telegram, e depois marque na planilha que aquele contato já foi atendido.</p>
+    <p><strong>Objetivos da aula:</strong></p>
+    <ul class="objetivos">
+      <li>Entender por que precisamos de um "Chat ID" e não do telefone para enviar mensagens no Telegram</li>
+      <li>Ligar o node do Google Sheets ao node da Groq</li>
+      <li>Ligar a resposta da IA ao envio pelo Telegram</li>
+      <li>Atualizar a planilha automaticamente, trocando o status de "Aguardando" para "Enviado"</li>
+      <li>Testar o workflow completo e (opcional) programar para rodar sozinho todos os dias</li>
+    </ul>
+  </div>
+
+  <div class="indice">
+    <strong>Nesta aula:</strong>
+    <ol>
+      <li><a href="#passo1">Um ajuste importante na planilha: o Chat ID</a></li>
+      <li><a href="#passo2">Montando o fluxo completo</a></li>
+      <li><a href="#passo3">Testando o workflow</a></li>
+      <li><a href="#passo4">Automatizando (opcional)</a></li>
+      <li><a href="#passo5">Cuidados antes de usar de verdade</a></li>
+    </ol>
+  </div>
+
+  <!-- PASSO 1 -->
+  <section class="passo" id="passo1">
+    <div class="passo-header">
+      <div class="passo-numero">1</div>
+      <h2>Um ajuste importante na planilha: o Chat ID</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Por que não dá pra usar só o telefone?</h3>
+      <p>Diferente do WhatsApp, um bot do Telegram <strong>não pode iniciar conversa com alguém só porque tem o número de telefone da pessoa</strong>. Ele só consegue mandar mensagem pra quem já mandou pelo menos uma mensagem pra ele antes. Por isso, em vez do telefone, cada contato da planilha precisa ter o <strong>Chat ID</strong> — um número que identifica a conversa entre aquela pessoa e o seu bot.</p>
+
+      <div class="atencao">
+        <strong>⚠️ Isso muda a planilha.</strong> Precisamos adicionar uma coluna nova chamada <code>CHATID</code>. A boa notícia é que a nossa planilha já tem uma coluna com número único por linha, a <code>N°</code> — vamos usar ela (ou o <code>row_number</code> que o próprio n8n gera) para o n8n saber qual linha atualizar depois.
+      </div>
+
+      <h3>Como descobrir o Chat ID de cada contato</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Peça para cada contato mandar uma mensagem qualquer (tipo "oi") para o seu bot no Telegram.</li>
+          <li>No n8n, crie um workflow novo, temporário, só com o node <strong>"Telegram Trigger"</strong>, escutando por mensagens.</li>
+          <li>Ative o modo de escuta ("Listen for test event") e peça para o contato mandar a mensagem.</li>
+          <li>O n8n vai mostrar o JSON recebido — dentro dele tem um campo <code>chat.id</code>. Esse é o Chat ID.</li>
+          <li>Copie esse número para a coluna <code>ChatID</code> da linha daquele contato, na planilha.</li>
+        </ol>
+      </div>
+
+      <p>A planilha atualizada fica assim (mantendo as colunas que já existem, só acrescentando <code>CHATID</code>):</p>
+      <table class="exemplo">
+        <tr><th>N°</th><th>NOME</th><th>NUMERO</th><th>EMAIL</th><th>ESCOLHA</th><th>DATA</th><th>CHATID</th><th>STATUS</th></tr>
+        <tr><td>1</td><td>Maria Souza</td><td>(12) 99999-0001</td><td>maria@email.com</td><td>—</td><td>—</td><td>123456789</td><td><span class="status-tag status-aguardando">Aguardando</span></td></tr>
+        <tr><td>2</td><td>João Lima</td><td>(12) 99999-0002</td><td>joao@email.com</td><td>—</td><td>—</td><td>987654321</td><td><span class="status-tag status-enviado">Enviado</span></td></tr>
+        <tr><td>3</td><td>Ana Paula</td><td>(12) 99999-0003</td><td>ana@email.com</td><td>—</td><td>—</td><td>456789123</td><td><span class="status-tag status-aguardando">Aguardando</span></td></tr>
+      </table>
+      <div class="dica">
+        <strong>💡 Fique de olho nas maiúsculas.</strong> Na nossa planilha o status é escrito como <code>Aguardando</code> e <code>Enviado</code> (com inicial maiúscula). O filtro e a atualização precisam usar exatamente essa grafia — se escrever "aguardando" tudo minúsculo, o n8n não vai encontrar nada.
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Por que precisamos do Chat ID em vez do telefone?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">Porque o telefone é muito grande para o n8n processar</button>
+        <button class="click-target" onclick="checarResposta(this, true)">Porque o bot só pode mandar mensagem para quem já iniciou uma conversa com ele</button>
+        <button class="click-target" onclick="checarResposta(this, false)">Porque o Chat ID é mais bonito que o telefone</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 2 -->
+  <section class="passo" id="passo2">
+    <div class="passo-header">
+      <div class="passo-numero">2</div>
+      <h2>Montando o fluxo completo</h2>
+    </div>
+    <div class="passo-body">
+      <p>Vamos construir este caminho no canvas:</p>
+      <div class="fluxo">
+        <div class="fluxo-node">Manual Trigger</div>
+        <div class="fluxo-seta">→</div>
+        <div class="fluxo-node">Google Sheets<br>(Get rows,<br>status = Aguardando)</div>
+        <div class="fluxo-seta">→</div>
+        <div class="fluxo-node">Basic LLM Chain<br>+ Groq Chat Model</div>
+        <div class="fluxo-seta">→</div>
+        <div class="fluxo-node">Telegram<br>(Send message)</div>
+        <div class="fluxo-seta">→</div>
+        <div class="fluxo-node">Google Sheets<br>(Update row,<br>status = Enviado)</div>
+      </div>
+
+      <h3>2.1 — Trigger e leitura da planilha</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Comece com um <strong>"Manual Trigger"</strong> (o mesmo "Test workflow" de sempre, por enquanto).</li>
+          <li>Conecte o node do <strong>Google Sheets</strong> que já configuramos na aula passada (Get row(s), filtrando <code>STATUS = Aguardando</code>).</li>
+        </ol>
+      </div>
+
+      <h3>2.2 — Gerando a mensagem com a IA</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Adicione um node <strong>"Basic LLM Chain"</strong>, conectado na saída do Google Sheets.</li>
+          <li>No campo <strong>Chat Model</strong>, conecte o <strong>"Groq Chat Model"</strong> que já configuramos, usando a mesma credencial da aula passada.</li>
+          <li>No campo de <strong>Prompt</strong>, escreva algo como:
+            <div class="codebox">Escreva uma mensagem curta e simpática avisando {{ $json.NOME }} que o atendimento dele já está disponível.</div>
+          </li>
+          <li>Repare que <code>{{ $json.NOME }}</code> é uma <strong>expressão</strong> — ela pega o valor da coluna "NOME" daquele contato específico, e muda automaticamente para cada linha.</li>
+          <li>Clique em <strong>"Test step"</strong> e veja a IA gerar uma mensagem personalizada para cada contato da lista.</li>
+        </ol>
+      </div>
+
+      <div class="dica">
+        <strong>💡 O que é essa "chave { }"?</strong> É como uma variável: em vez de escrever "Maria" fixo no texto, a expressão <code>{{ $json.Nome }}</code> diz para o n8n "coloque aqui o nome desta linha". Assim a mesma mensagem-modelo funciona para todos os contatos, cada um recebendo o próprio nome.
+      </div>
+
+      <h3>2.3 — Enviando pelo Telegram</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Adicione o node <strong>Telegram</strong> (ação "Send a text message"), conectado na saída do "Basic LLM Chain".</li>
+          <li>No campo <strong>Chat ID</strong>, use a expressão <code>{{ $('Google Sheets').item.json.CHATID }}</code> (assim ele busca o ChatID lá da planilha, não do resultado da IA).</li>
+          <li>No campo <strong>Text</strong>, use <code>{{ $json.text }}</code> (ou o nome do campo de saída do "Basic LLM Chain" — confira o nome exato no painel de resultado do node anterior).</li>
+        </ol>
+      </div>
+
+      <h3>2.4 — Atualizando o status na planilha</h3>
+      <div class="lista-passos">
+        <ol>
+          <li>Adicione mais um node <strong>Google Sheets</strong>, agora com a ação <strong>"Update Row"</strong>.</li>
+          <li>Selecione a mesma planilha e a mesma aba.</li>
+          <li>Em <strong>"Column to match on"</strong>, escolha <code>row_number</code> (recomendado — é gerado automaticamente pelo n8n e garante a linha certa) ou <code>N°</code>, se preferir usar a numeração da própria planilha.</li>
+          <li>No campo de valor dessa coluna, use uma expressão puxando do node anterior, por exemplo <code>{{ $('Google Sheets').item.json.row_number }}</code>.</li>
+          <li>Em <strong>STATUS</strong>, escreva o valor fixo <code>Enviado</code> (com o mesmo padrão de maiúscula/minúscula que já usamos na planilha).</li>
+        </ol>
+      </div>
+
+      <div class="atencao">
+        <strong>⚠️ Apague os campos que você não quer alterar.</strong> Quando você abre o node "Update Row", ele pode trazer automaticamente campos como <code>NOME</code>, <code>NUMERO</code>, <code>EMAIL</code>, <code>ESCOLHA</code> e <code>DATA</code> vazios (aparecendo como <code>[empty]</code>). Se deixar assim, o n8n entende que é para apagar o conteúdo dessas colunas! Clique no ícone de lixeira 🗑️ ao lado de cada um desses campos vazios para removê-los da lista. No final, deve sobrar só o campo <code>STATUS</code> para preencher.
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> antes de testar, confira que a lista de campos do node "Update Row" mostra <strong>somente</strong> a coluna <code>STATUS</code> (além da coluna de referência lá em cima, no "Column to match on"). Se aparecer qualquer outro campo vazio na lista, apague-o.
+      </div>
+
+      <div class="quiz">
+        <p class="pergunta">🧠 Por que usamos "row_number" (ou "N°") para atualizar a linha certa, em vez de "NOME"?</p>
+        <button class="click-target" onclick="checarResposta(this, false)">Porque "NOME" é mais rápido de digitar</button>
+        <button class="click-target" onclick="checarResposta(this, true)">Porque row_number/N° é único, evitando atualizar a linha errada quando há nomes repetidos</button>
+        <button class="click-target" onclick="checarResposta(this, false)">Porque a Groq exige um campo chamado row_number</button>
+        <p class="resposta-feedback"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 3 -->
+  <section class="passo" id="passo3">
+    <div class="passo-header">
+      <div class="passo-numero">3</div>
+      <h2>Testando o workflow completo</h2>
+    </div>
+    <div class="passo-body">
+      <h3>Antes de tudo: teste com 1 ou 2 contatos</h3>
+      <p>Para o primeiro teste, deixe só 1 ou 2 linhas com status "Aguardando" na planilha (mude as outras temporariamente, ou use uma cópia da planilha para teste). Assim, se algo estiver errado, poucos contatos recebem mensagem.</p>
+
+      <div class="lista-passos">
+        <ol>
+          <li>Clique em <strong>"Test workflow"</strong>, no canto do canvas.</li>
+          <li>Observe cada node ficar verde (sucesso) ou vermelho (erro), na ordem em que são executados.</li>
+          <li>Clique em cada node para ver os dados que passaram por ele — isso ajuda muito a entender e a corrigir erros.</li>
+          <li>Confira no seu Telegram se a mensagem chegou certinha.</li>
+          <li>Confira na planilha se o status daquela linha virou "Enviado".</li>
+        </ol>
+      </div>
+
+      <div class="checkpoint">
+        <strong>✅ Ponto de checagem:</strong> se tudo deu certo, rodar o workflow de novo não deve reenviar mensagem para quem já está com status "Enviado" — porque o filtro do Google Sheets só traz quem está "Aguardando".
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 4 -->
+  <section class="passo" id="passo4">
+    <div class="passo-header">
+      <div class="passo-numero">4</div>
+      <h2>Automatizando (opcional)</h2>
+    </div>
+    <div class="passo-body">
+      <p>Depois que o teste manual estiver funcionando bem, dá para trocar o <strong>"Manual Trigger"</strong> por um <strong>"Schedule Trigger"</strong>, para que o workflow rode sozinho em horários definidos (por exemplo, todo dia às 9h da manhã).</p>
+      <div class="lista-passos">
+        <ol>
+          <li>Remova (ou desative) o node "Manual Trigger".</li>
+          <li>Adicione o node <strong>"Schedule Trigger"</strong> e conecte na entrada do Google Sheets.</li>
+          <li>Configure o intervalo desejado (ex: "Every day" às 09:00).</li>
+          <li>Salve e <strong>ative</strong> o workflow (botão "Active", no topo direito).</li>
+        </ol>
+      </div>
+      <div class="dica">
+        <strong>💡 Fica ligado só se estiver ativo.</strong> O workflow só roda sozinho se o botão "Active" estiver ligado. Enquanto estiver desligado, ele só executa quando você clicar em "Test workflow".
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 5 -->
+  <section class="passo" id="passo5">
+    <div class="passo-header">
+      <div class="passo-numero">5</div>
+      <h2>Cuidados antes de usar de verdade</h2>
+    </div>
+    <div class="passo-body">
+      <ul class="checklist">
+        <li>Sempre teste com poucos contatos antes de rodar com a planilha inteira</li>
+        <li>Confira se a coluna "ID" realmente não tem números repetidos</li>
+        <li>Guarde uma cópia de segurança da planilha antes da primeira execução automática</li>
+        <li>Releia a mensagem gerada pela IA algumas vezes — ela pode variar, então vale revisar o tom antes de deixar 100% automático</li>
+        <li>Lembre-se: só é possível mandar mensagem para quem já iniciou conversa com o bot (tem ChatID)</li>
+      </ul>
+
+      <button class="toggle-reveal" onclick="toggleReveal('resumo-fluxo')">📌 Resumo do fluxo montado hoje</button>
+      <div class="reveal-content" id="resumo-fluxo">
+        <p><strong>Manual/Schedule Trigger</strong> → <strong>Google Sheets (buscar "Aguardando")</strong> → <strong>Basic LLM Chain + Groq (gerar mensagem)</strong> → <strong>Telegram (enviar)</strong> → <strong>Google Sheets (marcar "Enviado")</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="fim">
+  <div class="encerramento">
+    <h2>🎉 Parabéns!</h2>
+    <p>Vocês construíram, do zero, um workflow completo de automação: ele lê uma planilha, escreve uma mensagem com inteligência artificial, envia pelo Telegram e ainda atualiza o controle sozinho. Essa é a base de praticamente qualquer automação de atendimento!</p>
+  </div>
+</footer>
+
+<script>
+function checarResposta(botao, correta){
+  const container = botao.parentElement;
+  const botoes = container.querySelectorAll('.click-target');
+  botoes.forEach(b => b.disabled = true);
+  botao.classList.add('click-blue');
+  const feedback = container.querySelector('.resposta-feedback');
+  feedback.style.display = 'block';
+  if(correta){
+    feedback.textContent = '✅ Isso mesmo!';
+    feedback.className = 'resposta-feedback text-success-medium';
+    botao.style.borderColor = '#15803d';
+  } else {
+    feedback.textContent = '❌ Não é essa. Reveja o passo acima e tente lembrar antes de seguir.';
+    feedback.className = 'resposta-feedback text-danger-huge';
+    botao.style.borderColor = '#b91c1c';
+  }
+}
+function toggleReveal(id){
+  const el = document.getElementById(id);
+  el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+
+</body>
+</html>
