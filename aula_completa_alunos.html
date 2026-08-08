@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula de Informática · Navegação, ChatGPT e Gmail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul: #1E3A8A;
+    --azul-claro: #3B82F6;
+    --laranja: #F97316;
+    --laranja-claro: #FFEDD5;
+    --verde: #16A34A;
+    --vermelho: #DC2626;
+    --fundo: #F1F5F9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:var(--fundo);
+    margin:0;
+    padding:0;
+    color:#1E293B;
+    line-height:1.55;
+  }
+  .topo{
+    background:linear-gradient(135deg, var(--azul) 0%, #1E293B 100%);
+    color:#fff;
+    padding:36px 24px;
+    text-align:center;
+  }
+  .topo .tag{
+    display:inline-block;
+    background:var(--laranja);
+    padding:6px 18px;
+    border-radius:20px;
+    font-weight:800;
+    letter-spacing:1px;
+    font-size:14px;
+    margin-bottom:14px;
+  }
+  .topo h1{margin:0; font-size:32px; font-weight:800;}
+  .topo p{margin:10px auto 0; max-width:620px; font-size:16px; opacity:.9;}
+
+  .separador-parte{
+    max-width:820px;
+    margin:44px auto 20px;
+    padding:0 20px;
+  }
+  .separador-parte .caixa{
+    background:linear-gradient(135deg, var(--laranja) 0%, #EA580C 100%);
+    color:#fff;
+    border-radius:16px;
+    padding:22px 26px;
+    text-align:center;
+  }
+  .separador-parte .caixa .num{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:2px;
+    opacity:.9;
+    display:block;
+    margin-bottom:6px;
+  }
+  .separador-parte .caixa h2{margin:0; font-size:24px;}
+  .separador-parte .caixa p{margin:8px 0 0; font-size:14.5px; opacity:.95;}
+
+  main{max-width:820px; margin:0 auto; padding:10px 20px 80px;}
+  .passo{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 4px 18px rgba(30,58,138,.08);
+    margin-bottom:22px;
+    overflow:hidden;
+    border:1px solid #E2E8F0;
+  }
+  .passo-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--azul);
+    color:#fff;
+    padding:16px 22px;
+  }
+  .badge{
+    background:var(--laranja);
+    color:#fff;
+    font-weight:800;
+    font-size:14px;
+    padding:6px 14px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+  .passo-header h2{margin:0; font-size:19px;}
+  .passo-body{padding:22px;}
+  .passo-body p{margin:0 0 12px; font-size:15.5px;}
+  .livro{
+    background:var(--laranja-claro);
+    border-left:5px solid var(--laranja);
+    border-radius:10px;
+    padding:14px 16px;
+    margin:16px 0;
+    font-size:14.5px;
+  }
+  .livro strong{color:#9A3412;}
+  .livro .pag{
+    background:#fff;
+    border:1px solid var(--laranja);
+    padding:1px 8px;
+    border-radius:6px;
+    font-weight:800;
+    color:var(--laranja);
+  }
+  ol.passos li, ul.lista li{margin-bottom:8px; font-size:15px;}
+  .grid-nav{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(130px,1fr));
+    gap:12px;
+    margin:16px 0;
+  }
+  .nav-card{
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-radius:12px;
+    padding:14px 10px;
+    text-align:center;
+    font-weight:700;
+    font-size:14px;
+  }
+  .nav-card .emoji{font-size:28px; display:block; margin-bottom:6px;}
+  .click-blue{color:var(--azul-claro); font-weight:800;}
+  .text-success-medium{color:var(--verde); font-weight:700;}
+  .atividade{
+    background:#F0FDF4;
+    border:2px dashed var(--verde);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .atividade h3{margin:0 0 8px; color:var(--verde); font-size:16px;}
+  .campo-resposta{
+    border:none;
+    border-bottom:2px solid #94A3B8;
+    background:transparent;
+    width:100%;
+    padding:6px 2px;
+    font-family:'Nunito',sans-serif;
+    font-size:14.5px;
+    margin-top:4px;
+  }
+  .quiz{
+    background:#FEF3C7;
+    border-radius:12px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .quiz h3{margin:0 0 10px; font-size:15px; color:#92400E;}
+  .quiz-toggle{
+    background:var(--laranja);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:13.5px;
+    margin-top:6px;
+  }
+  .quiz-resposta{
+    display:none;
+    background:#fff;
+    border-radius:8px;
+    padding:10px 12px;
+    margin-top:10px;
+    font-size:14px;
+    border:1px solid #FBBF24;
+  }
+  .quiz-resposta.show{display:block;}
+  .op-tabela{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+  .op-tabela th{
+    background:var(--azul);
+    color:#fff;
+    padding:8px 10px;
+    text-align:left;
+  }
+  .op-tabela td{
+    padding:8px 10px;
+    border-bottom:1px solid #E2E8F0;
+    vertical-align:top;
+  }
+  .op-tabela .op{
+    font-family:monospace;
+    background:#1E293B;
+    color:#93C5FD;
+    padding:2px 8px;
+    border-radius:6px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .alerta{
+    background:#FEE2E2;
+    border-left:5px solid var(--vermelho);
+    border-radius:10px;
+    padding:12px 16px;
+    margin:14px 0;
+    font-size:14px;
+  }
+  .alerta strong{color:#991B1B;}
+  @media(max-width:560px){
+    .topo h1{font-size:24px;}
+    .op-tabela{font-size:12px;}
+  }
+  .encerramento{
+    background:linear-gradient(135deg, var(--laranja) 0%, #EA580C 100%);
+    color:#fff;
+    border-radius:16px;
+    padding:26px 24px;
+    text-align:center;
+    margin-top:10px;
+  }
+  .encerramento h2{margin:0 0 10px; font-size:22px;}
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <span class="tag">AULA DE HOJE</span>
+  <h1>Navegando na Internet, ChatGPT e Gmail</h1>
+  <p>Vamos aprender a usar o Google Chrome, pesquisar como um profissional, dar os primeiros passos com Inteligência Artificial e dominar sua conta do Google.</p>
+</div>
+
+<main>
+
+  <!-- ============ PARTE 1 ============ -->
+  <div class="separador-parte">
+    <div class="caixa">
+      <span class="num">1ª HORA · ANTES DO INTERVALO</span>
+      <h2>Aula 01 — Introdução da Navegação Online</h2>
+      <p>Livro: páginas 9 a 19</p>
+    </div>
+  </div>
+
+  <!-- PASSO 1 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 1</span>
+      <h2>O que é a Internet?</h2>
+    </div>
+    <div class="passo-body">
+      <p>A internet é uma rede global de computadores conectados, que permite trocar informações e serviços em tempo real. Com ela você navega em sites, envia e-mails, se comunica por mensagens instantâneas e realiza muitas outras atividades essenciais para o mercado de trabalho.</p>
+      <div class="livro">
+        📖 <strong>Abra o livro na página</strong> <span class="pag">9</span> e acompanhe o texto "Introdução do uso da internet".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 2 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 2</span>
+      <h2>Navegadores de Internet</h2>
+    </div>
+    <div class="passo-body">
+      <p>Navegadores são programas que permitem acessar sites na internet. Os mais usados são:</p>
+      <div class="grid-nav">
+        <div class="nav-card"><span class="emoji">🧭</span>Safari</div>
+        <div class="nav-card"><span class="emoji">🦊</span>Firefox</div>
+        <div class="nav-card"><span class="emoji">🌐</span>Chrome</div>
+        <div class="nav-card"><span class="emoji">🔷</span>Edge</div>
+        <div class="nav-card"><span class="emoji">🔴</span>Opera</div>
+      </div>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">9</span> — grife a característica principal de cada navegador (ex: Chrome = "rápido e compatível com o Google").
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 3 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 3</span>
+      <h2>Abrindo o Google Chrome</h2>
+    </div>
+    <div class="passo-body">
+      <p>Vamos abrir o Google Chrome e dar os primeiros passos, seguindo estes 4 passos:</p>
+      <ol class="passos">
+        <li><span class="click-blue">Passo 01</span> — Encontre o ícone do Google Chrome no computador ou no Menu Iniciar.</li>
+        <li><span class="click-blue">Passo 02</span> — Clique duas vezes no ícone com o botão esquerdo do mouse.</li>
+        <li><span class="click-blue">Passo 03</span> — Na barra de endereços (onde aparece "Pesquisar ou digitar um endereço"), digite uma palavra, como <em>"notícias"</em>, e aperte Enter.</li>
+        <li><span class="click-blue">Passo 04</span> — Para abrir um site específico, digite o endereço completo, por exemplo <em>allneteducacao.com.br</em>, e aperte Enter.</li>
+      </ol>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">10</span> — "Google Chrome: o início da nossa jornada".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 4 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 4</span>
+      <h2>Mundo Google: como tudo começou</h2>
+    </div>
+    <div class="passo-body">
+      <p>A história do Google começa em 1996, quando dois estudantes de Stanford, Larry Page e Sergey Brin, criaram um mecanismo de busca chamado "Backrub". Em 1998, eles registraram a empresa "Google Inc." — o nome veio da palavra <em>"googol"</em>, um número enorme (1 seguido de 100 zeros), simbolizando a missão de organizar uma quantidade gigantesca de dados.</p>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">11</span> — "Mundo Google: como tudo começou".
+      </div>
+      <div class="quiz">
+        <h3>🤔 Teste você mesmo</h3>
+        <p>De onde vem o nome "Google"?</p>
+        <button class="quiz-toggle" onclick="this.nextElementSibling.classList.toggle('show')">Ver resposta</button>
+        <div class="quiz-resposta">Da palavra <strong>"googol"</strong>, o número 1 seguido de 100 zeros — representando a ideia de organizar uma quantidade gigantesca de informação.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 5 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 5</span>
+      <h2>Pesquisa simples no Google Chrome</h2>
+    </div>
+    <div class="passo-body">
+      <p>A barra de pesquisa do Chrome (Omnibox) já é integrada com Maps, Tradutor, e-mail e outros serviços do Google. Digite o nome de um lugar e, antes mesmo de apertar Enter, o Google já mostra um mapa ao lado. Clique na sugestão ou aperte Enter para abrir o Google Maps.</p>
+      <p>Lá você pode ver o endereço, telefone, site oficial, horário de funcionamento, redes sociais, avaliações e fotos de outros usuários.</p>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">11</span> — "Pesquisa simples no Google Chrome".
+      </div>
+      <div class="atividade">
+        <h3>✍️ Atividade</h3>
+        <p>Pesquise no Chrome pelo nome de uma unidade All Net da sua cidade (ou de um restaurante/lanchonete conhecido) e responda no livro, na página <span class="pag">12</span>:</p>
+        <p><strong>a)</strong> Compensa mais ir de transporte público ou de carro? Veja o horário de funcionamento do estabelecimento.<br>
+        <input class="campo-resposta" type="text" placeholder="Sua resposta..."></p>
+        <p><strong>b)</strong> Com base nas opiniões e fotos do local, você frequentaria ou consumiria nesse estabelecimento?<br>
+        <input class="campo-resposta" type="text" placeholder="Sua resposta..."></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 6 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 6</span>
+      <h2>Hands On — Comandos de busca do Google</h2>
+    </div>
+    <div class="passo-body">
+      <p>Com estes comandos você encontra exatamente o que precisa, de forma mais rápida e organizada:</p>
+      <table class="op-tabela">
+        <tr><th>Comando</th><th>O que faz</th><th>Exemplo</th></tr>
+        <tr><td><span class="op">" "</span></td><td>Busca exata</td><td>"curso de informática básico"</td></tr>
+        <tr><td><span class="op">-</span></td><td>Excluir termos</td><td>curso de informática -avançado</td></tr>
+        <tr><td><span class="op">+</span></td><td>Forçar inclusão</td><td>curso de informática +grátis</td></tr>
+        <tr><td><span class="op">site:</span></td><td>Pesquisar dentro de um site</td><td>curso de informática site:gov.br</td></tr>
+        <tr><td><span class="op">intitle:</span></td><td>Palavra no título da página</td><td>intitle:"curso de informática"</td></tr>
+        <tr><td><span class="op">inurl:</span></td><td>Palavra no link da página</td><td>inurl:informática</td></tr>
+        <tr><td><span class="op">filetype:</span></td><td>Encontrar arquivos (PDF, DOC, PPT)</td><td>apostila informática filetype:pdf</td></tr>
+        <tr><td><span class="op">related:</span></td><td>Sites semelhantes</td><td>related:mercadolivre.com.br</td></tr>
+        <tr><td><span class="op">define:</span></td><td>Significado de palavras</td><td>define: inteligência artificial</td></tr>
+        <tr><td><span class="op">before: / after:</span></td><td>Filtrar por data</td><td>tecnologia after:2021</td></tr>
+      </table>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">12</span> — "HANDS ON — Os comandos do sistema de busca Google".
+      </div>
+      <div class="atividade">
+        <h3>✍️ Mãos na massa</h3>
+        <p>Escolha 2 comandos da tabela acima e teste ao vivo no seu Chrome, pesquisando um assunto do seu interesse.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 7 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 7</span>
+      <h2>Afinal, o que é o ChatGPT?</h2>
+    </div>
+    <div class="passo-body">
+      <p>O ChatGPT é um modelo de linguagem baseado em Inteligência Artificial (IA), desenvolvido pela OpenAI. Ele consegue escrever textos, responder perguntas e sugerir ideias de forma autônoma, entendendo o contexto das palavras para dar respostas que fazem sentido.</p>
+      <p><strong>Pré-treinamento:</strong> o ChatGPT aprendeu lendo uma enorme quantidade de textos de livros, artigos e outros conteúdos — assim ele aprende padrões de linguagem, sintaxe e gramática.</p>
+      <p><strong>Ajuste fino:</strong> depois do pré-treinamento, o modelo é ajustado com a ajuda de pessoas, para melhorar suas respostas, ser mais educado e evitar erros.</p>
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">13-14</span> — "Afinal, o que é ChatGPT?", "Pré-treinamento" e "Ajuste fino".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 8 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 8</span>
+      <h2>Hands On — Minha primeira interação com o ChatGPT</h2>
+    </div>
+    <div class="passo-body">
+      <p>Acesse <strong>chatgpt.com</strong> e siga os passos:</p>
+      <ol class="passos">
+        <li><span class="click-blue">Passo 01</span> — Pergunte sobre um tema geral, como "O que é inteligência artificial?" e observe a resposta.</li>
+        <li><span class="click-blue">Passo 02</span> — Faça uma pergunta mais específica, como "Como a IA é usada no setor de saúde?" e veja como ele ajusta a resposta.</li>
+      </ol>
+      <p>Quanto mais informações e contexto você fornece, mais detalhada e ajustada será a resposta do ChatGPT.</p>
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">14-15</span> — "HANDS ON — Minha primeira interação com ChatGPT" e "Vamos analisar...".
+      </div>
+      <div class="quiz">
+        <h3>🤔 Teste você mesmo</h3>
+        <p>Por que uma pergunta mais detalhada gera uma resposta melhor do ChatGPT?</p>
+        <button class="quiz-toggle" onclick="this.nextElementSibling.classList.toggle('show')">Ver resposta</button>
+        <div class="quiz-resposta">Porque o ChatGPT ajusta a resposta com base no <strong>contexto</strong> — quanto mais informação você fornece na pergunta, mais específica e detalhada é a resposta.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 9 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 9</span>
+      <h2>Monetize: pesquisa de oportunidades de negócio</h2>
+    </div>
+    <div class="passo-body">
+      <p>O ChatGPT pode ser uma ferramenta poderosa para transformar conhecimento em oportunidades de negócio. A chave do sucesso não está em criar algo do zero, mas em entender o que o mercado já está pedindo e oferecer uma solução prática.</p>
+      <p><strong>Desafio:</strong> você foi contratado como consultor para ajudar um empreendedor iniciante a estruturar seu novo negócio, desde o plano de negócios até a gestão da equipe.</p>
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">16-17</span> — "MONETIZE", "Pesquisa de oportunidades de negócio" e "Planejamento de um novo negócio".
+      </div>
+      <div class="atividade">
+        <h3>✍️ Pesquisa avançada no Google</h3>
+        <p>Utilizando os comandos que você aprendeu, pesquise:</p>
+        <ol class="passos">
+          <li><strong>Curso de Capacitação</strong> — cursos gratuitos de gestão de projetos, online.</li>
+          <li><strong>Modelo de Plano de Negócios</strong> — um modelo em PDF, sem opções pagas.</li>
+          <li><strong>Tendências do Mercado</strong> — artigos confiáveis sobre marketing digital, com "estratégias" no título.</li>
+          <li><strong>Recursos Visuais</strong> — apresentações recentes sobre planejamento estratégico.</li>
+          <li><strong>Networking Profissional</strong> — sites semelhantes ao LinkedIn.</li>
+        </ol>
+      </div>
+      <div class="atividade">
+        <h3>✍️ Pesquisa através do ChatGPT</h3>
+        <p>Pergunte ao ChatGPT:</p>
+        <ul class="lista">
+          <li>"Quais são os produtos mais vendidos online atualmente?"</li>
+          <li>"Quais serviços estão em alta na minha cidade?"</li>
+          <li>"Quais são as maneiras de começar a empreender na internet?"</li>
+        </ul>
+        <p>Combine com pesquisas no Google para encontrar lacunas de mercado e criar soluções lucrativas.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 10 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 10</span>
+      <h2>Como está indo sua pesquisa?</h2>
+    </div>
+    <div class="passo-body">
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">18</span> — responda no livro:
+      </div>
+      <p><strong>1.</strong> Quais tendências ou nichos você encontrou usando o ChatGPT? Se tivesse que escolher uma ideia agora, qual seria o produto ou serviço que gostaria de desenvolver?<br>
+      <input class="campo-resposta" type="text" placeholder="Sua resposta..."></p>
+      <p><strong>2.</strong> Alguma ideia que você teve já existe no mercado? Como você poderia diferenciá-la para torná-la mais atrativa?<br>
+      <input class="campo-resposta" type="text" placeholder="Sua resposta..."></p>
+
+      <div class="atividade">
+        <h3>✍️ Criando Treinamentos</h3>
+        <p>Em dupla, prepare um pequeno treinamento de 3 minutos sobre como melhorar o negócio de uma empresa (ou um nicho de conhecimento) a partir do uso do ChatGPT. Enfatize os benefícios que um profissional ou empresa pode ter ao saber utilizar o ChatGPT.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 11 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 11</span>
+      <h2>Como monetizar seu conhecimento adquirido até aqui</h2>
+    </div>
+    <div class="passo-body">
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">18-19</span>
+      </div>
+      <p><strong>💰 Consultorias e Mentorias Online (Zoom, Google Meet, Microsoft Teams)</strong><br>
+      Ofereça sessões de treinamento personalizadas para empresas e profissionais autônomos — muitos negócios preferem orientação prática e personalizada para suas necessidades específicas.</p>
+
+      <p><strong>📱 Redes Sociais (Instagram, YouTube, TikTok, LinkedIn)</strong><br>
+      Use as redes para criar autoridade no assunto e promover seus serviços de treinamento e consultoria, atraindo potenciais clientes que nem sabiam que precisavam desse tipo de serviço.</p>
+
+      <p><strong>🎯 Consultoria para Influenciadores Digitais e Criadores de Conteúdo</strong><br>
+      Auxilie influenciadores a utilizar o ChatGPT para criar conteúdo mais rápido e interagir com seguidores de forma mais eficiente.</p>
+    </div>
+  </div>
+
+  <!-- ============ PARTE 2 ============ -->
+  <div class="separador-parte">
+    <div class="caixa">
+      <span class="num">2ª HORA · DEPOIS DO INTERVALO</span>
+      <h2>Aula 02 — Funcionalidades da conta Google e Gmail</h2>
+      <p>Livro: páginas 21 a 25</p>
+    </div>
+  </div>
+
+  <!-- PASSO 12 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 12</span>
+      <h2>Criando uma conta Google</h2>
+    </div>
+    <div class="passo-body">
+      <p>No navegador, digite: <strong>Criar uma conta no Google</strong>, e você será redirecionado para a página de login da Conta do Google. Clique em <strong>Criar conta</strong>. Vai facilitar muito se você já estiver conectado no navegador Google Chrome.</p>
+      <p>Com sua Conta do Google, você tem acesso a Gmail, Maps, Fotos, YouTube e muitos outros serviços — tudo personalizado para você, em qualquer lugar.</p>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">21</span> — "Então vamos lá... criando uma conta Google" e "Todo o Google trabalhando para você".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 13 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 13</span>
+      <h2>Problemas comuns ao criar a conta</h2>
+    </div>
+    <div class="passo-body">
+      <div class="alerta">
+        <strong>O nome de usuário já está sendo usado:</strong> tente variações, como adicionar números, pontos ou combinações de letras. Ex: "joaosilva2024@gmail.com" ou "joao.silva@gmail.com".
+      </div>
+      <div class="alerta">
+        <strong>Erro de idade:</strong> se a data de nascimento informada for menor que 13 anos, a conta pode ser bloqueada. É preciso informar uma data válida ou pedir a um responsável para criar a conta pelo Google Family Link.
+      </div>
+      <div class="alerta">
+        <strong>Telefone ou e-mail já associado a outra conta:</strong> use um número/e-mail diferente ou recupere a conta vinculada a esse dado.
+      </div>
+      <div class="alerta">
+        <strong>Código de verificação não recebido:</strong> confira se o número/e-mail está correto, veja a caixa de spam e aguarde alguns minutos antes de tentar de novo.
+      </div>
+      <div class="alerta">
+        <strong>Conta temporariamente bloqueada:</strong> acontece após muitas tentativas de criação em pouco tempo. Aguarde algumas horas e tente novamente.
+      </div>
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">21-22</span> — "Ops... Está tendo problemas em criar sua conta Google?"
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 14 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 14</span>
+      <h2>Escolhendo um bom nome de usuário</h2>
+    </div>
+    <div class="passo-body">
+      <p>Um e-mail bem escolhido evita problemas de credibilidade e facilita a identificação em situações formais:</p>
+      <ul class="lista">
+        <li><strong>Use um nome profissional:</strong> como "joao.silva@gmail.com" ou "maria.souza2024@gmail.com".</li>
+        <li><strong>Evite apelidos informais:</strong> e-mails como "gatinho123@gmail.com" podem não ser bem vistos em ambientes profissionais.</li>
+        <li><strong>Adicione números ou pontos, se necessário:</strong> como "joao.silva85@gmail.com".</li>
+        <li><strong>Evite excesso de caracteres e símbolos:</strong> nomes muito longos são difíceis de lembrar e digitar.</li>
+      </ul>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">22</span> — "Escolhendo um bom nome de usuário".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 15 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 15</span>
+      <h2>Hands On — Conhecendo a caixa de entrada</h2>
+    </div>
+    <div class="passo-body">
+      <p>Abra seu navegador e acesse <strong>gmail.com</strong>. Clique em <strong>Fazer login</strong> e insira seu e-mail e senha. Caso tenha mais de uma conta, clique na sua foto de perfil no canto superior direito e selecione <strong>Adicionar outra conta</strong> para alternar entre e-mails.</p>
+      <p>Organização da tela principal:</p>
+      <ul class="lista">
+        <li><strong>Caixa de Entrada</strong> — exibe seus e-mails recebidos.</li>
+        <li><strong>Estrela</strong> — permite marcar e-mails importantes.</li>
+        <li><strong>Rótulos</strong> — organizam e-mails por categorias.</li>
+        <li><strong>E-mails não lidos</strong> — aparecem em negrito, para fácil identificação.</li>
+        <li><strong>Ícones de ação</strong> — responder, arquivar, excluir.</li>
+      </ul>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">22</span> — "HANDS ON — Conhecendo a caixa de entrada".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 16 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 16</span>
+      <h2>Como marcar e-mails como importantes</h2>
+    </div>
+    <div class="passo-body">
+      <ul class="lista">
+        <li>Clique na <strong>estrela</strong> ao lado do e-mail que deseja destacar — ela ficará amarela indicando que o e-mail foi marcado como importante.</li>
+        <li>Utilize os <strong>rótulos</strong> para categorizar e organizar seus e-mails de acordo com temas ou prioridades.</li>
+        <li>Verifique se o e-mail está <strong>não lido</strong> (em negrito), facilitando a identificação de mensagens ainda não abertas.</li>
+        <li>Use os ícones de ação como <strong>Marcar como lido</strong>, <strong>Arquivar</strong>, <strong>Excluir</strong> ou <strong>Mover</strong> para outras pastas conforme a necessidade.</li>
+      </ul>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">23</span> — "Como marcar e-mails como importantes".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 17 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 17</span>
+      <h2>Enviando e-mails</h2>
+    </div>
+    <div class="passo-body">
+      <p><strong>Como escrever e enviar um e-mail:</strong></p>
+      <ol class="passos">
+        <li>Clique no botão <strong>Escrever</strong> para abrir a tela.</li>
+        <li>No campo <strong>Para</strong>, digite o e-mail do destinatário.</li>
+        <li>No campo <strong>Assunto</strong>, insira um título resumido.</li>
+        <li>No corpo do e-mail, escreva sua mensagem.</li>
+        <li>Clique em <strong>Enviar</strong>.</li>
+      </ol>
+      <p><strong>Como anexar arquivos e imagens:</strong></p>
+      <ol class="passos">
+        <li>Durante a escrita do e-mail, clique no ícone de <strong>clipe</strong> para anexar arquivos.</li>
+        <li>Para imagens, clique no ícone de foto e selecione uma do computador ou do Google Drive.</li>
+        <li>A imagem vai aparecer no corpo do texto do e-mail, já o arquivo anexado.</li>
+      </ol>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">23</span> — "Enviando e-mails".
+      </div>
+      <div class="atividade">
+        <h3>✍️ Mãos na massa</h3>
+        <p>Envie um e-mail de teste para um colega da turma, com assunto e uma pequena mensagem.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 18 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 18</span>
+      <h2>Gerenciando e-mails</h2>
+    </div>
+    <div class="passo-body">
+      <p><strong>Como responder e encaminhar mensagens:</strong></p>
+      <ol class="passos">
+        <li>Abra o e-mail recebido.</li>
+        <li>Para responder, clique em <strong>Responder</strong> e digite sua resposta.</li>
+        <li>Para encaminhar, clique em <strong>Encaminhar</strong> e insira o e-mail do destinatário.</li>
+        <li>Clique em <strong>Enviar</strong>.</li>
+      </ol>
+      <p><strong>Como excluir e-mails:</strong></p>
+      <ol class="passos">
+        <li>Selecione o e-mail na Caixa de Entrada.</li>
+        <li>Clique no ícone da lixeira para removê-lo.</li>
+        <li>Para excluir vários e-mails de uma vez, marque-os e clique na lixeira.</li>
+      </ol>
+      <div class="livro">
+        📖 <strong>Páginas</strong> <span class="pag">23-24</span> — "Gerenciando e-mails" e "Como excluir e-mails".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 19 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 19</span>
+      <h2>Diferenciando caixas de entrada</h2>
+    </div>
+    <div class="passo-body">
+      <p><strong>Caixa de Entrada Principal</strong><br>
+      Contém os e-mails mais importantes, geralmente de contatos conhecidos ou mensagens que exigem atenção prioritária. Inclui conversas, e-mails pessoais e trocas de mensagens diretas.</p>
+      <p><strong>Caixa de entrada Promoções</strong><br>
+      Armazena e-mails de ofertas, descontos, newsletters e campanhas de marketing — ajuda a manter a caixa principal livre de mensagens promocionais, mas sem perder oportunidades de ofertas e novidades.</p>
+      <p><strong>Caixa de entrada Atualizações</strong><br>
+      Contém notificações automáticas, como confirmações de compra, recibos, faturas e alertas de serviços usados.</p>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">24</span> — "Diferenciando caixas de entrada".
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSO 20 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 20</span>
+      <h2>Organizando e-mails com marcadores</h2>
+    </div>
+    <div class="passo-body">
+      <p>Marcadores funcionam como pastas inteligentes que ajudam você a classificar e localizar seus e-mails de maneira rápida e eficiente:</p>
+      <ul class="lista">
+        <li>Clique no sinal de <strong>"+"</strong> ao lado de Marcadores.</li>
+        <li>Digite um nome para a pasta e clique em <strong>Criar</strong>.</li>
+        <li>Para mover um e-mail para um marcador, arraste-o ou clique no ícone de etiquetas.</li>
+      </ul>
+      <p>Você pode separar suas mensagens por categorias, como Trabalho, Estudos, Pessoal, ou qualquer outro critério que faça sentido para sua rotina.</p>
+      <div class="livro">
+        📖 <strong>Página</strong> <span class="pag">24-25</span> — "Organizando e-mails com marcadores".
+      </div>
+      <div class="atividade">
+        <h3>✍️ Mãos na massa</h3>
+        <p>Crie um marcador chamado "Curso Informática" e mova um e-mail para dentro dele.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="encerramento">
+    <h2>🎉 Fim da aula de hoje!</h2>
+    <p>Hoje você aprendeu a navegar com confiança, pesquisar como um profissional, dar os primeiros passos com o ChatGPT e organizar sua conta Google e Gmail. Continue praticando em casa!</p>
+  </div>
+
+</main>
+
+</body>
+</html>
