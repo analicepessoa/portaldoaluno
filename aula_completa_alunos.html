@@ -190,7 +190,25 @@
     border-bottom:1px solid #E2E8F0;
     vertical-align:top;
   }
-  .op-tabela .op{
+  .op-detalhe{
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-left:4px solid var(--azul-claro);
+    border-radius:10px;
+    padding:12px 16px;
+    margin:12px 0;
+    font-size:14px;
+  }
+  .op-detalhe p{margin:6px 0 0; font-size:14px;}
+  .op-detalhe code{
+    background:#1E293B;
+    color:#93C5FD;
+    padding:2px 8px;
+    border-radius:6px;
+    font-family:monospace;
+    font-size:13px;
+  }
+  .op{
     font-family:monospace;
     background:#1E293B;
     color:#93C5FD;
@@ -348,25 +366,73 @@
     </div>
     <div class="passo-body">
       <p>Com estes comandos você encontra exatamente o que precisa, de forma mais rápida e organizada:</p>
-      <table class="op-tabela">
-        <tr><th>Comando</th><th>O que faz</th><th>Exemplo</th></tr>
-        <tr><td><span class="op">" "</span></td><td>Busca exata</td><td>"curso de informática básico"</td></tr>
-        <tr><td><span class="op">-</span></td><td>Excluir termos</td><td>curso de informática -avançado</td></tr>
-        <tr><td><span class="op">+</span></td><td>Forçar inclusão</td><td>curso de informática +grátis</td></tr>
-        <tr><td><span class="op">site:</span></td><td>Pesquisar dentro de um site</td><td>curso de informática site:gov.br</td></tr>
-        <tr><td><span class="op">intitle:</span></td><td>Palavra no título da página</td><td>intitle:"curso de informática"</td></tr>
-        <tr><td><span class="op">inurl:</span></td><td>Palavra no link da página</td><td>inurl:informática</td></tr>
-        <tr><td><span class="op">filetype:</span></td><td>Encontrar arquivos (PDF, DOC, PPT)</td><td>apostila informática filetype:pdf</td></tr>
-        <tr><td><span class="op">related:</span></td><td>Sites semelhantes</td><td>related:mercadolivre.com.br</td></tr>
-        <tr><td><span class="op">define:</span></td><td>Significado de palavras</td><td>define: inteligência artificial</td></tr>
-        <tr><td><span class="op">before: / after:</span></td><td>Filtrar por data</td><td>tecnologia after:2021</td></tr>
-      </table>
+
+      <div class="op-detalhe">
+        <span class="op">" "</span> <strong>Aspas — Busca exata</strong>
+        <p><strong>Para que serve:</strong> traz só páginas que têm exatamente aquela frase, na mesma ordem — ótimo quando o Google está trazendo resultados "parecidos" demais e você quer algo específico.</p>
+        <p><strong>Exemplo de uso:</strong> você quer a letra exata de uma música, não uma página falando sobre ela → <code>"deixa a vida me levar"</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">-</span> <strong>Sinal de menos — Excluir termos</strong>
+        <p><strong>Para que serve:</strong> remove da busca um assunto que está "poluindo" os resultados.</p>
+        <p><strong>Exemplo de uso:</strong> você quer notícias sobre "Java", a linguagem de programação, sem misturar com a ilha da Indonésia → <code>java -indonésia</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">+</span> <strong>Sinal de mais — Forçar inclusão</strong>
+        <p><strong>Para que serve:</strong> garante que uma palavra específica apareça nos resultados, mesmo que o Google normalmente ignore ela (como "de", "e", "a").</p>
+        <p><strong>Exemplo de uso:</strong> você só quer cursos que sejam gratuitos, e não qualquer curso → <code>curso de informática +grátis</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">site:</span> <strong>Pesquisar dentro de um site específico</strong>
+        <p><strong>Para que serve:</strong> busca só dentro de um site ou domínio, ignorando o resto da internet — ótimo pra achar informação oficial, sem cair em blogs duvidosos.</p>
+        <p><strong>Exemplo de uso:</strong> você quer saber sobre um programa do governo, só em sites oficiais → <code>auxílio brasil site:gov.br</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">intitle:</span> <strong>Palavra no título da página</strong>
+        <p><strong>Para que serve:</strong> mostra só páginas que têm aquela palavra no título — geralmente são páginas mais focadas naquele assunto.</p>
+        <p><strong>Exemplo de uso:</strong> você quer artigos que sejam realmente sobre receitas fit, não que só citem de passagem → <code>intitle:"receitas fitness"</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">inurl:</span> <strong>Palavra no link da página</strong>
+        <p><strong>Para que serve:</strong> filtra páginas que têm determinada palavra no próprio endereço (URL) — útil pra achar seções específicas de um site.</p>
+        <p><strong>Exemplo de uso:</strong> você quer achar a área de "contato" de vários sites → <code>inurl:contato informática</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">filetype:</span> <strong>Encontrar arquivos específicos (PDF, DOC, PPT)</strong>
+        <p><strong>Para que serve:</strong> filtra só arquivos de um determinado formato, direto — sem precisar abrir vários sites até achar um PDF.</p>
+        <p><strong>Exemplo de uso:</strong> você quer baixar uma apostila pronta em PDF sobre informática → <code>apostila informática filetype:pdf</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">related:</span> <strong>Encontrar sites semelhantes</strong>
+        <p><strong>Para que serve:</strong> mostra sites parecidos com um que você já conhece — ótimo pra pesquisar concorrentes ou alternativas.</p>
+        <p><strong>Exemplo de uso:</strong> você gosta de comprar no Mercado Livre e quer conhecer opções parecidas → <code>related:mercadolivre.com.br</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">define:</span> <strong>Buscar significado de palavras</strong>
+        <p><strong>Para que serve:</strong> mostra a definição de uma palavra ou termo direto na página de busca, sem precisar abrir um dicionário à parte.</p>
+        <p><strong>Exemplo de uso:</strong> você ouviu o termo "inteligência artificial" e quer o significado rápido → <code>define: inteligência artificial</code></p>
+      </div>
+
+      <div class="op-detalhe">
+        <span class="op">before: / after:</span> <strong>Filtrar por data</strong>
+        <p><strong>Para que serve:</strong> mostra só páginas publicadas antes ou depois de um determinado ano — ótimo pra achar informação atualizada, ou o contrário, evitar notícia velha.</p>
+        <p><strong>Exemplo de uso:</strong> você quer só notícias recentes sobre tecnologia, sem nada antigo → <code>tecnologia after:2021</code></p>
+      </div>
+
       <div class="livro">
         📖 <strong>Página</strong> <span class="pag">12</span> — "HANDS ON — Os comandos do sistema de busca Google".
       </div>
       <div class="atividade">
         <h3>✍️ Mãos na massa</h3>
-        <p>Escolha 2 comandos da tabela acima e teste ao vivo no seu Chrome, pesquisando um assunto do seu interesse.</p>
+        <p>Escolha 2 comandos acima e teste ao vivo no seu Chrome, pesquisando um assunto do seu interesse.</p>
       </div>
     </div>
   </div>

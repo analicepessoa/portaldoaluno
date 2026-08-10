@@ -113,11 +113,11 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 2</span>
-      <h2>Recapitulando seu projeto</h2>
+      <h2>A missão de hoje: criar um Agente de Prompts</h2>
     </div>
     <div class="passo-body">
-      <p>Na aula do Monetize, você pesquisou tendências de mercado, um modelo de plano de negócios, artigos sobre estratégias e até conversou com o ChatGPT sobre produtos e serviços em alta.</p>
-      <p>Hoje, tudo isso vira as fontes do seu notebook — e você vai poder consultar, resumir e até "conversar" com esse material sempre que precisar, sem se perder entre várias abas e arquivos.</p>
+      <p>Na aula do Monetize, você já pesquisou e conversou bastante com o ChatGPT sobre o seu negócio. Só que a qualidade da resposta de uma IA depende muito de como o pedido (o <strong>prompt</strong>) é escrito — um pedido solto e genérico gera uma resposta genérica.</p>
+      <p>Hoje você vai criar, dentro do NotebookLM, um <strong>Agente de Prompts</strong>: um caderno configurado para pegar qualquer ideia solta sua e transformar em um prompt técnico e detalhado, pronto pra colar no ChatGPT.</p>
     </div>
   </div>
 
@@ -125,14 +125,13 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 3</span>
-      <h2>Criando seu primeiro notebook</h2>
+      <h2>Criando o notebook do seu agente</h2>
     </div>
     <div class="passo-body">
       <ol class="passos">
         <li><span class="click-blue">Passo 01</span> — Acesse <strong>notebooklm.google.com</strong> e faça login com sua conta Google.</li>
         <li><span class="click-blue">Passo 02</span> — Clique em <strong>"Criar novo"</strong> (ou "Novo notebook").</li>
-        <li><span class="click-blue">Passo 03</span> — Dê um nome ao seu notebook, por exemplo: <em>"Meu Projeto de Negócio"</em>.</li>
-        <li><span class="click-blue">Passo 04</span> — Clique em <strong>"Adicionar fonte"</strong> e escolha o tipo: PDF, link, site, texto colado ou vídeo do YouTube.</li>
+        <li><span class="click-blue">Passo 03</span> — Dê um nome ao seu notebook: <em>"Meu Agente de Prompts"</em>.</li>
       </ol>
       <div class="recurso">
         🌐 <strong>Acesse:</strong> notebooklm.google.com
@@ -144,13 +143,26 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 4</span>
-      <h2>Subindo suas fontes de pesquisa</h2>
+      <h2>Adicionando a fonte-base do seu agente</h2>
     </div>
     <div class="passo-body">
-      <p>Quanto mais fontes de qualidade você subir, mais completo e confiável fica o seu "consultor documentado".</p>
-      <div class="atividade">
-        <h3>✍️ Atividade</h3>
-        <p>Reúna os materiais que você pesquisou na aula do Monetize (modelo de plano de negócios em PDF, artigos sobre tendências, apresentações etc.) e suba pelo menos <strong>3 fontes diferentes</strong> no seu notebook.</p>
+      <p>Todo agente precisa de uma base — vamos usar o texto abaixo como fonte, com as regras do que é um bom prompt:</p>
+      <ol class="passos">
+        <li><span class="click-blue">Passo 01</span> — No seu notebook, clique em <strong>"Adicionar fonte"</strong>.</li>
+        <li><span class="click-blue">Passo 02</span> — Escolha a opção de <strong>texto colado</strong> (copiar e colar).</li>
+        <li><span class="click-blue">Passo 03</span> — Copie o texto do quadro abaixo e cole como fonte.</li>
+      </ol>
+      <div class="recurso">
+        📋 <strong>Copie este texto e cole como fonte:</strong><br><br>
+        <em>
+        Guia de Boas Práticas para Criar Prompts Técnicos<br><br>
+        Um bom prompt costuma ter 4 partes:<br>
+        1. Contexto — quem está pedindo, para quem é, em que situação.<br>
+        2. Tarefa clara — o que exatamente a IA deve fazer.<br>
+        3. Formato de saída — como a resposta deve vir (lista, tabela, texto corrido, tamanho aproximado).<br>
+        4. Restrições — o que evitar, tom de voz, público-alvo.<br><br>
+        Pedidos genéricos como "fale sobre marketing" geram respostas genéricas. Pedidos com contexto, tarefa clara e formato definido geram respostas muito mais úteis e específicas.
+        </em>
       </div>
     </div>
   </div>
@@ -159,19 +171,15 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 5</span>
-      <h2>Conversando com suas fontes</h2>
+      <h2>Configurando as instruções do seu agente</h2>
     </div>
     <div class="passo-body">
-      <p>Depois de subir os materiais, o NotebookLM processa tudo e libera um chat. Experimente perguntar:</p>
-      <ul class="lista">
-        <li>"Quais são as principais tendências de mercado que aparecem nas minhas fontes?"</li>
-        <li>"Resuma o modelo de plano de negócios que eu subi."</li>
-        <li>"Quais oportunidades essas fontes sugerem para o meu nicho?"</li>
-      </ul>
-      <p>Toda resposta vem com uma <strong>citação numerada</strong>, mostrando exatamente de qual fonte e de qual trecho ela tirou a informação. Clique na citação para conferir.</p>
-      <div class="atividade">
-        <h3>✍️ Mãos na massa</h3>
-        <p>Faça pelo menos <strong>2 perguntas</strong> ao chat do seu notebook sobre o seu projeto de negócio.</p>
+      <p>Agora vamos ensinar o notebook a se comportar como um agente. Procure a opção de <strong>personalizar respostas</strong> do caderno (pode aparecer como um ícone de engrenagem ou "Configurações do notebook").</p>
+      <div class="recurso">
+        📋 <strong>Copie este texto e cole nas instruções personalizadas:</strong><br><br>
+        <em>
+        Toda vez que eu enviar uma ideia solta, transforme em um prompt técnico e detalhado, seguindo os princípios do Guia de Boas Práticas de Prompt disponível nas fontes. O prompt final deve ter contexto, tarefa clara, formato de saída esperado e restrições, quando fizer sentido. Devolva só o prompt pronto, sem explicações extras.
+        </em>
       </div>
     </div>
   </div>
@@ -180,14 +188,20 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 6</span>
-      <h2>Recursos automáticos</h2>
+      <h2>Testando seu agente</h2>
     </div>
     <div class="passo-body">
+      <p>Agora é hora de testar! Envie uma ideia solta no chat do seu notebook, como uma dessas:</p>
       <ul class="lista">
-        <li><strong>Resumo automático:</strong> assim que você sobe as fontes, o NotebookLM já gera um resumo geral do conteúdo.</li>
-        <li><strong>Perguntas sugeridas:</strong> ele sugere perguntas prontas com base no material — ótimo pra quem não sabe por onde começar.</li>
-        <li><strong>Guia de estudo / FAQ:</strong> gera perguntas e respostas automáticas sobre o conteúdo das fontes.</li>
+        <li>"Quero um prompt pra pedir um plano de divulgação pro meu negócio."</li>
+        <li>"Quero um prompt pra pedir uma análise dos meus concorrentes."</li>
+        <li>"Quero um prompt pra criar um cronograma dos primeiros 30 dias do meu negócio."</li>
       </ul>
+      <p>Veja o prompt detalhado que o agente devolve — repare como ele já vem com contexto, tarefa clara e formato definido.</p>
+      <div class="atividade">
+        <h3>✍️ Mãos na massa</h3>
+        <p>Envie <strong>2 ideias soltas</strong> relacionadas ao seu projeto de negócio para o seu agente e guarde os prompts que ele gerar.</p>
+      </div>
     </div>
   </div>
 
@@ -195,27 +209,10 @@
   <div class="passo">
     <div class="passo-header">
       <span class="badge">PASSO 7</span>
-      <h2>Hands On — Audio Overview: o podcast do seu negócio</h2>
+      <h2>Fechando o ciclo: usando o prompt no ChatGPT</h2>
     </div>
     <div class="passo-body">
-      <p>Um dos recursos mais impressionantes do NotebookLM: ele transforma todas as suas fontes em um podcast, com duas vozes de IA conversando e explicando o conteúdo como um programa de rádio.</p>
-      <ol class="passos">
-        <li><span class="click-blue">Passo 01</span> — No seu notebook, procure o recurso <strong>"Audio Overview"</strong> (Visão geral em áudio).</li>
-        <li><span class="click-blue">Passo 02</span> — Clique em gerar — pode levar alguns minutos.</li>
-        <li><span class="click-blue">Passo 03</span> — Ouça o resultado: é uma forma diferente e mais leve de revisar tudo que você pesquisou sobre o seu negócio.</li>
-      </ol>
-    </div>
-  </div>
-
-  <!-- PASSO 8 -->
-  <div class="passo">
-    <div class="passo-header">
-      <span class="badge">PASSO 8</span>
-      <h2>Por que isso é um diferencial pro seu negócio</h2>
-    </div>
-    <div class="passo-body">
-      <p>Imagine usar essa mesma técnica com um cliente de consultoria: em vez de dar respostas genéricas, você sobe os documentos reais da empresa dele (contratos, relatórios, planilhas) e usa o NotebookLM para responder só com base naquele material — sempre com a fonte citada. É uma forma de agregar valor e mostrar profissionalismo desde já.</p>
-
+      <p>Pegue um dos prompts que seu agente gerou e cole direto no <strong>chatgpt.com</strong>. Compare a resposta com o que você conseguiria pedindo direto, sem o agente — a diferença de qualidade mostra o valor de um bom prompt.</p>
       <div class="quiz">
         <h3>🤔 Teste você mesmo</h3>
         <p>Qual a principal diferença entre o ChatGPT e o NotebookLM?</p>
@@ -225,9 +222,20 @@
     </div>
   </div>
 
+  <!-- PASSO 8 -->
+  <div class="passo">
+    <div class="passo-header">
+      <span class="badge">PASSO 8</span>
+      <h2>Bônus: personalizando a capa do seu caderno</h2>
+    </div>
+    <div class="passo-body">
+      <p>Se sobrar tempo, procure a opção de personalizar a capa (banner) do seu notebook — deixa seu Agente de Prompts com a sua cara.</p>
+    </div>
+  </div>
+
   <div class="encerramento">
     <h2>🎯 Missão da aula</h2>
-    <p>Ao final de hoje, seu notebook do projeto de negócio deve estar pronto, com pelo menos 3 fontes carregadas e pelo menos 2 perguntas já respondidas pelo chat.</p>
+    <p>Ao final de hoje, seu Agente de Prompts deve estar pronto: com a fonte do guia adicionada, as instruções configuradas, e pelo menos 2 prompts gerados e testados no ChatGPT.</p>
   </div>
 
 </main>
