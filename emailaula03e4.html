@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-mails Profissionais e Presença Digital — Material do Aluno</title>
+<style>
+  :root{
+    --azul:#1e3a8a; --azul-claro:#3b82f6; --laranja:#f97316;
+    --verde:#16a34a; --verde-claro:#dcfce7; --roxo:#7c3aed; --roxo-claro:#ede9fe;
+    --cinza:#f3f4f6; --texto:#1f2937;
+  }
+  *{box-sizing:border-box;}
+  body{ font-family:'Segoe UI',Arial,sans-serif; margin:0; background:#fafafa; color:var(--texto); line-height:1.6; }
+  .hero{ background:linear-gradient(135deg,var(--azul) 0%,#172554 100%); color:#fff; padding:36px 24px; text-align:center; }
+  .hero .badge{ display:inline-block; background:var(--laranja); color:#fff; padding:6px 18px; border-radius:20px; font-weight:700; font-size:13px; letter-spacing:1px; margin-bottom:12px; }
+  .hero h1{ margin:0 0 8px; font-size:1.9em; }
+  .hero p{ margin:4px 0 0; opacity:.9; }
+  .container{ max-width:880px; margin:0 auto; padding:24px 20px 60px; }
+  .fonte-livro{ background:#fff; border:2px solid var(--azul); border-radius:12px; padding:16px 20px; margin-bottom:28px; font-size:.95em; }
+  .fonte-livro table{ width:100%; border-collapse:collapse; }
+  .fonte-livro td{ padding:5px 8px; border-bottom:1px solid #eee; }
+  .fonte-livro td.pag{ text-align:right; font-weight:700; color:var(--laranja); white-space:nowrap; }
+  .fonte-livro td.extra{ text-align:right; font-weight:700; color:var(--roxo); white-space:nowrap; font-size:.85em; }
+  .parte-titulo{ background:var(--azul); color:#fff; padding:14px 22px; border-radius:12px 12px 0 0; margin-top:38px; font-size:1.25em; font-weight:800; }
+  .parte-corpo{ border:2px solid var(--azul); border-top:none; border-radius:0 0 12px 12px; padding:6px 22px 22px; }
+  .topico{ margin:26px 0; }
+  .topico-header{ display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+  .topico-header h3{ margin:0; color:var(--azul); font-size:1.1em; }
+  .pag-tag{ background:var(--cinza); color:#555; font-size:.75em; font-weight:700; padding:3px 10px; border-radius:12px; border:1px solid #ddd; }
+  .nivel-tag{ font-size:.72em; font-weight:800; padding:3px 10px; border-radius:12px; letter-spacing:.5px; }
+  .nivel-essencial{ background:var(--verde-claro); color:var(--verde); border:1px solid var(--verde); }
+  .nivel-aprofundamento{ background:var(--roxo-claro); color:var(--roxo); border:1px solid var(--roxo); }
+  .box{ border-radius:10px; padding:14px 18px; margin:10px 0; }
+  .box-passo{ background:#fff7ed; border-left:5px solid var(--laranja); }
+  .box-passo .titulo{ font-weight:800; color:var(--laranja); margin-bottom:6px; }
+  .box-dica{ background:var(--verde-claro); border-left:5px solid var(--verde); }
+  .box-dica .titulo{ font-weight:800; color:var(--verde); margin-bottom:6px; }
+  .box-atencao{ background:#fef2f2; border-left:5px solid #dc2626; }
+  .box-atencao .titulo{ font-weight:800; color:#dc2626; margin-bottom:6px; }
+  .box-explicacao{ background:#eff6ff; border-left:5px solid var(--azul-claro); }
+  .box-explicacao .titulo{ font-weight:800; color:var(--azul); margin-bottom:6px; }
+  ol.checklist, ul.checklist{ margin:8px 0; padding-left:20px; }
+  ol.checklist li, ul.checklist li{ margin-bottom:6px; }
+  .prompt-box{ background:#0f172a; color:#e2e8f0; border-radius:10px; padding:14px; font-family:'Courier New',monospace; font-size:.88em; margin:10px 0; white-space:pre-wrap; }
+  .plataforma-card{ display:flex; gap:12px; align-items:flex-start; background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:10px 14px; margin:8px 0; }
+  .plataforma-card .nome{ font-weight:800; color:var(--azul); min-width:110px; }
+  .plataforma-card .pag{ margin-left:auto; font-size:.75em; color:#999; white-space:nowrap; }
+  .exemplo-golpe{ background:#fff; border:2px dashed #dc2626; border-radius:10px; padding:14px 16px; margin:12px 0; font-family:monospace; font-size:.88em; }
+  .exemplo-golpe .rotulo{ font-family:'Segoe UI',Arial,sans-serif; font-weight:800; color:#dc2626; margin-bottom:8px; }
+  .anotacoes{ margin-top:40px; background:#fff; border:2px dashed #ccc; border-radius:12px; padding:20px; }
+  .anotacoes h2{ color:var(--azul); margin-top:0; }
+  .linha{ border:none; border-bottom:1px solid #ccc; margin:22px 0; }
+  .resumo-final{ background:linear-gradient(135deg,var(--laranja) 0%,#ea580c 100%); color:#fff; border-radius:14px; padding:22px; margin-top:36px; }
+  .resumo-final h2{ margin-top:0; }
+  @media(max-width:600px){ .hero h1{ font-size:1.4em; } .plataforma-card{ flex-direction:column; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="badge">MATERIAL DO ALUNO</span>
+  <h1>E-mails Profissionais e Presença Digital para Emprego</h1>
+  <p>Baseado no livro <b>Informática 5.0: EmpreTech</b> (pág. 27–39) + conteúdo extra de segurança, IA e privacidade</p>
+</div>
+
+<div class="container">
+
+  <div class="fonte-livro">
+    <b>📖 Onde encontrar cada assunto:</b>
+    <table>
+      <tr><td>Tipos de e-mail</td><td class="pag">livro, pág. 27</td></tr>
+      <tr><td>Pedindo e-mails prontos ao ChatGPT</td><td class="pag">livro, pág. 28</td></tr>
+      <tr><td>IA dentro do próprio Gmail (Gemini)</td><td class="extra">conteúdo extra</td></tr>
+      <tr><td>Enviando para vários destinatários (Cc e Cco)</td><td class="pag">livro, pág. 28</td></tr>
+      <tr><td>Inserindo e gerenciando anexos</td><td class="pag">livro, pág. 28–29</td></tr>
+      <tr><td>Boas práticas para envio de anexos</td><td class="pag">livro, pág. 30</td></tr>
+      <tr><td>Segurança contra golpes por e-mail</td><td class="extra">conteúdo extra</td></tr>
+      <tr><td>Importância da presença digital</td><td class="pag">livro, pág. 33</td></tr>
+      <tr><td>Criando perfis em sites de vaga</td><td class="pag">livro, pág. 33–34</td></tr>
+      <tr><td>LinkedIn Jobs</td><td class="pag">livro, pág. 34–35</td></tr>
+      <tr><td>Indeed</td><td class="pag">livro, pág. 35–36</td></tr>
+      <tr><td>Glassdoor</td><td class="pag">livro, pág. 36</td></tr>
+      <tr><td>InfoJobs</td><td class="pag">livro, pág. 37</td></tr>
+      <tr><td>Vagas.com e Gupy</td><td class="pag">livro, pág. 37–38</td></tr>
+      <tr><td>Privacidade e pegada digital</td><td class="extra">conteúdo extra</td></tr>
+    </table>
+  </div>
+
+  <!-- ===================== PARTE 1 ===================== -->
+  <div class="parte-titulo">📧 Parte 1 — Gerenciando E-mails</div>
+  <div class="parte-corpo">
+
+    <div class="topico">
+      <div class="topico-header"><h3>Tipos de e-mail</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 27</span></div>
+      <p>Antes de escrever, pergunte-se: <b>"o que eu quero que a pessoa faça depois de ler isso?"</b> No livro você encontra 10 tipos de e-mail; os 5 mais usados no dia a dia são:</p>
+      <ol class="checklist">
+        <li><b>Boas-vindas / Apresentação</b> — se apresentar a um novo contato</li>
+        <li><b>Reunião</b> — convocar, confirmar ou remarcar</li>
+        <li><b>Follow-up</b> — cobrar algo com educação, lembrar de um pendente</li>
+        <li><b>Solicitação</b> — pedir um documento, informação ou aprovação</li>
+        <li><b>Confirmação</b> — confirmar que recebeu ou que algo foi feito</li>
+      </ol>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Peça o e-mail pronto pro ChatGPT</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 28</span></div>
+      <p>Use este prompt sempre que precisar escrever um e-mail corporativo:</p>
+      <div class="prompt-box">Crie um modelo de e-mail corporativo para a seguinte situação: [descreva sua situação].
+O e-mail deve ser formal, objetivo e incluir:
+- Saudação apropriada
+- Introdução clara e direta
+- Corpo do e-mail com informações essenciais
+- Fechamento profissional com call to action (se aplicável)
+- Assinatura padrão</div>
+      <div class="box box-dica">
+        <div class="titulo">💡 Dica</div>
+        Sempre revise o texto gerado — confira nomes, datas e valores antes de enviar.
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>IA dentro do próprio Gmail: o Gemini</h3><span class="nivel-tag nivel-aprofundamento">APROFUNDAMENTO</span></div>
+      <div class="box box-explicacao">
+        <div class="titulo">🤖 O que é isso?</div>
+        Você não precisa sempre abrir outra aba pra usar IA — o próprio Gmail já vem com uma IA embutida chamada <b>Gemini</b>. Ela aparece direto na tela onde você escreve o e-mail, sem precisar copiar e colar de outro site.
+      </div>
+      <ul class="checklist">
+        <li><b>"Ajude-me a escrever" (Help me write):</b> ao compor um e-mail, procure o ícone de estrelinha/caneta. Clique, descreva o que quer dizer em poucas palavras (ex: "avisar que vou chegar 10 minutos atrasado") e o Gemini escreve o rascunho ali mesmo, dentro do e-mail.</li>
+        <li><b>Resumir uma conversa longa:</b> quando uma troca de e-mails (thread) tem muitas mensagens, aparece um botão para "resumir" no topo da conversa — ótimo pra quem chegou depois e precisa se atualizar rápido, sem ler tudo.</li>
+        <li><b>Resposta inteligente (Smart Reply):</b> embaixo de um e-mail recebido, aparecem sugestões de resposta curta, tipo "Ok, obrigado!" ou "Vou verificar e retorno". Um clique já responde, sem precisar digitar.</li>
+        <li><b>Agendar envio:</b> em vez de clicar direto em "Enviar", clique na setinha ao lado do botão e escolha "Agendar envio". Você escolhe o dia e a hora — útil para não mandar um e-mail de trabalho de madrugada ou no fim de semana.</li>
+        <li><b>Filtros e marcadores:</b> permitem criar uma "regra automática" — por exemplo, todo e-mail de um remetente específico já cai direto numa pasta/marcador, sem você precisar organizar manualmente todo dia.</li>
+        <li><b>Cancelar inscrição com segurança:</b> quando você recebe newsletter ou propaganda que não quer mais, o Gmail mostra um botão próprio de "Cancelar inscrição" no topo do e-mail. Clicar nesse botão do Gmail é seguro. <b>Cuidado diferente:</b> links de "descadastre-se" escritos dentro do corpo de e-mails desconhecidos podem ser golpe — veja o próximo tópico.</li>
+      </ul>
+      <div class="box box-dica">
+        <div class="titulo">💡 Pra praticar em casa</div>
+        Abra um e-mail antigo qualquer na sua caixa e tente usar o "Ajude-me a escrever" pra responder. Não tem erro — é só testar.
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Cc e Cco</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 28</span></div>
+      <div class="plataforma-card"><div class="nome">Cc</div><div>Todo mundo vê quem está nesse campo. Use para quem precisa <b>saber</b> mas não precisa <b>agir</b>.</div></div>
+      <div class="plataforma-card"><div class="nome">Cco</div><div>Ninguém vê quem está nesse campo. Se alguém responder "Para todos", quem está em Cco <b>não recebe</b> a resposta.</div></div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Inserindo anexos</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 28–29</span></div>
+      <ul class="checklist">
+        <li><b>Tamanho máximo:</b> até 25MB direto no e-mail; acima disso, o Gmail usa o Google Drive automaticamente</li>
+        <li><b>Vários anexos:</b> clique no ícone de clipe e selecione mais de um arquivo</li>
+        <li><b>Formatos suportados:</b> PDF, Word, Excel, imagens (JPEG, PNG, GIF), vídeos, áudios — mas não arquivos executáveis (.exe)</li>
+        <li><b>Pré-visualização:</b> dá pra ver o conteúdo de muitos anexos sem precisar abri-los</li>
+      </ul>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Boas práticas para envio de anexos</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 30</span></div>
+      <ol class="checklist">
+        <li><b>Verifique o formato:</b> prefira PDF ou JPEG, que são universais</li>
+        <li><b>Nomeie de forma clara:</b> "Curriculo_Joao_Silva.pdf" em vez de "documento1.pdf"</li>
+        <li><b>Confira se anexou de fato</b> antes de clicar em "Enviar"</li>
+      </ol>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Segurança: identificando e-mail de golpe (phishing)</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span></div>
+      <div class="box box-explicacao">
+        <div class="titulo">🎣 O que é phishing?</div>
+        É um e-mail falso, disfarçado de mensagem de banco, empresa conhecida ou até de alguém que você confia, com o objetivo de te enganar pra roubar dados ou dinheiro. O nome vem de "pescar" (fishing) — o golpista joga a isca e espera alguém morder.
+      </div>
+      <p><b>5 sinais de alerta para observar sempre:</b></p>
+      <ol class="checklist">
+        <li><b>Remetente estranho:</b> o endereço de e-mail não bate com o nome da empresa. Um banco de verdade não manda e-mail de um endereço tipo "suporte@ita-seguranca123.net"</li>
+        <li><b>Urgência forçada:</b> "sua conta será bloqueada em 24 horas", "clique agora ou você perde o acesso" — golpistas criam pressa pra você não pensar direito</li>
+        <li><b>Erros de português ou formatação estranha:</b> empresas sérias revisam seus e-mails; erro de digitação constante é sinal de alerta</li>
+        <li><b>Pedido de dados sensíveis:</b> senha, número completo do cartão, código de verificação recebido por SMS — bancos e empresas sérias <b>nunca</b> pedem isso por e-mail</li>
+        <li><b>Link suspeito:</b> sem clicar, deixe o mouse (ou o dedo, no celular, sem soltar) sobre o link — aparece o endereço real embaixo. Se for diferente do que o texto promete, é golpe</li>
+      </ol>
+      <div class="exemplo-golpe">
+        <div class="rotulo">📧 Exemplo de e-mail de golpe (para identificar os sinais):</div>
+        De: Banco Seguro &lt;suporte@bancoseguro-verificacao.net&gt;<br>
+        Assunto: URGENTE!! Sua conta será BLOQUEADA em 24 horas<br><br>
+        Prezado cliente,<br>
+        Detectamos uma atividade suspeita em sua conta. Para evitar o bloqueio definitivo, clique no link abaixo e confirme sua senha e os dados do seu cartão imediatamente.<br>
+        [CONFIRMAR AGORA]
+      </div>
+      <div class="box box-dica">
+        <div class="titulo">💡 Atividade</div>
+        No exemplo acima, quantos dos 5 sinais de alerta você consegue apontar? (Resposta: remetente estranho, urgência forçada, pedido de senha/cartão, link disfarçado — praticamente todos!)
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Verificação em duas etapas (2FA)</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span></div>
+      <div class="box box-explicacao">
+        <div class="titulo">🔐 Explicando com uma analogia</div>
+        Pense na verificação em duas etapas como <b>duas fechaduras na porta de casa</b>. A senha é a primeira chave. O código que chega no seu celular é a segunda chave. Mesmo se alguém descobrir sua senha, essa pessoa não consegue entrar na sua conta sem a segunda chave — que só chega no seu celular.
+      </div>
+      <div class="box box-passo">
+        <div class="titulo">👉 Como ativar no Gmail</div>
+        <ol class="checklist">
+          <li>Acesse as <b>Configurações</b> da sua Conta Google</li>
+          <li>Vá em <b>Segurança</b></li>
+          <li>Procure <b>"Verificação em duas etapas"</b> e clique em ativar</li>
+          <li>Siga o passo a passo do Google, informando seu número de celular</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Recebi um e-mail pedindo senha ou dados bancários — e agora?</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span></div>
+      <ol class="checklist">
+        <li><b>Não clique</b> em nenhum link do e-mail</li>
+        <li><b>Não responda</b> a mensagem</li>
+        <li><b>Verifique direto</b> no site oficial ou no aplicativo do banco — nunca pelo link do e-mail</li>
+        <li><b>Denuncie como phishing</b> — o próprio Gmail tem essa opção no menu de três pontinhos do e-mail</li>
+        <li><b>Se já clicou e forneceu dados:</b> troque a senha imediatamente e entre em contato com o banco</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <!-- ===================== PARTE 2 ===================== -->
+  <div class="parte-titulo">💼 Parte 2 — Presença Digital e Recrutamento</div>
+  <div class="parte-corpo">
+
+    <div class="topico">
+      <div class="topico-header"><h3>Por que a presença digital importa</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 33</span></div>
+      <p>Ter um perfil ativo e bem construído em plataformas de recrutamento pode ser o diferencial que abre portas — muitas empresas concentram os processos seletivos nesses ambientes.</p>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Checklist para criar seu perfil</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 33–34</span></div>
+      <ol class="checklist">
+        <li><b>Perfil completo:</b> nome, cargo desejado, experiência, formação e habilidades</li>
+        <li><b>Foto profissional:</b> nada de selfie — fundo neutro, roupa adequada ao setor</li>
+        <li><b>Palavras-chave estratégicas:</b> use termos da sua área ("gestão de projetos", "análise de dados") — os sistemas ATS filtram currículos por elas</li>
+        <li><b>Título chamativo:</b> em vez de "Analista de Marketing", prefira "Especialista em Marketing Digital | SEO e Mídias Pagas"</li>
+        <li><b>Ative alertas de vagas</b> compatíveis com seu perfil</li>
+      </ol>
+      <p>Para o resumo profissional (3 a 5 frases), use este prompt:</p>
+      <div class="prompt-box">Me ajude a escrever um resumo profissional de 3 a 5 frases para meu perfil.
+Minha experiência: [conte sua experiência]
+Minhas habilidades: [liste 3 a 5 habilidades]
+O que me diferencia: [conte o que te diferencia]</div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>As plataformas</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span><span class="pag-tag">livro, pág. 34–38</span></div>
+      <div class="plataforma-card"><div class="nome">LinkedIn</div><div>Rede profissional fundada em 2002. Mais de 774 milhões de usuários. Forte em networking e visibilidade para recrutadores.</div><div class="pag">pág. 34–35</div></div>
+      <div class="plataforma-card"><div class="nome">Indeed</div><div>Fundado em 2004. Um dos maiores agregadores de vagas do mundo, presente em mais de 60 países.</div><div class="pag">pág. 35–36</div></div>
+      <div class="plataforma-card"><div class="nome">Glassdoor</div><div>Fundado em 2007. Traz avaliações de empresas, salários e experiências de entrevista — bom para pesquisar antes de se candidatar.</div><div class="pag">pág. 36</div></div>
+      <div class="plataforma-card"><div class="nome">InfoJobs</div><div>Lançado em 2004. Popular no Brasil, Espanha e Itália. Publicação de vagas e banco de currículos.</div><div class="pag">pág. 37</div></div>
+      <div class="plataforma-card"><div class="nome">Vagas.com</div><div>Fundado em 1999. Uma das principais plataformas de recrutamento do Brasil, gratuita para candidatos.</div><div class="pag">pág. 37–38</div></div>
+      <div class="plataforma-card"><div class="nome">Gupy</div><div>Plataforma brasileira, muito usada por empresas de médio e grande porte em processos seletivos.</div><div class="pag">pág. 38</div></div>
+    </div>
+
+  </div>
+
+  <!-- ===================== PARTE 3 ===================== -->
+  <div class="parte-titulo">🔒 Parte 3 — Privacidade e Pegada Digital</div>
+  <div class="parte-corpo">
+
+    <div class="topico">
+      <div class="topico-header"><h3>O que é "pegada digital"</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span></div>
+      <div class="box box-explicacao">
+        <div class="titulo">👣 Explicando o conceito</div>
+        Pegada digital é o rastro que você deixa online: tudo que posta, curte e comenta fica registrado e pode ser visto por outras pessoas — inclusive por quem está avaliando você para uma vaga de emprego.
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>O que os recrutadores veem além do LinkedIn</h3><span class="nivel-tag nivel-essencial">ESSENCIAL</span></div>
+      <p>Cada vez mais empresas pesquisam o nome do candidato no Google e olham o Instagram e o Facebook público antes de decidir contratar.</p>
+      <div class="box box-passo">
+        <div class="titulo">👉 Teste rápido</div>
+        Pesquise seu próprio nome no Google agora e veja o que aparece na primeira página de resultados. Foi o que você esperava?
+      </div>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Ajustando privacidade no Facebook</h3><span class="nivel-tag nivel-aprofundamento">APROFUNDAMENTO</span></div>
+      <ol class="checklist">
+        <li>Vá em <b>Configurações</b> → <b>Privacidade</b></li>
+        <li>Escolha quem pode ver suas publicações futuras (recomendado: "Amigos")</li>
+        <li>Use a opção "Limitar publicações passadas" para restringir postagens antigas de uma vez só</li>
+      </ol>
+    </div>
+
+    <div class="topico">
+      <div class="topico-header"><h3>Ajustando privacidade no Instagram</h3><span class="nivel-tag nivel-aprofundamento">APROFUNDAMENTO</span></div>
+      <ol class="checklist">
+        <li>Vá em <b>Configurações</b> → <b>Privacidade da conta</b></li>
+        <li>Decida entre <b>conta privada</b> (só seguidores aprovados veem) ou pública</li>
+        <li>Revise quem pode comentar em suas publicações</li>
+      </ol>
+      <div class="box box-dica">
+        <div class="titulo">💡 Não existe certo ou errado</div>
+        Não é sobre esconder tudo — é sobre decidir <b>de propósito</b> o que fica público e o que fica só para conhecidos.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="anotacoes">
+    <h2>📝 Faça suas anotações aqui</h2>
+    <hr class="linha"><hr class="linha"><hr class="linha"><hr class="linha">
+    <hr class="linha"><hr class="linha"><hr class="linha"><hr class="linha">
+  </div>
+
+  <div class="resumo-final">
+    <h2>🎯 O que aprendemos hoje</h2>
+    <ul class="checklist">
+      <li>Escrever e-mails profissionais com ajuda do ChatGPT e do Gemini dentro do Gmail</li>
+      <li>Usar Cc e Cco corretamente</li>
+      <li>Anexar arquivos com nome e formato adequados</li>
+      <li>Identificar e-mails de golpe (phishing) e ativar a verificação em duas etapas</li>
+      <li>Montar ou atualizar um perfil numa plataforma de vagas</li>
+      <li>Entender o que fica visível da nossa pegada digital e ajustar a privacidade</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
