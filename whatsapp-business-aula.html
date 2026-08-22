@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Business & Segurança na Internet — Aula Prática</title>
+<style>
+  :root{
+    --royal: #1a3aad;
+    --royal-dark: #10225c;
+    --orange: #ff7a1a;
+    --orange-light: #ffe4cc;
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --ink: #1b2233;
+    --muted: #5b6478;
+    --success: #1e8e5a;
+    --success-bg: #e6f6ee;
+    --danger: #c92a2a;
+    --danger-bg: #fdeaea;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height:1.55;
+    padding-bottom:60px;
+  }
+  header.top{
+    background: linear-gradient(120deg, var(--royal) 0%, var(--royal-dark) 100%);
+    color:#fff;
+    padding: 36px 20px 44px;
+    text-align:center;
+  }
+  header.top h1{
+    margin:0 0 8px;
+    font-size: clamp(20px, 4vw, 32px);
+  }
+  header.top p{
+    margin:0;
+    opacity:.9;
+    font-size: 15px;
+  }
+  .container{
+    max-width: 900px;
+    margin: -22px auto 0;
+    padding: 0 16px;
+  }
+  .passo{
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(16,34,92,.08);
+    padding: 26px 24px;
+    margin-bottom: 22px;
+  }
+  .passo-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background: var(--orange);
+    color:#fff;
+    font-weight:700;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .passo-badge.dark{ background: var(--royal-dark); }
+  .passo h2{
+    margin: 0 0 10px;
+    color: var(--royal-dark);
+    font-size: 21px;
+  }
+  .passo h3{
+    color: var(--royal-dark);
+    font-size: 16.5px;
+    margin: 18px 0 8px;
+  }
+  .passo p{ color: var(--ink); font-size:15.5px; }
+  .muted{ color: var(--muted); font-size: 14px; }
+
+  .click-target{
+    cursor:pointer;
+    border:none;
+    background: var(--orange-light);
+    color: var(--royal-dark);
+    font-weight:600;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-align:left;
+    width:100%;
+    font-size:15px;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .click-target:hover{ background:#ffd7ad; transform: translateY(-1px); }
+  .click-blue{ background: #e7ecfb; color: var(--royal-dark); }
+  .click-blue:hover{ background:#d3dcf7; }
+
+  .reveal{
+    display:none;
+    margin-top: 10px;
+    padding: 14px 16px;
+    background: var(--success-bg);
+    border-left: 4px solid var(--success);
+    border-radius: 8px;
+    font-size: 14.5px;
+  }
+  .reveal.show{ display:block; }
+
+  .text-success-medium{ color: var(--success); font-weight:600; }
+  .text-danger-huge{ color: var(--danger); font-weight:800; font-size:20px; }
+
+  /* Phone simulator */
+  .phone-wrap{ display:flex; justify-content:center; margin: 18px 0 8px; }
+  .phone{
+    width: 310px;
+    background: #0b0f1a;
+    border-radius: 34px;
+    padding: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.25);
+  }
+  .screen{
+    background:#e5ddd5;
+    border-radius: 22px;
+    overflow:hidden;
+    min-height: 500px;
+    display:flex;
+    flex-direction:column;
+  }
+  .wa-header{ background: #075e54; color:#fff; padding: 14px 14px 10px; }
+  .wa-header .biz{ font-weight:700; font-size:15px; display:flex; align-items:center; gap:6px; }
+  .wa-header .biz .tag{ background:#25d366; color:#04351f; font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px; }
+  .wa-tabs{ display:flex; background:#075e54; }
+  .wa-tab{ flex:1; text-align:center; color:#cfe9e4; font-size: 11.5px; padding: 8px 2px; cursor:pointer; border-bottom: 3px solid transparent; }
+  .wa-tab.active{ color:#fff; font-weight:700; border-bottom-color:#25d366; }
+  .wa-body{ flex:1; padding: 12px; overflow-y:auto; }
+  .wa-pane{ display:none; }
+  .wa-pane.active{ display:block; }
+
+  .chat-bubble{ background:#fff; padding:8px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 8px; max-width: 85%; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+  .catalog-item{ background:#fff; border-radius:10px; padding:8px; margin-bottom:8px; font-size:12.5px; }
+  .catalog-item .row1{ display:flex; justify-content:space-between; align-items:center; }
+  .catalog-item .price{ color:#075e54; font-weight:700; }
+  .catalog-item .status{ font-size:10.5px; font-weight:700; margin-top:2px; }
+  .catalog-item .status.visible{ color:#1e8e5a; }
+  .catalog-item .status.hidden{ color:#c92a2a; }
+  .cat-actions{ display:flex; gap:6px; margin-top:6px; }
+  .cat-actions button{
+    flex:1; border:none; border-radius:6px; padding:5px 4px; font-size:10.5px; cursor:pointer; font-weight:700; background:#eef1f8; color:#334;
+  }
+  .cat-actions button:hover{ background:#dde3f5; }
+  .add-item-btn{ width:100%; background:#25d366; color:#04351f; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:12.5px; cursor:pointer; margin-top:4px; }
+  .mini-form{ display:none; background:#fff; border-radius:10px; padding:10px; margin-top:8px; }
+  .mini-form.show{ display:block; }
+  .mini-form label{ display:block; font-size:10.5px; font-weight:700; color:#075e54; margin:6px 0 2px; }
+  .mini-form input{ width:100%; padding:6px 8px; border-radius:6px; border:1px solid #ddd; font-size:11.5px; }
+  .mini-form .save{ margin-top:8px; width:100%; background:#075e54; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer; }
+
+  .ad-card{ background:#fff; border-radius:10px; padding:10px; margin-bottom:8px; font-size:12px; cursor:pointer; }
+  .ad-card b{ color:#075e54; display:block; margin-bottom:2px; }
+  .ad-detail{ display:none; font-size:11.5px; color:#333; margin-top:6px; background:#f2f2f2; padding:8px; border-radius:6px; }
+  .ad-detail.show{ display:block; }
+
+  .config-item{ background:#fff; border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:12.5px; cursor:pointer; }
+  .config-item b{ color:#075e54; }
+  .config-detail{ display:none; font-size:12px; color:#333; margin-top:6px; background:#f2f2f2; padding:8px; border-radius:6px; }
+  .config-detail.show{ display:block; }
+
+  .field{ margin-bottom: 14px; }
+  .field label{ display:block; font-weight:700; font-size: 13.5px; color: var(--royal-dark); margin-bottom:4px; }
+  .field input, .field textarea{ width:100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #d6dcec; font-family: inherit; font-size: 14px; }
+  .field textarea{ min-height:60px; resize:vertical; }
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width:600px){ .grid2{ grid-template-columns:1fr; } }
+
+  .roleplay-card{ background: #f0f3ff; border: 1.5px dashed var(--royal); border-radius: 12px; padding: 16px; margin-top: 12px; }
+
+  .tone-options{ display:flex; gap:10px; flex-wrap:wrap; }
+  .tone-opt{
+    display:flex; align-items:center; gap:8px;
+    background:#f6f8fd; border:1.5px solid #d6dcec; border-radius:10px;
+    padding:10px 14px; font-size:14px; font-weight:600; color:var(--royal-dark);
+    cursor:pointer; flex:1; min-width:180px;
+  }
+  .tone-opt:has(input:checked){ background: var(--orange-light); border-color: var(--orange); }
+  .tone-opt input{ accent-color: var(--orange); }
+
+  .quiz-q{ background:#fafbfe; border-radius:10px; padding:14px 16px; margin-bottom:12px; border:1px solid #e4e8f5; }
+  .quiz-q p.q-text{ font-weight:600; margin:0 0 10px; }
+
+  /* Security simulator */
+  .score-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    background: var(--royal-dark); color:#fff; border-radius: 10px;
+    padding: 10px 16px; margin-bottom:16px; font-size:14px; font-weight:700;
+  }
+  #score{ color:#7ee6a8; font-size:16px; }
+  .scenario{
+    border-radius: 14px;
+    overflow:hidden;
+    margin-bottom: 20px;
+    border: 1.5px solid #e4e8f5;
+  }
+  .scenario-tag{
+    font-size:11px; font-weight:800; letter-spacing:.03em; text-transform:uppercase;
+    padding:6px 14px; color:#fff;
+  }
+  .scenario-tag.sms{ background:#2b6cb0; }
+  .scenario-tag.whats{ background:#128c53; }
+  .scenario-tag.email{ background:#7a4fbf; }
+  .scenario-tag.popup{ background:#c9822a; }
+  .scenario-body{ padding: 14px 16px; background:#fdfdfd; }
+  .mock-message{
+    background:#fff;
+    border:1px solid #e2e6f0;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13.5px;
+    margin-bottom:12px;
+    white-space:pre-line;
+  }
+  .mock-message .from{ font-size:11.5px; color:var(--muted); margin-bottom:4px; display:block; }
+  .mock-message.popup-style{ background:#fff3e0; border:1px solid #ffcf8f; }
+  .scenario-actions{ display:flex; gap:10px; }
+  .scenario-actions button{
+    flex:1; padding:11px 8px; border-radius:9px; border:none; font-weight:700; font-size:13.5px; cursor:pointer;
+  }
+  .btn-golpe{ background: var(--danger-bg); color: var(--danger); }
+  .btn-golpe:hover{ background:#f9d3d3; }
+  .btn-seguro{ background: var(--success-bg); color: var(--success); }
+  .btn-seguro:hover{ background:#cdeedc; }
+  .scenario-feedback{
+    display:none; margin-top:12px; padding:12px 14px; border-radius:9px; font-size:13.5px;
+  }
+  .scenario-feedback.show{ display:block; }
+  .scenario-feedback.correct{ background: var(--success-bg); border-left:4px solid var(--success); }
+  .scenario-feedback.incorrect{ background: var(--danger-bg); border-left:4px solid var(--danger); }
+  .scenario-actions button:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .flags-list{ display:grid; grid-template-columns: 1fr 1fr; gap:8px 16px; margin-top:10px; }
+  @media (max-width:600px){ .flags-list{ grid-template-columns:1fr; } }
+  .flags-list div{ font-size:13.5px; background:#f6f8fd; padding:8px 10px; border-radius:8px; }
+
+  footer.note{ text-align:center; color: var(--muted); font-size: 13px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>📱 WhatsApp Business & 🛡️ Segurança na Internet</h1>
+  <p>Aula prática — mesmo quem não tem o app instalado participa de tudo</p>
+</header>
+
+<div class="container">
+
+  <!-- PASSO 1 -->
+  <section class="passo">
+    <span class="passo-badge">PASSO 1</span>
+    <h2>Por que isso importa, mesmo sem ter o app?</h2>
+    <p>Você não precisa ter o WhatsApp Business instalado pra entender <strong>como um negócio se organiza</strong> pra atender clientes. As ideias de hoje servem pra qualquer ferramenta parecida que você for usar no futuro — seja pra vender um trabalho, um serviço, ou até organizar uma rifa da escola.</p>
+    <button class="click-target" onclick="toggleReveal('r1')">👉 Clique: então pra que serve o WhatsApp Business?</button>
+    <div class="reveal" id="r1">
+      É uma versão do WhatsApp feita <span class="text-success-medium">para empresas</span>: com catálogo de produtos, respostas automáticas, anúncios, etiquetas de organização e até estatísticas de atendimento — tudo isso vamos ver funcionando no simulador abaixo.
+    </div>
+  </section>
+
+  <!-- PASSO 2 -->
+  <section class="passo">
+    <span class="passo-badge">PASSO 2</span>
+    <h2>Simulador — explore a tela sem instalar nada</h2>
+    <p class="muted">Toque nas abas do "celular" abaixo. É uma cópia fiel do app de verdade — dá pra clicar em tudo, adicionar produto, ocultar item, gerar anúncio, ver as configurações. Ninguém precisa abrir o WhatsApp de verdade.</p>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="wa-header">
+            <div class="biz">Doces da Ana <span class="tag">EMPRESA</span></div>
+            <div style="font-size:11px;opacity:.85;">online</div>
+          </div>
+          <div class="wa-tabs">
+            <div class="wa-tab active" onclick="showPane('conversas', this)">Conversas</div>
+            <div class="wa-tab" onclick="showPane('catalogo', this)">Catálogo</div>
+            <div class="wa-tab" onclick="showPane('anuncios', this)">Anúncios</div>
+            <div class="wa-tab" onclick="showPane('config', this)">Config</div>
+          </div>
+          <div class="wa-body">
+
+            <div class="wa-pane active" id="pane-conversas">
+              <div class="chat-bubble"><b>Cliente:</b> Oi, vocês têm brigadeiro gourmet?</div>
+              <div class="chat-bubble" style="background:#dcf8c6;"><b>Doces da Ana:</b> Olá! 😊 Temos sim! Dá uma olhada no nosso catálogo 👇</div>
+              <div class="chat-bubble"><b>Cliente:</b> Perfeito, vou ver!</div>
+            </div>
+
+            <div class="wa-pane" id="pane-catalogo">
+              <div class="catalog-item" id="item1">
+                <div class="row1"><span>🍫 Brigadeiro gourmet (un.)</span><span class="price">R$ 3,50</span></div>
+                <div class="status visible" id="status1">● visível no catálogo</div>
+                <div class="cat-actions">
+                  <button onclick="toggleItem('item1','status1')">👁 Ocultar/Mostrar</button>
+                  <button onclick="toggleReveal('edit-info')">✏️ Editar</button>
+                  <button onclick="toggleReveal('del-info')">🗑 Apagar</button>
+                </div>
+              </div>
+              <div class="catalog-item" id="item2">
+                <div class="row1"><span>🎂 Bolo no pote</span><span class="price">R$ 12,00</span></div>
+                <div class="status visible" id="status2">● visível no catálogo</div>
+                <div class="cat-actions">
+                  <button onclick="toggleItem('item2','status2')">👁 Ocultar/Mostrar</button>
+                  <button onclick="toggleReveal('edit-info')">✏️ Editar</button>
+                  <button onclick="toggleReveal('del-info')">🗑 Apagar</button>
+                </div>
+              </div>
+              <div class="catalog-item" id="item3">
+                <div class="row1"><span>🍪 Caixa de cookies (6un.)</span><span class="price">R$ 18,00</span></div>
+                <div class="status visible" id="status3">● visível no catálogo</div>
+                <div class="cat-actions">
+                  <button onclick="toggleItem('item3','status3')">👁 Ocultar/Mostrar</button>
+                  <button onclick="toggleReveal('edit-info')">✏️ Editar</button>
+                  <button onclick="toggleReveal('del-info')">🗑 Apagar</button>
+                </div>
+              </div>
+
+              <button class="add-item-btn" onclick="toggleMiniForm('add-form')">➕ Adicionar item</button>
+              <div class="mini-form" id="add-form">
+                <label>Nome do produto</label><input type="text" placeholder="Ex: Torta de limão">
+                <label>Preço (BRL)</label><input type="text" placeholder="R$ 0,00">
+                <label>Descrição (opcional)</label><input type="text" placeholder="Ex: Fatia individual">
+                <button class="save" onclick="alert('No app de verdade, esse botão salvaria o item no catálogo.')">Adicionar ao catálogo</button>
+              </div>
+
+              <div class="reveal" id="edit-info" style="margin-top:10px;">No app de verdade: toque em "Editar", ajuste nome, preço ou descrição e toque em "Salvar" — o catálogo atualiza na hora para os clientes.</div>
+              <div class="reveal" id="del-info" style="margin-top:10px;">⚠️ Apagar um item é permanente — uma vez excluído, não dá pra recuperar. Por isso o app sempre pede confirmação antes.</div>
+            </div>
+
+            <div class="wa-pane" id="pane-anuncios">
+              <div class="ad-card" onclick="toggleAd('ad1')">
+                <b>🔗 Link direto (wa.me)</b>
+                Gera um link que abre direto uma conversa com sua empresa — pode colar no Instagram, TikTok ou onde quiser.
+                <div class="ad-detail" id="ad1"><b>Passo 1:</b> Escolha o conteúdo do anúncio (foto, item do catálogo ou status).<br><b>Passo 2:</b> Escreva uma descrição, defina orçamento e público, e toque em "Criar anúncio".</div>
+              </div>
+              <div class="ad-card" onclick="toggleAd('ad2')">
+                <b>📷 QR Code</b>
+                O cliente aponta a câmera do celular e cai direto na conversa — ótimo pra embalagens, panfletos e vitrines.
+                <div class="ad-detail" id="ad2">Pode ser colado em: vitrines, embalagens de produto, flyers, banners em feiras e até nas redes sociais como imagem.</div>
+              </div>
+            </div>
+
+            <div class="wa-pane" id="pane-config">
+              <div class="config-item" onclick="toggleConfig('c1')">
+                <b>👤 Perfil comercial</b>
+                <div class="config-detail" id="c1">Nome da empresa, categoria, horário de funcionamento, endereço, site e redes sociais — tudo isso transmite profissionalismo e reduz a desconfiança do cliente.</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c2')">
+                <b>👋 Mensagem de saudação</b>
+                <div class="config-detail" id="c2">Enviada automaticamente na primeira mensagem do dia: "Oi! Bem-vindo à Doces da Ana 🍬 Como posso ajudar?"</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c3')">
+                <b>🌙 Mensagem de ausência</b>
+                <div class="config-detail" id="c3">Enviada fora do horário: "No momento estamos fechados. Retornamos amanhã às 9h!"</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c4')">
+                <b>⚡ Respostas rápidas</b>
+                <div class="config-detail" id="c4">Atalhos como "/obrigado" que já disparam uma mensagem pronta — economiza tempo em perguntas repetidas (horário, formas de pagamento, endereço).</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c5')">
+                <b>🏷️ Etiquetas</b>
+                <div class="config-detail" id="c5">Até 20 etiquetas personalizadas (ex: "Novo Cliente", "Pedido em Andamento", "Pagamento Pendente"). Cada conversa recebe só uma etiqueta por vez — ajuda a nunca esquecer um cliente.</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c6')">
+                <b>💳 Pagamento integrado</b>
+                <div class="config-detail" id="c6">Permite receber pagamento sem sair da conversa — reduz a desistência da compra por precisar acessar outro site.</div>
+              </div>
+              <div class="config-item" onclick="toggleConfig('c7')">
+                <b>📊 Estatísticas e relatórios</b>
+                <div class="config-detail" id="c7">Mostra mensagens enviadas, entregues e lidas, tempo médio de resposta e evolução do atendimento — ajuda a melhorar o negócio com dados reais.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSO 3 -->
+  <section class="passo">
+    <span class="passo-badge">PASSO 3</span>
+    <h2>Atividade em dupla: role-play</h2>
+    <p>Formem duplas. Uma pessoa é <strong>dona(o) do negócio</strong>, a outra é <strong>cliente</strong>. Simulem a conversa usando o roteiro abaixo.</p>
+    <div class="roleplay-card">
+      <p style="margin:0 0 8px;"><strong>Roteiro sugerido:</strong></p>
+      <ol style="margin:0; padding-left:18px; font-size:14.5px;">
+        <li>Cliente manda a primeira mensagem perguntando sobre um produto</li>
+        <li>Dono(a) responde com a mensagem de saudação</li>
+        <li>Dono(a) "mostra" 2 itens do catálogo (pode inventar)</li>
+        <li>Cliente escolhe um e pergunta a forma de pagamento</li>
+        <li>Dono(a) confirma o pedido e "coloca uma etiqueta" (ex: "Aguardando pagamento")</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PASSO 4 -->
+  <section class="passo">
+    <span class="passo-badge">PASSO 4</span>
+    <h2>Plano de negócio digital — mais elaborado</h2>
+    <p>Agora vamos além do "nome + produto". Pensem num negócio de verdade: quem é o cliente, como vocês falam com ele, e como uma conversa do início ao fim aconteceria. Pode ser em dupla ou individual — não precisa de internet nem do app.</p>
+
+    <h3>4.1 — A ideia</h3>
+    <div class="field"><label>Nome do negócio</label><input type="text" placeholder="Ex: Doces da Ana"></div>
+    <div class="grid2">
+      <div class="field"><label>O que vocês vendem?</label><input type="text" placeholder="Ex: doces artesanais sob encomenda"></div>
+      <div class="field"><label>Para quem? (público-alvo)</label><input type="text" placeholder="Ex: gente que quer presentear ou fazer festa"></div>
+    </div>
+
+    <h3>4.2 — Como vocês vão falar com o cliente</h3>
+    <p class="muted">Escolham um tom de voz. Isso muda completamente como as mensagens são escritas.</p>
+    <div class="tone-options">
+      <label class="tone-opt"><input type="radio" name="tom" value="formal"> Formal e direto</label>
+      <label class="tone-opt"><input type="radio" name="tom" value="descontraido"> Descontraído, com emojis</label>
+      <label class="tone-opt"><input type="radio" name="tom" value="animado"> Vendedor(a) animado(a)</label>
+    </div>
+    <div class="grid2" style="margin-top:14px;">
+      <div class="field"><label>Um cliente pergunta "vocês entregam?" — como vocês responderiam, no tom escolhido?</label><textarea placeholder="Escreva a resposta aqui"></textarea></div>
+      <div class="field"><label>Um cliente reclama que o pedido atrasou — como vocês responderiam?</label><textarea placeholder="Escreva a resposta aqui"></textarea></div>
+    </div>
+
+    <h3>4.3 — Catálogo que convence</h3>
+    <p class="muted">Não vale só nome e preço — escrevam uma descrição curta que faça o cliente querer comprar.</p>
+    <div class="field"><label>Produto 1 — nome, preço e descrição que "vende"</label><input type="text" placeholder="Ex: Brigadeiro gourmet — R$ 3,50 — feito na hora, casquinha crocante"></div>
+    <div class="field"><label>Produto 2 — nome, preço e descrição que "vende"</label><input type="text" placeholder="Ex: Bolo no pote — R$ 12,00 — 3 camadas, ótimo pra presentear"></div>
+    <div class="field"><label>Produto 3 — nome, preço e descrição que "vende"</label><input type="text" placeholder="Ex: Caixa de cookies — R$ 18,00 — 6 unidades, ideal pra dividir"></div>
+
+    <h3>4.4 — Mensagens automáticas</h3>
+    <div class="field"><label>Mensagem de boas-vindas</label><textarea placeholder="Ex: Oi! Bem-vindo à minha loja 😊 Como posso ajudar?"></textarea></div>
+    <div class="field"><label>Mensagem de ausência</label><textarea placeholder="Ex: No momento estou fora. Já te respondo assim que puder!"></textarea></div>
+
+    <h3>4.5 — Suas próprias etiquetas</h3>
+    <p class="muted">Lembrando do simulador: etiquetas ajudam a organizar clientes. Criem 3 que façam sentido pro negócio de vocês (além das óbvias "Novo cliente" e "Pago").</p>
+    <div class="grid2">
+      <div class="field"><label>Etiqueta 1</label><input type="text" placeholder="Ex: Encomenda de festa"></div>
+      <div class="field"><label>Etiqueta 2</label><input type="text" placeholder="Ex: Cliente recorrente"></div>
+    </div>
+    <div class="field"><label>Etiqueta 3</label><input type="text" placeholder="Ex: Aguardando retirada"></div>
+
+    <h3>4.6 — Simule a conversa inteira</h3>
+    <p class="muted">Do primeiro "oi" até o pedido fechado. Usem o tom de voz e o catálogo que vocês criaram acima. Pode ser escrito aqui ou representado em voz alta com a dupla.</p>
+    <div class="roleplay-card">
+      <div class="field" style="margin-bottom:8px;"><label>Cliente inicia a conversa</label><input type="text" placeholder="Ex: Oi, vocês têm alguma coisa pra presente de aniversário?"></div>
+      <div class="field" style="margin-bottom:8px;"><label>Vocês respondem com a saudação + oferecem 1-2 produtos</label><textarea placeholder="Escreva a resposta"></textarea></div>
+      <div class="field" style="margin-bottom:8px;"><label>Cliente escolhe e pergunta forma de pagamento/entrega</label><input type="text" placeholder="Ex: Fico com o bolo no pote, como faço pra pagar?"></div>
+      <div class="field" style="margin-bottom:0;"><label>Vocês fecham o pedido e definem qual etiqueta usar</label><textarea placeholder="Escreva o fechamento e diga qual etiqueta vocês aplicariam"></textarea></div>
+    </div>
+  </section>
+
+  <!-- QUIZ WHATSAPP -->
+
+  <section class="passo">
+    <span class="passo-badge">CONFIRA O QUE APRENDEU</span>
+    <h2>Quiz rápido — WhatsApp Business</h2>
+    <div class="quiz-q">
+      <p class="q-text">1. Para que serve o catálogo dentro do WhatsApp Business?</p>
+      <button class="click-target click-blue" onclick="toggleReveal('q1')">Ver resposta</button>
+      <div class="reveal" id="q1">Para o cliente ver produtos, fotos e preços sem precisar perguntar um por um.</div>
+    </div>
+    <div class="quiz-q">
+      <p class="q-text">2. Qual a diferença entre mensagem de saudação e mensagem de ausência?</p>
+      <button class="click-target click-blue" onclick="toggleReveal('q2')">Ver resposta</button>
+      <div class="reveal" id="q2">A de saudação é enviada quando o cliente escreve pela primeira vez no dia. A de ausência avisa que a loja está fechada.</div>
+    </div>
+    <div class="quiz-q">
+      <p class="q-text">3. Para que servem as etiquetas (labels)?</p>
+      <button class="click-target click-blue" onclick="toggleReveal('q3')">Ver resposta</button>
+      <div class="reveal" id="q3">Para organizar os clientes por status, como "novo pedido" ou "aguardando pagamento", e não esquecer ninguém.</div>
+    </div>
+  </section>
+
+  <!-- PASSO 5 - SEGURANÇA -->
+  <section class="passo">
+    <span class="passo-badge dark">PASSO 5</span>
+    <h2>🛡️ Você cairia no golpe?</h2>
+    <p>Nível avançado: aqui os golpes vêm bem escritos, com nomes de empresas reais e sem erro de português — e algumas mensagens legítimas vão soar alarmantes só pra testar sua desconfiança. Leia com atenção antes de decidir.</p>
+
+    <div class="score-bar">
+      <span>Seu placar</span>
+      <span id="score">0 / 8 acertos</span>
+    </div>
+
+    <!-- Cenário 1 - golpe do chefe, bem escrito -->
+    <div class="scenario" data-correct="golpe">
+      <div class="scenario-tag whats">WhatsApp</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">Contato: "Diretora Fernanda" (foto e nome iguais aos que você conhece)</span>Bom dia! Estou em reunião com um fornecedor e não posso ligar agora. Preciso que você compre 3 cartões-presente Google Play de R$ 100, no mercado mais próximo, e me envie o código de trás por foto. Reembolso amanhã na folha. É urgente, o fornecedor está esperando.</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 2 - domínio quase idêntico -->
+    <div class="scenario" data-correct="golpe">
+      <div class="scenario-tag email">E-mail</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">De: atendimento@itau-seguranca-cliente.com</span>Prezado cliente, detectamos uma tentativa de compra não reconhecida de R$ 1.240,00 em seu cartão. Se não foi você, cancele imediatamente clicando no botão abaixo e confirme seus dados para bloqueio preventivo.</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 3 - legítimo, mas soa alarmante -->
+    <div class="scenario" data-correct="seguro">
+      <div class="scenario-tag email">E-mail</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">De: no-reply@accounts.google.com</span>Novo login detectado em um dispositivo Windows perto de São Paulo, SP, agora há pouco. Se foi você, não precisa fazer nada. Se não reconhece essa atividade, acesse diretamente myaccount.google.com para revisar a segurança da conta.</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 4 - vaga de emprego -->
+    <div class="scenario" data-correct="golpe">
+      <div class="scenario-tag whats">Grupo de WhatsApp</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">Mensagem encaminhada em grupo de emprego</span>📢 Vaga HOME OFFICE — sem experiência necessária, R$ 350/dia, começa hoje mesmo! Preencha o formulário com seus dados bancários completos pra já cair o adiantamento do primeiro dia. Vagas limitadas!</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 5 - virus mais sutil -->
+    <div class="scenario" data-correct="golpe">
+      <div class="scenario-tag popup">Pop-up no navegador</div>
+      <div class="scenario-body">
+        <div class="mock-message popup-style">Sistema Windows Defender: foram encontradas 3 ameaças no seu dispositivo. Sua conexão pode estar comprometida. Baixe a ferramenta de limpeza oficial para resolver automaticamente.</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 6 - legítimo, pedido comum de escola -->
+    <div class="scenario" data-correct="seguro">
+      <div class="scenario-tag whats">Grupo da turma</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">Professor(a), número já salvo há meses no seu grupo da turma</span>Pessoal, vamos fazer uma vaquinha pra comprar o presente de despedida da coordenadora. Quem quiser contribuir, chave Pix é o CNPJ da escola mesmo (o de sempre, que já está fixado no grupo). Sem pressa!</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 7 - rastreio de encomenda, TLD estranho -->
+    <div class="scenario" data-correct="golpe">
+      <div class="scenario-tag sms">SMS</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">De: CORREIOS</span>Sua encomenda BR458219663BR está retida no Centro de Distribuição aguardando pagamento da taxa alfandegária de R$ 14,90. Regularize em: correios-rastreio-entrega.rf.gr</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <!-- Cenário 8 - legítimo, confirmação de pedido -->
+    <div class="scenario" data-correct="seguro">
+      <div class="scenario-tag whats">WhatsApp</div>
+      <div class="scenario-body">
+        <div class="mock-message"><span class="from">Número comercial verificado, com nome da loja e selo ✔️</span>Olá! Seu pedido #4471 na Loja Bela Vista foi confirmado: 1 tênis, tamanho 39, R$ 189,90. Chega em até 5 dias úteis. Nenhuma ação é necessária da sua parte, essa é só uma confirmação.</div>
+        <div class="scenario-actions">
+          <button class="btn-golpe" onclick="checkAnswer(this,'golpe')">🚨 Isso é golpe</button>
+          <button class="btn-seguro" onclick="checkAnswer(this,'seguro')">✅ Parece seguro</button>
+        </div>
+        <div class="scenario-feedback"></div>
+      </div>
+    </div>
+
+    <h3>🚩 Sinais de alerta pra decorar</h3>
+    <div class="flags-list">
+      <div>⏱️ <strong>Urgência</strong> — "faça agora ou perde"</div>
+      <div>🔗 <strong>Link estranho/encurtado</strong></div>
+      <div>🎁 <strong>Oferta boa demais</strong> pra ser verdade</div>
+      <div>🔢 <strong>Pedido de código/senha</strong> — nunca compartilhe</div>
+      <div>❓ <strong>Remetente desconhecido</strong> ou número estranho</div>
+      <div>😢 <strong>Pressão emocional</strong> ("é urgente, me ajuda")</div>
+    </div>
+  </section>
+
+  <p class="text-danger-huge" style="text-align:center;">Golpe bom é golpe reconhecido a tempo! 🛡️</p>
+  <footer class="note">All Net Educação — Aula prática de WhatsApp Business e Segurança na Internet</footer>
+</div>
+
+<script>
+let acertos = 0;
+let respondidos = 0;
+const totalCenarios = document.querySelectorAll('.scenario').length;
+
+function toggleReveal(id){ document.getElementById(id).classList.toggle('show'); }
+function toggleConfig(id){ document.getElementById(id).classList.toggle('show'); }
+function toggleAd(id){ document.getElementById(id).classList.toggle('show'); }
+function toggleMiniForm(id){ document.getElementById(id).classList.toggle('show'); }
+
+function toggleItem(itemId, statusId){
+  const el = document.getElementById(statusId);
+  if(el.classList.contains('visible')){
+    el.classList.remove('visible'); el.classList.add('hidden');
+    el.textContent = '● oculto do catálogo';
+  } else {
+    el.classList.remove('hidden'); el.classList.add('visible');
+    el.textContent = '● visível no catálogo';
+  }
+}
+
+function showPane(name, el){
+  document.querySelectorAll('.wa-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+const explicacoes = {
+  0: "🚨 GOLPE! Mesmo com nome e foto certos, é o 'golpe do chefe/número trocado'. O detalhe é o PEDIDO em si: nenhuma empresa de verdade pede pra comprar cartão-presente e mandar o código por foto. Desconfie do pedido, não só da escrita.",
+  1: "🚨 GOLPE! Repare no domínio: 'itau-seguranca-cliente.com' não é o site oficial do banco (que é itau.com.br). Bancos nunca pedem confirmação de dados por link recebido em e-mail — o texto bem escrito e o logo não garantem nada.",
+  2: "✅ Legítimo! Um aviso de novo login que NÃO pede clique em link nem dados, e te direciona a digitar o endereço oficial por conta própria, é o padrão de segurança real do Google. Alarmante no texto, mas seguro na prática.",
+  3: "🚨 GOLPE! Promessa de salário alto sem experiência + pedido de dados bancários ANTES de começar a trabalhar é clássico golpe de emprego falso, mesmo vindo formatado como anúncio 'profissional'.",
+  4: "🚨 GOLPE (falso vírus)! Nomear o alerta como 'Windows Defender' é só disfarce — sistemas de segurança de verdade não pedem pra baixar 'ferramenta de limpeza' por pop-up de site. Feche a aba.",
+  5: "✅ Legítimo! O que diferencia de golpe aqui: contato já salvo há meses, chave Pix que já é conhecida do grupo (não uma nova, urgente, de última hora) e nenhuma pressão de tempo.",
+  6: "🚨 GOLPE! Repare no final do link: '.rf.gr' não é um domínio dos Correios (o site oficial é correios.com.br). Golpes de encomenda copiam até o formato do código de rastreio pra parecer real.",
+  7: "✅ Legítimo! É uma confirmação de pedido que você já fez, sem link pra clicar, sem pedido de dados e avisando que 'nenhuma ação é necessária' — esse é o padrão de mensagens automáticas reais de loja."
+};
+
+function checkAnswer(btn, escolha){
+  const scenario = btn.closest('.scenario');
+  const correta = scenario.dataset.correct;
+  const feedback = scenario.querySelector('.scenario-feedback');
+  const idx = Array.from(document.querySelectorAll('.scenario')).indexOf(scenario);
+  const acertou = escolha === correta;
+
+  scenario.querySelectorAll('.scenario-actions button').forEach(b => b.disabled = true);
+
+  feedback.classList.add('show');
+  feedback.classList.add(acertou ? 'correct' : 'incorrect');
+  feedback.innerHTML = (acertou ? '<strong>✅ Acertou!</strong> ' : '<strong>❌ Essa passou batido.</strong> ') + explicacoes[idx];
+
+  respondidos++;
+  if(acertou) acertos++;
+  document.getElementById('score').textContent = acertos + ' / ' + totalCenarios + ' acertos';
+}
+</script>
+
+</body>
+</html>
