@@ -1372,10 +1372,35 @@
                 doc.head.appendChild(viewport);
             }
 
+            const estiloQuizFinal = doc.createElement('style');
+            estiloQuizFinal.textContent = `
+                #portal-quiz-final{max-width:980px;margin:40px auto 28px;padding:30px;border-radius:22px;background:#f5f3ff;border:3px solid #7c3aed;color:#1f2937;box-sizing:border-box}
+                #portal-quiz-final .portal-quiz-topo{text-align:center;margin-bottom:26px}
+                #portal-quiz-final .portal-quiz-topo h2{margin:8px 0;color:#5b21b6;font-size:2rem}
+                #portal-quiz-final .portal-quiz-topo p{margin:0;color:#5b6472}
+                #portal-quiz-final .portal-quiz-parte{margin:26px 0 14px;color:#5b21b6}
+                #portal-quiz-final .portal-quiz-pergunta{background:#fff;border:1px solid #ddd6fe;border-radius:16px;padding:20px;margin:14px 0;break-inside:avoid}
+                #portal-quiz-final .portal-quiz-enunciado{font-weight:800;margin:0 0 14px;font-size:1.05rem}
+                #portal-quiz-final .portal-quiz-opcao{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;margin:8px 0;border:2px solid #e5e7eb;border-radius:11px;cursor:pointer;background:#fff}
+                #portal-quiz-final .portal-quiz-opcao input{width:auto;margin:4px 0 0;flex:0 0 auto}
+                #portal-quiz-final .portal-quiz-opcao.correta{border-color:#16a34a;background:#dcfce7}
+                #portal-quiz-final .portal-quiz-opcao.errada{border-color:#dc2626;background:#fee2e2}
+                #portal-quiz-final .portal-quiz-explicacao{display:none;margin-top:12px;padding:12px;border-radius:10px;background:#ecfdf5;color:#166534;font-weight:600}
+                #portal-quiz-final .portal-quiz-explicacao.ativa{display:block}
+                #portal-quiz-final .portal-quiz-resultado{text-align:center;font-size:1.15rem;font-weight:800;margin:16px 0 0;color:#5b21b6}
+                #portal-quiz-final .portal-quiz-corrigir{display:block;margin:22px auto 0;padding:14px 24px;border:0;border-radius:12px;background:#7c3aed;color:#fff;font-size:1.05rem;font-weight:800;cursor:pointer}
+                #portal-quiz-final > section{margin-top:24px}
+                @media(max-width:650px){#portal-quiz-final{padding:20px 14px;border-radius:16px}#portal-quiz-final .portal-quiz-topo h2{font-size:1.55rem}}
+                @media print{#portal-quiz-final{break-before:page;page-break-before:always;border:2px solid #7c3aed;background:#fff;max-width:none}.portal-quiz-corrigir{display:none!important}.portal-quiz-opcao{break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+            `;
+            doc.head.appendChild(estiloQuizFinal);
+
             const integracaoPortal = doc.createElement('script');
             integracaoPortal.textContent = `
                 (() => {
                     const encontrarQuiz = () => {
+                        const quizFinal = document.querySelector('[data-portal-quiz]');
+                        if (quizFinal) return quizFinal;
                         const porTitulo = Array.from(document.querySelectorAll('h1, h2, h3, h4')).find(el => /quiz|question[aá]rio|teste\\s+(seus?|o\\s+que|voc[eê])|atividade\\s+final/i.test(el.textContent || ''));
                         if (porTitulo) return porTitulo;
                         const porSeletor = document.querySelector('[data-quiz], #quiz, [id*="quiz" i], [class*="quiz" i], [id*="questionario" i], [id*="questionário" i]');
@@ -1384,6 +1409,177 @@
                     const informarAltura = () => {
                         const altura = Math.max(document.body?.scrollHeight || 0, document.documentElement?.scrollHeight || 0);
                         parent.postMessage({ tipo: 'portal-altura-aula-html', altura, temQuiz: !!encontrarQuiz() }, '*');
+                    };
+                    const montarQuizFinal = () => {
+                        if (document.getElementById('portal-quiz-final')) return;
+                        const blocosPergunta = Array.from(document.querySelectorAll('.quiz-q'));
+                        const perguntasOriginais = blocosPergunta.map(bloco => ({
+                            pergunta: (bloco.querySelector('.q-text')?.textContent || '').trim().replace(/^\\d+[.)-]?\\s*/, ''),
+                            resposta: (bloco.querySelector('.reveal')?.textContent || '').trim(),
+                            secao: bloco.closest('section')
+                        })).filter(item => item.pergunta && item.resposta);
+                        const identificacaoAula = ((document.title || '') + ' ' + (document.querySelector('h1')?.textContent || '')).toLowerCase();
+                        const ehAulaWhatsApp = identificacaoAula.includes('whatsapp business');
+                        let perguntasFinais = [];
+
+                        if (ehAulaWhatsApp) {
+                            perguntasFinais = [
+                                {
+                                    pergunta: 'Qual é a principal utilidade do catálogo no WhatsApp Business?',
+                                    alternativas: ['Apresentar produtos ou serviços com foto, descrição e preço', 'Trocar automaticamente a foto do perfil', 'Apagar conversas antigas do cliente', 'Bloquear mensagens fora do horário'],
+                                    correta: 0,
+                                    explicacao: 'O catálogo funciona como uma vitrine dentro do WhatsApp e facilita a apresentação do que a empresa oferece.'
+                                },
+                                {
+                                    pergunta: 'Qual é a diferença entre a mensagem de saudação e a mensagem de ausência?',
+                                    alternativas: ['A saudação recebe o cliente; a ausência avisa quando não há atendimento imediato', 'As duas servem apenas para enviar promoções', 'A saudação só funciona à noite; a ausência só funciona de manhã', 'Não existe diferença entre elas'],
+                                    correta: 0,
+                                    explicacao: 'A saudação dá as boas-vindas. A mensagem de ausência informa que o atendimento não está disponível naquele momento.'
+                                },
+                                {
+                                    pergunta: 'Para que servem as etiquetas nas conversas?',
+                                    alternativas: ['Organizar clientes e atendimentos por etapas ou categorias', 'Mudar a cor do aplicativo para cada cliente', 'Enviar a mesma resposta sem ler a conversa', 'Impedir que o cliente envie novas mensagens'],
+                                    correta: 0,
+                                    explicacao: 'Etiquetas ajudam a identificar situações como novo pedido, pagamento pendente, pedido enviado ou atendimento concluído.'
+                                },
+                                {
+                                    pergunta: 'O que demonstra um atendimento de boa qualidade?',
+                                    alternativas: ['Ler toda a mensagem e adaptar a resposta ao que o cliente precisa', 'Responder rapidamente com qualquer frase pronta', 'Usar sempre mensagens longas e formais', 'Pedir que o cliente repita tudo em áudio'],
+                                    correta: 0,
+                                    explicacao: 'Antes de responder, é importante compreender o pedido e usar um tom adequado à situação.'
+                                },
+                                {
+                                    pergunta: 'Qual é uma boa sequência para lidar com uma reclamação?',
+                                    alternativas: ['Acolher, entender, solucionar e confirmar se ficou resolvido', 'Discordar, justificar, encerrar e bloquear', 'Oferecer desconto antes de saber o problema', 'Ignorar a reclamação e enviar o catálogo'],
+                                    correta: 0,
+                                    explicacao: 'Acolher o cliente, compreender o problema, propor uma solução e confirmar o resultado torna o atendimento mais seguro e profissional.'
+                                },
+                                {
+                                    pergunta: 'Qual informação é melhor deixar registrada por escrito?',
+                                    alternativas: ['Preços, endereço, horários, prazos e detalhes do pedido', 'Somente cumprimentos e emojis', 'Apenas opiniões pessoais do atendente', 'Nenhuma, porque todo atendimento deve ser em áudio'],
+                                    correta: 0,
+                                    explicacao: 'Informações importantes por escrito podem ser consultadas depois e reduzem mal-entendidos.'
+                                },
+                                {
+                                    pergunta: 'Como ajudar um cliente que ainda está indeciso?',
+                                    alternativas: ['Comparar opções e explicar diferenças sem pressionar a compra', 'Escolher o produto mais caro pelo cliente', 'Dizer que só existe uma opção disponível', 'Encerrar a conversa até ele decidir sozinho'],
+                                    correta: 0,
+                                    explicacao: 'Uma comparação clara ajuda o cliente a decidir com confiança e mantém o atendimento respeitoso.'
+                                },
+                                {
+                                    pergunta: 'O que deve ser confirmado antes de finalizar um pedido?',
+                                    alternativas: ['Itens, valores, forma de pagamento, prazo e dados de entrega', 'Somente o primeiro nome do cliente', 'A quantidade de mensagens da conversa', 'A foto de perfil do atendente'],
+                                    correta: 0,
+                                    explicacao: 'A confirmação final evita erros e garante que empresa e cliente tenham o mesmo entendimento do pedido.'
+                                },
+                                {
+                                    pergunta: 'Ao responder sobre uma entrega, quais dados ajudam a dar uma informação completa?',
+                                    alternativas: ['Bairro ou endereço, valor da entrega e prazo estimado', 'Somente a cor da embalagem', 'A senha do celular do cliente', 'A lista de todos os funcionários da empresa'],
+                                    correta: 0,
+                                    explicacao: 'Local, taxa e prazo são os dados essenciais para orientar corretamente o cliente sobre a entrega.'
+                                },
+                                {
+                                    pergunta: 'Como usar respostas rápidas sem deixar o atendimento robotizado?',
+                                    alternativas: ['Adaptar o texto salvo à pergunta e à situação de cada cliente', 'Enviar várias respostas rápidas de uma vez', 'Nunca alterar o texto pronto', 'Usar respostas rápidas mesmo quando não têm relação com a dúvida'],
+                                    correta: 0,
+                                    explicacao: 'Respostas rápidas economizam tempo, mas devem ser revisadas e personalizadas para manter a conversa natural.'
+                                }
+                            ];
+                        } else if (perguntasOriginais.length) {
+                            const respostas = perguntasOriginais.map(item => item.resposta);
+                            const reservas = [
+                                'Serve somente para mudar as cores e a aparência do aplicativo.',
+                                'Apaga automaticamente todas as conversas depois do atendimento.',
+                                'Nenhuma das alternativas apresentadas explica essa função.'
+                            ];
+                            perguntasFinais = perguntasOriginais.map((item, indice) => {
+                                let alternativas = [item.resposta, ...respostas.filter(r => r !== item.resposta), ...reservas.filter(r => r !== item.resposta)];
+                                alternativas = Array.from(new Set(alternativas)).slice(0, 4);
+                                const deslocamento = indice % alternativas.length;
+                                alternativas = alternativas.slice(deslocamento).concat(alternativas.slice(0, deslocamento));
+                                return {
+                                    pergunta: item.pergunta,
+                                    alternativas,
+                                    correta: alternativas.indexOf(item.resposta),
+                                    explicacao: 'Resposta: ' + item.resposta
+                                };
+                            });
+                        }
+                        if (!perguntasFinais.length) return;
+
+                        const quizFinal = document.createElement('section');
+                        quizFinal.id = 'portal-quiz-final';
+                        quizFinal.dataset.portalQuiz = 'true';
+                        const tituloQuiz = ehAulaWhatsApp ? 'Quiz final — WhatsApp Business' : 'Quiz final da aula';
+                        const resumoQuiz = perguntasFinais.length + ' perguntas de múltipla escolha. Responda, confira sua pontuação e salve o PDF com suas escolhas.';
+                        quizFinal.innerHTML = '<div class="portal-quiz-topo"><span style="font-size:2.7rem">🧠</span><h2>' + tituloQuiz + '</h2><p>' + resumoQuiz + '</p></div>';
+
+                        perguntasFinais.forEach((item, indice) => {
+                                const deslocamento = ehAulaWhatsApp ? (indice * 3 + 1) % item.alternativas.length : 0;
+                                const alternativasExibidas = item.alternativas.slice(deslocamento).concat(item.alternativas.slice(0, deslocamento));
+                                const corretaExibida = (item.correta - deslocamento + item.alternativas.length) % item.alternativas.length;
+                                const caixa = document.createElement('div');
+                                caixa.className = 'portal-quiz-pergunta';
+                                caixa.dataset.correta = String(corretaExibida);
+                                const enunciado = document.createElement('p');
+                                enunciado.className = 'portal-quiz-enunciado';
+                                enunciado.textContent = (indice + 1) + '. ' + item.pergunta;
+                                caixa.appendChild(enunciado);
+
+                                alternativasExibidas.forEach((textoOpcao, opcaoIndice) => {
+                                    const label = document.createElement('label');
+                                    label.className = 'portal-quiz-opcao';
+                                    const radio = document.createElement('input');
+                                    radio.type = 'radio';
+                                    radio.name = 'portal-quiz-' + indice;
+                                    radio.value = String(opcaoIndice);
+                                    const texto = document.createElement('span');
+                                    texto.textContent = textoOpcao;
+                                    label.append(radio, texto);
+                                    caixa.appendChild(label);
+                                });
+
+                                const explicacao = document.createElement('div');
+                                explicacao.className = 'portal-quiz-explicacao';
+                                explicacao.textContent = item.explicacao;
+                                caixa.appendChild(explicacao);
+                                quizFinal.appendChild(caixa);
+                        });
+
+                        const corrigir = document.createElement('button');
+                        corrigir.type = 'button';
+                        corrigir.className = 'portal-quiz-corrigir';
+                        corrigir.textContent = '✅ Corrigir múltipla escolha';
+                        const resultado = document.createElement('div');
+                        resultado.className = 'portal-quiz-resultado';
+                        corrigir.addEventListener('click', () => {
+                            let acertos = 0;
+                            let respondidas = 0;
+                            quizFinal.querySelectorAll('.portal-quiz-pergunta').forEach(caixa => {
+                                const correta = Number(caixa.dataset.correta);
+                                const marcada = caixa.querySelector('input:checked');
+                                caixa.querySelectorAll('.portal-quiz-opcao').forEach((label, i) => {
+                                    label.classList.toggle('correta', i === correta);
+                                    label.classList.toggle('errada', !!marcada && i === Number(marcada.value) && i !== correta);
+                                });
+                                caixa.querySelector('.portal-quiz-explicacao')?.classList.add('ativa');
+                                if (marcada) {
+                                    respondidas++;
+                                    if (Number(marcada.value) === correta) acertos++;
+                                }
+                            });
+                            resultado.textContent = respondidas < perguntasFinais.length
+                                ? 'Você respondeu ' + respondidas + ' de ' + perguntasFinais.length + '. Complete as demais perguntas.'
+                                : 'Resultado: ' + acertos + ' de ' + perguntasFinais.length + ' respostas corretas.';
+                            informarAltura();
+                        });
+                        quizFinal.append(corrigir, resultado);
+
+                        const secoesPerguntas = new Set(perguntasOriginais.map(item => item.secao).filter(Boolean));
+                        secoesPerguntas.forEach(secao => secao.remove());
+                        const rodape = document.querySelector('footer');
+                        if (rodape) rodape.before(quizFinal); else document.body.appendChild(quizFinal);
+                        informarAltura();
                     };
                     addEventListener('message', evento => {
                         if (evento.data?.tipo !== 'portal-ir-quiz') return;
@@ -1395,6 +1591,8 @@
                     });
                     addEventListener('load', informarAltura);
                     document.addEventListener('load', informarAltura, true);
+                    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montarQuizFinal);
+                    else montarQuizFinal();
                     if (window.ResizeObserver) new ResizeObserver(informarAltura).observe(document.documentElement);
                     setTimeout(informarAltura, 100);
                     setTimeout(informarAltura, 800);
