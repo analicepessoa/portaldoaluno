@@ -1,0 +1,60 @@
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    # Três consultas leves por dia, fora do início da hora (UTC).
+    - cron: "17 3,11,19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manter-supabase-ativo
+  cancel-in-progress: true
+
+jobs:
+  consultar-banco:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Baixar o portal
+        uses: actions/checkout@v4
+
+      - name: Fazer uma consulta leve no Supabase
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const pagina = fs.readFileSync('index.html', 'utf8');
+          const url = pagina.match(/const SUPABASE_URL\s*=\s*["']([^"']+)/)?.[1];
+          const chave = pagina.match(/const SUPABASE_KEY\s*=\s*["']([^"']+)/)?.[1];
+
+          if (!url || !chave) {
+            throw new Error('Não encontrei a URL ou a chave pública do Supabase no index.html.');
+          }
+
+          const executar = async () => {
+            const resposta = await fetch(`${url}/rest/v1/config_cursos?select=id&limit=1`, {
+              headers: {
+                apikey: chave,
+                Authorization: `Bearer ${chave}`,
+                Accept: 'application/json'
+              },
+              signal: AbortSignal.timeout(30000)
+            });
+
+            if (!resposta.ok) {
+              const detalhe = (await resposta.text()).slice(0, 300);
+              throw new Error(`Supabase respondeu ${resposta.status}: ${detalhe}`);
+            }
+
+            console.log(`Supabase respondeu ${resposta.status}. Consulta concluída em ${new Date().toISOString()}.`);
+          };
+
+          executar().catch(erro => {
+            console.error(erro.message);
+            process.exit(1);
+          });
+          NODE
+

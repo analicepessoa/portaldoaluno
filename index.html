@@ -257,6 +257,17 @@
         
         .quiz-prof-item { background: var(--warning-light); border: 2px dashed var(--warning); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
 
+        .importador-html-card { background: var(--primary-light); border: 2px dashed var(--primary); border-radius: 16px; padding: 20px; margin: 24px 0; }
+        .importador-html-card h3 { color: var(--primary); margin: 0 0 6px; }
+        .importador-html-acoes { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .importador-html-acoes input[type="file"] { flex: 1; min-width: 240px; margin: 0; background: var(--bg); }
+        .importador-html-status { display: none; margin-top: 14px; padding: 14px; border-radius: 12px; background: var(--bg); border: 1px solid var(--primary); }
+        .importador-html-status.ativo { display: block; }
+        .preview-html-importado, .aula-html-importada { width: 100%; border: 1px solid var(--gray-light); border-radius: 14px; background: #fff; }
+        .preview-html-importado { display: none; height: 480px; margin-top: 14px; }
+        .preview-html-importado.ativo { display: block; }
+        .aula-html-importada { min-height: 70vh; height: 72vh; }
+
         /* Abas do Professor */
         .prof-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
         .prof-tab-btn { padding: 12px 20px; border-radius: 12px; border: 2px solid var(--gray-light); background: transparent; cursor: pointer; font-weight: bold; color: var(--text-light); transition: all 0.2s; white-space: nowrap; }
@@ -676,6 +687,20 @@
                     <div style="flex:2;"><label id="label-nome-aula">Nome Visível da Aula:</label><input type="text" id="prof-nome-aula"></div>
                 </div>
 
+                <div class="importador-html-card">
+                    <h3>⚡ Aula pronta em HTML</h3>
+                    <p style="margin:0 0 14px; color:var(--text-light);">Selecione um arquivo <strong>.html</strong> ou <strong>.htm</strong>. Ele vira a aula completa, sem precisar montar os passos abaixo.</p>
+                    <div class="importador-html-acoes">
+                        <input type="file" id="arquivo-html-aula" accept=".html,.htm,text/html" onchange="importarAulaHtml(this.files[0])">
+                        <button type="button" class="btn-action secondary" style="margin:0; padding:12px 18px;" onclick="alternarPreviewHtmlImportado()">👁️ Prévia</button>
+                        <button type="button" id="btn-remover-html-importado" class="btn-action secondary" style="display:none; margin:0; padding:12px 18px; background:var(--danger-light); color:var(--danger);" onclick="removerAulaHtmlImportada()">Remover HTML</button>
+                    </div>
+                    <div id="status-html-importado" class="importador-html-status" aria-live="polite"></div>
+                    <iframe id="preview-html-importado" class="preview-html-importado" title="Prévia da aula HTML" sandbox="allow-scripts allow-forms allow-modals allow-popups" referrerpolicy="no-referrer"></iframe>
+                    <p style="font-size:0.86rem; color:var(--text-light); margin:12px 0 0;">Limite: 2 MB. Imagens, vídeos e estilos devem estar dentro do arquivo ou usar links completos da internet.</p>
+                </div>
+
+                <div id="editor-visual-aula">
                 <hr style="border:1px solid var(--gray-light); margin:30px 0;">
                 <h3>Passos do Roteiro</h3>
                 <div id="editor-passos-container"></div>
@@ -707,6 +732,7 @@
                     <li><strong>Simples:</strong> se você não usar nenhum <code style="background:var(--gray-light); padding:1px 5px; border-radius:4px;">{{ }}</code>, este texto entra antes de uma lista com as perguntas e respostas.</li>
                 </ul>
                 <textarea id="prof-prompt-template" placeholder="Cole aqui o prompt e troque os [colchetes] por {{codigo_da_variavel}}..." style="min-height: 130px;"></textarea>
+                </div>
 
                 <br><br>
                 <div style="display:flex; gap:10px;">
@@ -768,6 +794,8 @@
         let respostasAbertas = {};
         let promptTemplateAtual = '';
         let nomesCustomizados = {};
+        let aulaHtmlImportada = null;
+        const LIMITE_HTML_AULA = 2 * 1024 * 1024;
         const nomesModulosIngles = ["Preparation", "Basic 01 - Mid Term", "Basic 01 - End Term", "Basic 02 - Mid Term", "Basic 02 - End Term", "Intermediate 01 - Mid Term", "Intermediate 01 - End Term", "Intermediate 02 - Mid Term", "Intermediate 02 - End Term"];
         const configuracaoModulosSenior = [
             { nome: "Start", aulas: 5 },
@@ -1300,6 +1328,97 @@
             } catch (e) {}
         }
 
+        function prepararHtmlParaIframe(html) {
+            const ajustes = '<base target="_blank"><meta name="viewport" content="width=device-width, initial-scale=1">';
+            if (/<head[\s>]/i.test(html)) return html.replace(/<head([^>]*)>/i, `<head$1>${ajustes}`);
+            if (/<html[\s>]/i.test(html)) return html.replace(/<html([^>]*)>/i, `<html$1><head>${ajustes}</head>`);
+            return `<!doctype html><html><head>${ajustes}</head><body>${html}</body></html>`;
+        }
+
+        function extrairTituloDoHtml(html, nomeArquivo) {
+            try {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const titulo = (doc.querySelector('title')?.textContent || doc.querySelector('h1')?.textContent || '').trim();
+                if (titulo) return titulo.substring(0, 120);
+            } catch (e) {}
+            return (nomeArquivo || 'Aula HTML').replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').trim().substring(0, 120);
+        }
+
+        function atualizarInterfaceHtmlImportado() {
+            const status = document.getElementById('status-html-importado');
+            const preview = document.getElementById('preview-html-importado');
+            const editorVisual = document.getElementById('editor-visual-aula');
+            const btnRemover = document.getElementById('btn-remover-html-importado');
+            if (!status || !preview || !editorVisual || !btnRemover) return;
+
+            if (!aulaHtmlImportada) {
+                status.classList.remove('ativo');
+                status.textContent = '';
+                preview.classList.remove('ativo');
+                preview.removeAttribute('srcdoc');
+                editorVisual.style.display = '';
+                btnRemover.style.display = 'none';
+                return;
+            }
+
+            const tamanhoKb = Math.max(1, Math.round(new Blob([aulaHtmlImportada.html]).size / 1024));
+            status.classList.add('ativo');
+            status.textContent = `✅ ${aulaHtmlImportada.arquivo || 'Aula HTML salva'} pronta para salvar (${tamanhoKb} KB). O construtor visual fica desativado enquanto este HTML estiver selecionado.`;
+            preview.srcdoc = prepararHtmlParaIframe(aulaHtmlImportada.html);
+            editorVisual.style.display = 'none';
+            btnRemover.style.display = 'inline-block';
+        }
+
+        async function importarAulaHtml(arquivo) {
+            if (!arquivo) return;
+            const input = document.getElementById('arquivo-html-aula');
+            if (!/\.html?$/i.test(arquivo.name) && arquivo.type !== 'text/html') {
+                if (input) input.value = '';
+                showToast('Escolha um arquivo .html ou .htm.', 'warning');
+                return;
+            }
+            if (arquivo.size > LIMITE_HTML_AULA) {
+                if (input) input.value = '';
+                showToast('O HTML ultrapassa o limite de 2 MB.', 'warning');
+                return;
+            }
+
+            try {
+                const html = await arquivo.text();
+                if (!html.trim()) throw new Error('arquivo vazio');
+                aulaHtmlImportada = { tipo: 'html_importado', html: html, arquivo: arquivo.name };
+                const campoTitulo = document.getElementById('prof-nome-aula');
+                if (campoTitulo && !campoTitulo.value.trim()) campoTitulo.value = extrairTituloDoHtml(html, arquivo.name);
+                atualizarInterfaceHtmlImportado();
+                showToast('HTML carregado! Confira a prévia e salve a aula.', 'success');
+            } catch (e) {
+                aulaHtmlImportada = null;
+                if (input) input.value = '';
+                atualizarInterfaceHtmlImportado();
+                showToast('Não foi possível ler esse arquivo HTML.', 'error');
+            }
+        }
+
+        function alternarPreviewHtmlImportado() {
+            if (!aulaHtmlImportada) { showToast('Primeiro escolha um arquivo HTML.', 'info'); return; }
+            const preview = document.getElementById('preview-html-importado');
+            preview.classList.toggle('ativo');
+            if (preview.classList.contains('ativo')) preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function limparEstadoHtmlImportado() {
+            aulaHtmlImportada = null;
+            const input = document.getElementById('arquivo-html-aula');
+            if (input) input.value = '';
+            atualizarInterfaceHtmlImportado();
+        }
+
+        function removerAulaHtmlImportada() {
+            limparEstadoHtmlImportado();
+            if (!document.getElementById('editor-passos-container').children.length) adicionarPassoAoEditor();
+            showToast('HTML removido. O construtor visual foi reativado.', 'info');
+        }
+
         function adicionarPassoAoEditor(textoHtml = '', urlImg = '', urlLink = '') {
             const container = document.getElementById('editor-passos-container');
             const div = document.createElement('div');
@@ -1511,14 +1630,15 @@
             const m = document.getElementById('prof-modulo').value;
             const a = document.getElementById('prof-aula').value;
             document.getElementById('editor-passos-container').innerHTML = '';
+            document.getElementById('editor-quiz-container').innerHTML = '';
+            document.getElementById('prof-prompt-template').value = '';
+            limparEstadoHtmlImportado();
             try {
                 const { data } = await bancoDados.from('roteiros_aulas').select('nome_modulo, nome_aula, passos_midia').eq('id', `${c}_${m}_${a}`).maybeSingle();
                 if (data) {
                     let titulo = data.nome_aula || ''; if (titulo.includes('|||')) titulo = titulo.split('|||')[0].trim();
                     document.getElementById('prof-nome-aula').value = titulo;
                     document.getElementById('prof-nome-modulo').value = data.nome_modulo || '';
-                    document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
-                    document.getElementById('prof-prompt-template').value = '';
                     if (data.passos_midia) {
                         data.passos_midia.forEach(p => {
                             if (p.tipo === 'quiz') adicionarPerguntaQuiz(p);
@@ -1529,17 +1649,20 @@
                             else if (p.tipo === 'lista') adicionarBlocoLista(p);
                             else if (p.tipo === 'cartoes') adicionarBlocoCartoes(p);
                             else if (p.tipo === 'config_respostas') document.getElementById('prof-prompt-template').value = p.prompt_template || '';
+                            else if (p.tipo === 'html_importado' && p.html) aulaHtmlImportada = { tipo: 'html_importado', html: p.html, arquivo: p.arquivo || 'Aula HTML salva' };
                             else adicionarPassoAoEditor(p.texto, p.imagem, p.link);
                         });
                     }
+                    atualizarInterfaceHtmlImportado();
+                    if (!aulaHtmlImportada && !document.getElementById('editor-passos-container').children.length) adicionarPassoAoEditor();
                 } else {
                     document.getElementById('prof-nome-modulo').value = '';
                     document.getElementById('prof-nome-aula').value = '';
-                    document.getElementById('editor-quiz-container').innerHTML = ''; // Limpa quiz
-                    document.getElementById('prof-prompt-template').value = '';
                     adicionarPassoAoEditor();
                 }
-            } catch (err) {}
+            } catch (err) {
+                if (!document.getElementById('editor-passos-container').children.length) adicionarPassoAoEditor();
+            }
         }
 
         function adicionarPerguntaQuiz(dados = null) {
@@ -1587,7 +1710,10 @@
             const nAula = document.getElementById('prof-nome-aula').value.trim();
 
             let pacotePassos = [];
-            document.querySelectorAll('#editor-passos-container .step-editor-item').forEach(item => {
+            if (aulaHtmlImportada) {
+                pacotePassos.push({ tipo: 'html_importado', html: aulaHtmlImportada.html, arquivo: aulaHtmlImportada.arquivo || 'aula.html' });
+            } else {
+                document.querySelectorAll('#editor-passos-container .step-editor-item').forEach(item => {
                 if (item.dataset.tipo === 'pergunta') {
                     const pTxt = item.querySelector('.pergunta-aberta-texto').value.trim();
                     const dica = item.querySelector('.pergunta-aberta-dica').value.trim();
@@ -1618,21 +1744,22 @@
                 }
             });
 
-            document.querySelectorAll('.quiz-prof-item').forEach(item => {
-                const p = item.querySelector('.quiz-p').value.trim();
-                const opcoes = Array.from(item.querySelectorAll('.quiz-o')).map(input => input.value.trim());
-                let correta = 0;
-                item.querySelectorAll('.quiz-r').forEach((r, idx) => { if(r.checked) correta = idx; });
-                if (p && opcoes[0] && opcoes[1]) {
-                    pacotePassos.push({ tipo: 'quiz', pergunta: p, opcoes: opcoes, correta: correta });
-                }
-            });
+                document.querySelectorAll('.quiz-prof-item').forEach(item => {
+                    const p = item.querySelector('.quiz-p').value.trim();
+                    const opcoes = Array.from(item.querySelectorAll('.quiz-o')).map(input => input.value.trim());
+                    let correta = 0;
+                    item.querySelectorAll('.quiz-r').forEach((r, idx) => { if(r.checked) correta = idx; });
+                    if (p && opcoes[0] && opcoes[1]) {
+                        pacotePassos.push({ tipo: 'quiz', pergunta: p, opcoes: opcoes, correta: correta });
+                    }
+                });
+            }
 
             if(pacotePassos.length === 0) { showToast("Escreva pelo menos um passo ou adicione uma pergunta!", "warning"); return; }
 
             const promptTemplate = (document.getElementById('prof-prompt-template').value || '').trim();
             const temPerguntaAberta = pacotePassos.some(p => p.tipo === 'pergunta');
-            if (promptTemplate || temPerguntaAberta) {
+            if (!aulaHtmlImportada && (promptTemplate || temPerguntaAberta)) {
                 pacotePassos.push({ tipo: 'config_respostas', prompt_template: promptTemplate });
             }
             let dMod = c === 'reposicao' ? `Ficha ${m.split('_')[1].padStart(2, '0')}` : `Módulo ${m.split('_')[1].padStart(2, '0')}`;
@@ -1640,7 +1767,8 @@
             let dAula = c === 'ingles' ? `Lesson ${a.split('_')[1].padStart(2, '0')}` : `Aula ${a.split('_')[1].padStart(2, '0')}`;
 
             try {
-                await bancoDados.from('roteiros_aulas').upsert({ id: `${c}_${m}_${a}`, modulo_id: `${c}_${m}`, aula_id: a, nome_modulo: nModulo || dMod, nome_aula: nAula || dAula, passos_midia: pacotePassos, passos: ["html_rich_text"] });
+                const { error } = await bancoDados.from('roteiros_aulas').upsert({ id: `${c}_${m}_${a}`, modulo_id: `${c}_${m}`, aula_id: a, nome_modulo: nModulo || dMod, nome_aula: nAula || dAula, passos_midia: pacotePassos, passos: [aulaHtmlImportada ? "html_importado" : "html_rich_text"] });
+                if (error) throw error;
                 showToast("Aula salva com sucesso! 🚀", "success");
                 await baixarNomesCustomizados();
             } catch (err) { showToast("Erro ao salvar", "error"); }
@@ -1847,7 +1975,21 @@
             void contPasso.offsetWidth; // Trigger reflow
             contPasso.classList.add('fade-in-step');
 
-            if (passo.tipo === 'quiz') {
+            if (passo.tipo === 'html_importado') {
+                document.getElementById('btn-ler-audio').style.display = 'none';
+                contPasso.innerHTML = '';
+                const iframe = document.createElement('iframe');
+                iframe.className = 'aula-html-importada';
+                iframe.title = 'Conteúdo da aula';
+                iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-popups');
+                iframe.setAttribute('referrerpolicy', 'no-referrer');
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.srcdoc = prepararHtmlParaIframe(passo.html || '');
+                contPasso.appendChild(iframe);
+                btnNext.style.display = 'block';
+                btnPrev.disabled = true;
+                aplicarEstiloBotaoFinal(btnNext);
+            } else if (passo.tipo === 'quiz') {
                 document.getElementById('btn-ler-audio').style.display = 'none';
 
                 let opcoesHtml = passo.opcoes.map((op, idx) => {
