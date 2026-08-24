@@ -266,7 +266,23 @@
         .preview-html-importado, .aula-html-importada { width: 100%; border: 1px solid var(--gray-light); border-radius: 14px; background: #fff; }
         .preview-html-importado { display: none; height: 480px; margin-top: 14px; }
         .preview-html-importado.ativo { display: block; }
-        .aula-html-importada { min-height: 70vh; height: 72vh; }
+        .aula-html-importada { display: block; min-height: 70vh; height: 72vh; border: 0; border-radius: 0; overflow: hidden; }
+
+        /* Aula HTML ocupa a página inteira, sem a caixa do leitor passo a passo */
+        body.aula-html-aberta .container { max-width: 1200px; }
+        #estudante-passos.aula-html-ativa #titulo-aula-atual,
+        #estudante-passos.aula-html-ativa #tempo-estimado-aula,
+        #estudante-passos.aula-html-ativa .progress-wrapper { display: none; }
+        #estudante-passos.aula-html-ativa .step-viewer-card,
+        body:not(.dark-mode) #estudante-passos.aula-html-ativa .step-viewer-card { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; margin-bottom: 0; }
+        #estudante-passos.aula-html-ativa .step-scroll-area,
+        #estudante-passos.aula-html-ativa #conteudo-passo { margin: 0; padding: 0; min-height: 0; }
+        #estudante-passos.aula-html-ativa .nav-steps-spacer { display: none; }
+        #estudante-passos.aula-html-ativa .nav-steps { position: static; max-width: none; justify-content: center; padding: 18px 0 8px; }
+        #estudante-passos.aula-html-ativa #btnPrev { display: none !important; }
+        .quiz-html-chamada { margin: 22px auto 6px; padding: 22px; max-width: 720px; text-align: center; border-radius: 16px; background: var(--warning-light); border: 2px dashed var(--warning); }
+        .quiz-html-chamada strong { display: block; color: var(--text); font-size: 1.2rem; margin-bottom: 5px; }
+        .quiz-html-chamada p { color: var(--text-light); margin: 0 0 14px; }
 
         /* Abas do Professor */
         .prof-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
@@ -998,6 +1014,7 @@
 
         function sairDoPortal() {
             if (window.speechSynthesis) window.speechSynthesis.cancel();
+            alternarModoAulaHtml(false);
             alunoLogado = '';
             alunoLogadoDados = null;
             cursoSelecionado = '';
@@ -1328,11 +1345,88 @@
             } catch (e) {}
         }
 
+        function encontrarQuizNoDocumento(doc) {
+            const porTitulo = Array.from(doc.querySelectorAll('h1, h2, h3, h4')).find(el => /quiz|question[aá]rio|teste\s+(seus?|o\s+que|voc[eê])|atividade\s+final/i.test(el.textContent || ''));
+            if (porTitulo) return porTitulo;
+            const porSeletor = doc.querySelector('[data-quiz], #quiz, [id*="quiz" i], [class*="quiz" i], [id*="questionario" i], [id*="questionário" i]');
+            return porSeletor || null;
+        }
+
+        function htmlContemQuiz(html) {
+            try {
+                const doc = new DOMParser().parseFromString(html || '', 'text/html');
+                return !!encontrarQuizNoDocumento(doc);
+            } catch (e) { return false; }
+        }
+
         function prepararHtmlParaIframe(html) {
-            const ajustes = '<base target="_blank"><meta name="viewport" content="width=device-width, initial-scale=1">';
-            if (/<head[\s>]/i.test(html)) return html.replace(/<head([^>]*)>/i, `<head$1>${ajustes}`);
-            if (/<html[\s>]/i.test(html)) return html.replace(/<html([^>]*)>/i, `<html$1><head>${ajustes}</head>`);
-            return `<!doctype html><html><head>${ajustes}</head><body>${html}</body></html>`;
+            const doc = new DOMParser().parseFromString(html || '', 'text/html');
+            let base = doc.querySelector('base');
+            if (!base) { base = doc.createElement('base'); doc.head.prepend(base); }
+            base.target = '_blank';
+
+            if (!doc.querySelector('meta[name="viewport"]')) {
+                const viewport = doc.createElement('meta');
+                viewport.name = 'viewport';
+                viewport.content = 'width=device-width, initial-scale=1';
+                doc.head.appendChild(viewport);
+            }
+
+            const integracaoPortal = doc.createElement('script');
+            integracaoPortal.textContent = `
+                (() => {
+                    const encontrarQuiz = () => {
+                        const porTitulo = Array.from(document.querySelectorAll('h1, h2, h3, h4')).find(el => /quiz|question[aá]rio|teste\\s+(seus?|o\\s+que|voc[eê])|atividade\\s+final/i.test(el.textContent || ''));
+                        if (porTitulo) return porTitulo;
+                        const porSeletor = document.querySelector('[data-quiz], #quiz, [id*="quiz" i], [class*="quiz" i], [id*="questionario" i], [id*="questionário" i]');
+                        return porSeletor || null;
+                    };
+                    const informarAltura = () => {
+                        const altura = Math.max(document.body?.scrollHeight || 0, document.documentElement?.scrollHeight || 0);
+                        parent.postMessage({ tipo: 'portal-altura-aula-html', altura, temQuiz: !!encontrarQuiz() }, '*');
+                    };
+                    addEventListener('message', evento => {
+                        if (evento.data?.tipo !== 'portal-ir-quiz') return;
+                        const quiz = encontrarQuiz();
+                        if (quiz) {
+                            const topo = quiz.getBoundingClientRect().top + (document.scrollingElement?.scrollTop || 0);
+                            parent.postMessage({ tipo: 'portal-quiz-localizado', topo }, '*');
+                        }
+                    });
+                    addEventListener('load', informarAltura);
+                    document.addEventListener('load', informarAltura, true);
+                    if (window.ResizeObserver) new ResizeObserver(informarAltura).observe(document.documentElement);
+                    setTimeout(informarAltura, 100);
+                    setTimeout(informarAltura, 800);
+                })();
+            `;
+            doc.head.appendChild(integracaoPortal);
+            return '<!doctype html>' + doc.documentElement.outerHTML;
+        }
+
+        window.addEventListener('message', evento => {
+            const iframe = document.querySelector('.aula-html-importada');
+            if (!iframe || evento.source !== iframe.contentWindow || !evento.data) return;
+            if (evento.data.tipo === 'portal-altura-aula-html') {
+                const altura = Math.min(100000, Math.max(500, Number(evento.data.altura) || 0));
+                iframe.style.height = `${altura}px`;
+            } else if (evento.data.tipo === 'portal-quiz-localizado') {
+                const topoDentroDoHtml = Math.max(0, Number(evento.data.topo) || 0);
+                const alturaHeader = document.querySelector('header')?.offsetHeight || 0;
+                const topoNaPagina = window.scrollY + iframe.getBoundingClientRect().top + topoDentroDoHtml - alturaHeader - 16;
+                window.scrollTo({ top: Math.max(0, topoNaPagina), behavior: 'auto' });
+            }
+        });
+
+        function alternarModoAulaHtml(ativar) {
+            document.getElementById('estudante-passos')?.classList.toggle('aula-html-ativa', ativar);
+            document.body.classList.toggle('aula-html-aberta', ativar);
+        }
+
+        function irParaQuizHtml() {
+            const iframe = document.querySelector('.aula-html-importada');
+            if (!iframe || !iframe.contentWindow) { showToast('Quiz não encontrado nesta aula.', 'warning'); return; }
+            iframe.contentWindow.postMessage({ tipo: 'portal-ir-quiz' }, '*');
         }
 
         function extrairTituloDoHtml(html, nomeArquivo) {
@@ -1363,7 +1457,8 @@
 
             const tamanhoKb = Math.max(1, Math.round(new Blob([aulaHtmlImportada.html]).size / 1024));
             status.classList.add('ativo');
-            status.textContent = `✅ ${aulaHtmlImportada.arquivo || 'Aula HTML salva'} pronta para salvar (${tamanhoKb} KB). O construtor visual fica desativado enquanto este HTML estiver selecionado.`;
+            const avisoQuiz = htmlContemQuiz(aulaHtmlImportada.html) ? ' Quiz detectado automaticamente.' : '';
+            status.textContent = `✅ ${aulaHtmlImportada.arquivo || 'Aula HTML salva'} pronta para salvar (${tamanhoKb} KB).${avisoQuiz} O construtor visual fica desativado enquanto este HTML estiver selecionado.`;
             preview.srcdoc = prepararHtmlParaIframe(aulaHtmlImportada.html);
             editorVisual.style.display = 'none';
             btnRemover.style.display = 'inline-block';
@@ -1974,6 +2069,7 @@
             contPasso.classList.remove('fade-in-step');
             void contPasso.offsetWidth; // Trigger reflow
             contPasso.classList.add('fade-in-step');
+            alternarModoAulaHtml(passo.tipo === 'html_importado');
 
             if (passo.tipo === 'html_importado') {
                 document.getElementById('btn-ler-audio').style.display = 'none';
@@ -1986,6 +2082,14 @@
                 iframe.setAttribute('allowfullscreen', '');
                 iframe.srcdoc = prepararHtmlParaIframe(passo.html || '');
                 contPasso.appendChild(iframe);
+                if (htmlContemQuiz(passo.html)) {
+                    linkCont.innerHTML = `
+                        <div class="quiz-html-chamada">
+                            <strong>🧠 Hora de testar o que você aprendeu</strong>
+                            <p>O quiz desta aula está dentro do próprio conteúdo.</p>
+                            <button type="button" class="btn-action" onclick="irParaQuizHtml()">Fazer o quiz da aula</button>
+                        </div>`;
+                }
                 btnNext.style.display = 'block';
                 btnPrev.disabled = true;
                 aplicarEstiloBotaoFinal(btnNext);
@@ -2093,7 +2197,10 @@
 
             // Ações de fim de aula (PDF / copiar respostas) — só no último passo
             const acoesFim = document.getElementById('conclusao-acoes');
-            if (passoAtual === passosAulaAtual.length - 1) {
+            if (passo.tipo === 'html_importado') {
+                acoesFim.style.display = 'none';
+                acoesFim.innerHTML = '';
+            } else if (passoAtual === passosAulaAtual.length - 1) {
                 acoesFim.className = 'conclusao-acoes-box';
                 acoesFim.style.display = 'block';
                 acoesFim.innerHTML = `<strong style="font-size:1.1rem;">🎁 Guarde esta aula</strong>${htmlBotoesConclusao()}`;
@@ -2155,15 +2262,17 @@
                 verificarConquistas();
                 atualizarDashboard();
                 showToast("Parabéns! Aula concluída com sucesso! 🎓", "success");
+                const eraAulaHtml = passosAulaAtual.some(p => p.tipo === 'html_importado');
+                alternarModoAulaHtml(false);
                 avancarParaAulasModulo();
                 document.getElementById('estudante-passos').style.display = 'none';
                 document.getElementById('estudante-aulas').style.display = 'block';
-                abrirModalConclusao();
+                if (!eraAulaHtml) abrirModalConclusao();
 
             } else mostrarPasso();
         }
 
-        function voltarParaAulas() { document.getElementById('estudante-passos').style.display = 'none'; document.getElementById('estudante-aulas').style.display = 'block'; }
+        function voltarParaAulas() { alternarModoAulaHtml(false); document.getElementById('estudante-passos').style.display = 'none'; document.getElementById('estudante-aulas').style.display = 'block'; }
 
         function lerTextoPasso() {
             if ('speechSynthesis' in window) {
@@ -2191,6 +2300,7 @@
         }
 
         function htmlBotoesConclusao() {
+            if (passosAulaAtual.some(p => p.tipo === 'html_importado')) return '';
             const temPerguntas = passosAulaAtual.some(p => p.tipo === 'pergunta');
             let h = `<button class="btn-conclusao alt" onclick="salvarAulaPDF()">📄 Salvar aula em PDF</button>`;
             if (temPerguntas) {
@@ -2201,7 +2311,9 @@
         }
 
         function abrirModalConclusao() {
-            document.getElementById('conclusao-modal-botoes').innerHTML = htmlBotoesConclusao();
+            const botoes = htmlBotoesConclusao();
+            if (!botoes) return;
+            document.getElementById('conclusao-modal-botoes').innerHTML = botoes;
             document.getElementById('conclusao-modal-overlay').style.display = 'flex';
         }
 
