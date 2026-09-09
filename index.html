@@ -808,6 +808,10 @@
         let passosAulaAtual = [];
         let passoAtual = 0;
         let respostasAbertas = {};
+        let respostasHtmlAtual = {};
+        let aulaHtmlRespostasId = '';
+        let nomeAulaHtmlAtual = '';
+        let timerSalvamentoHtml = null;
         let promptTemplateAtual = '';
         let nomesCustomizados = {};
         let aulaHtmlImportada = null;
@@ -1410,6 +1414,106 @@
                         const altura = Math.max(document.body?.scrollHeight || 0, document.documentElement?.scrollHeight || 0);
                         parent.postMessage({ tipo: 'portal-altura-aula-html', altura, temQuiz: !!encontrarQuiz() }, '*');
                     };
+                    let restaurandoRespostas = false;
+                    const textoCurto = texto => (texto || '').replace(/\\s+/g, ' ').trim().substring(0, 240);
+                    const elementosDeFormulario = () => Array.from(document.querySelectorAll('textarea, select, [contenteditable="true"], input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="hidden"])'));
+                    const contextoDoCampo = campo => {
+                        const contexto = campo.closest('[data-resposta-id], .portal-quiz-pergunta, .quiz-q, .question, .pergunta, fieldset, section, article');
+                        return contexto === campo ? campo.parentElement : (contexto || campo.parentElement);
+                    };
+                    const perguntaDoCampo = campo => {
+                        const contexto = contextoDoCampo(campo);
+                        const titulo = contexto?.querySelector('.portal-quiz-enunciado, .q-text, legend, h1, h2, h3, h4, label, p');
+                        return textoCurto(titulo?.textContent || campo.closest('label')?.textContent || campo.getAttribute('aria-label') || campo.placeholder || campo.name || 'Resposta da aula');
+                    };
+                    const idDoCampo = campo => {
+                        if (campo.dataset.portalCampoId) return campo.dataset.portalCampoId;
+                        const explicito = campo.dataset.respostaId || contextoDoCampo(campo)?.dataset?.respostaId;
+                        let id = explicito || campo.id || campo.name;
+                        if ((campo.type || '').toLowerCase() === 'radio' && campo.name) id = 'radio-' + campo.name;
+                        if (!id) id = 'campo-' + elementosDeFormulario().indexOf(campo);
+                        campo.dataset.portalCampoId = String(id).substring(0, 160);
+                        return campo.dataset.portalCampoId;
+                    };
+                    const registroDoCampo = campo => {
+                        const tipo = (campo.type || campo.tagName || 'texto').toLowerCase();
+                        if (tipo === 'radio' && !campo.checked) return null;
+                        let valor = campo.isContentEditable ? campo.innerText : campo.value;
+                        let resposta = valor;
+                        if (tipo === 'checkbox') {
+                            valor = campo.checked ? 'true' : 'false';
+                            resposta = campo.checked ? 'Marcado' : 'Não marcado';
+                        } else if (tipo === 'select-one' || tipo === 'select-multiple') {
+                            resposta = Array.from(campo.selectedOptions || []).map(opcao => textoCurto(opcao.textContent)).join(', ');
+                            valor = tipo === 'select-multiple' ? Array.from(campo.selectedOptions || []).map(opcao => opcao.value) : campo.value;
+                        } else if (tipo === 'radio') {
+                            resposta = textoCurto(campo.closest('label')?.textContent || campo.value);
+                        }
+                        return { campo_id: idDoCampo(campo), tipo, valor, resposta: String(resposta ?? '').substring(0, 10000), pergunta: perguntaDoCampo(campo) };
+                    };
+                    const enviarRegistro = registro => {
+                        if (!registro || restaurandoRespostas) return;
+                        parent.postMessage({ tipo: 'portal-resposta-html', registro }, '*');
+                    };
+                    const idDoGrupoDeBotoes = grupo => {
+                        const explicito = grupo.dataset.respostaId || grupo.id;
+                        if (explicito) return 'botao-' + explicito;
+                        if (grupo.matches('.scenario[data-correct]')) return 'botao-cenario-' + Array.from(document.querySelectorAll('.scenario[data-correct]')).indexOf(grupo);
+                        const grupos = Array.from(document.querySelectorAll('[data-resposta-id], [data-question], [data-pergunta]')).filter(item => item.querySelector('button'));
+                        return 'botao-grupo-' + Math.max(0, grupos.indexOf(grupo));
+                    };
+                    const configurarSalvamento = () => {
+                        document.addEventListener('input', evento => enviarRegistro(registroDoCampo(evento.target)), true);
+                        document.addEventListener('change', evento => enviarRegistro(registroDoCampo(evento.target)), true);
+                        document.addEventListener('click', evento => {
+                            const botao = evento.target.closest('button');
+                            if (!botao) return;
+                            const grupo = botao.closest('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta]');
+                            if (grupo && !botao.classList.contains('portal-quiz-corrigir')) {
+                                const botoes = Array.from(grupo.querySelectorAll('button'));
+                                enviarRegistro({
+                                    campo_id: idDoGrupoDeBotoes(grupo),
+                                    tipo: 'botao',
+                                    valor: String(botoes.indexOf(botao)),
+                                    resposta: textoCurto(botao.textContent),
+                                    pergunta: textoCurto(grupo.querySelector('h1, h2, h3, h4, p')?.textContent || 'Escolha da atividade')
+                                });
+                            }
+                            if (botao.classList.contains('portal-quiz-corrigir')) {
+                                setTimeout(() => enviarRegistro({
+                                    campo_id: 'portal-quiz-corrigido',
+                                    tipo: 'acao',
+                                    valor: 'true',
+                                    resposta: textoCurto(document.querySelector('.portal-quiz-resultado')?.textContent || 'Quiz corrigido'),
+                                    pergunta: 'Resultado do quiz final'
+                                }), 0);
+                            }
+                        });
+                    };
+                    const restaurarRespostas = registros => {
+                        restaurandoRespostas = true;
+                        const lista = Array.isArray(registros) ? registros : [];
+                        const porId = Object.fromEntries(lista.filter(item => item?.campo_id).map(item => [item.campo_id, item]));
+                        elementosDeFormulario().forEach(campo => {
+                            const registro = porId[idDoCampo(campo)];
+                            if (!registro) return;
+                            const tipo = (campo.type || campo.tagName || '').toLowerCase();
+                            if (tipo === 'radio') campo.checked = String(campo.value) === String(registro.valor);
+                            else if (tipo === 'checkbox') campo.checked = String(registro.valor) === 'true';
+                            else if (tipo === 'select-multiple' && Array.isArray(registro.valor)) Array.from(campo.options).forEach(opcao => { opcao.selected = registro.valor.includes(opcao.value); });
+                            else if (campo.isContentEditable) campo.innerText = registro.valor || '';
+                            else campo.value = registro.valor ?? '';
+                        });
+                        lista.filter(item => item?.tipo === 'botao').forEach(registro => {
+                            const grupos = Array.from(document.querySelectorAll('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta]')).filter(item => item.matches('.scenario[data-correct]') || item.querySelector('button'));
+                            const grupo = grupos.find(item => idDoGrupoDeBotoes(item) === registro.campo_id);
+                            const botao = grupo?.querySelectorAll('button')?.[Number(registro.valor)];
+                            if (botao && !botao.disabled) botao.click();
+                        });
+                        if (porId['portal-quiz-corrigido']) document.querySelector('.portal-quiz-corrigir')?.click();
+                        restaurandoRespostas = false;
+                        informarAltura();
+                    };
                     const montarQuizFinal = () => {
                         if (document.getElementById('portal-quiz-final')) return;
                         const blocosPergunta = Array.from(document.querySelectorAll('.quiz-q'));
@@ -1582,17 +1686,25 @@
                         informarAltura();
                     };
                     addEventListener('message', evento => {
-                        if (evento.data?.tipo !== 'portal-ir-quiz') return;
-                        const quiz = encontrarQuiz();
-                        if (quiz) {
-                            const topo = quiz.getBoundingClientRect().top + (document.scrollingElement?.scrollTop || 0);
-                            parent.postMessage({ tipo: 'portal-quiz-localizado', topo }, '*');
+                        if (evento.data?.tipo === 'portal-ir-quiz') {
+                            const quiz = encontrarQuiz();
+                            if (quiz) {
+                                const topo = quiz.getBoundingClientRect().top + (document.scrollingElement?.scrollTop || 0);
+                                parent.postMessage({ tipo: 'portal-quiz-localizado', topo }, '*');
+                            }
+                        } else if (evento.data?.tipo === 'portal-restaurar-respostas-html') {
+                            restaurarRespostas(evento.data.respostas);
                         }
                     });
                     addEventListener('load', informarAltura);
                     document.addEventListener('load', informarAltura, true);
-                    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montarQuizFinal);
-                    else montarQuizFinal();
+                    const inicializarIntegracao = () => {
+                        montarQuizFinal();
+                        configurarSalvamento();
+                        parent.postMessage({ tipo: 'portal-html-pronto' }, '*');
+                    };
+                    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializarIntegracao);
+                    else inicializarIntegracao();
                     if (window.ResizeObserver) new ResizeObserver(informarAltura).observe(document.documentElement);
                     setTimeout(informarAltura, 100);
                     setTimeout(informarAltura, 800);
@@ -1600,6 +1712,83 @@
             `;
             doc.head.appendChild(integracaoPortal);
             return '<!doctype html>' + doc.documentElement.outerHTML;
+        }
+
+        function chaveLocalRespostasHtml(aulaId = aulaHtmlRespostasId) {
+            return `respostas_html_${alunoLogadoDados?.id || alunoLogado || 'visitante'}_${aulaId}`;
+        }
+
+        function atualizarStatusRespostasHtml(texto, tipo = '') {
+            const status = document.getElementById('status-respostas-html');
+            if (!status) return;
+            status.textContent = texto;
+            status.style.color = tipo === 'erro' ? 'var(--warning)' : 'var(--text-light)';
+        }
+
+        function enviarRespostasHtmlAoIframe(iframe = document.querySelector('.aula-html-importada')) {
+            if (!iframe?.contentWindow) return;
+            iframe.contentWindow.postMessage({ tipo: 'portal-restaurar-respostas-html', respostas: Object.values(respostasHtmlAtual) }, '*');
+        }
+
+        async function carregarRespostasHtmlNuvem(aulaId) {
+            respostasHtmlAtual = {};
+            aulaHtmlRespostasId = aulaId;
+            if (alunoLogado === 'professora_teste') return;
+            try {
+                const local = JSON.parse(localStorage.getItem(chaveLocalRespostasHtml(aulaId)) || '[]');
+                if (Array.isArray(local)) local.forEach(item => { if (item?.campo_id) respostasHtmlAtual[item.campo_id] = item; });
+            } catch(e) {}
+            if (!bancoDados || !alunoLogadoDados) return;
+            try {
+                const idRegistro = `${alunoLogadoDados.id}__${aulaId}`;
+                const { data, error } = await bancoDados.from('respostas_alunos').select('respostas').eq('id', idRegistro).maybeSingle();
+                if (error) throw error;
+                if (Array.isArray(data?.respostas)) {
+                    data.respostas.forEach(item => { if (item?.campo_id) respostasHtmlAtual[item.campo_id] = item; });
+                    localStorage.setItem(chaveLocalRespostasHtml(aulaId), JSON.stringify(Object.values(respostasHtmlAtual)));
+                }
+            } catch(e) {}
+        }
+
+        function registrarRespostaHtml(registro) {
+            if (!registro?.campo_id || alunoLogado === 'professora_teste' || !aulaHtmlRespostasId) return;
+            const campoId = String(registro.campo_id).substring(0, 160);
+            respostasHtmlAtual[campoId] = {
+                campo_id: campoId,
+                tipo: String(registro.tipo || 'texto').substring(0, 40),
+                valor: Array.isArray(registro.valor) ? registro.valor.slice(0, 100) : String(registro.valor ?? '').substring(0, 10000),
+                pergunta: String(registro.pergunta || 'Resposta da aula').substring(0, 240),
+                resposta: String(registro.resposta ?? '').substring(0, 10000)
+            };
+            try { localStorage.setItem(chaveLocalRespostasHtml(), JSON.stringify(Object.values(respostasHtmlAtual))); } catch(e) {}
+            atualizarStatusRespostasHtml('💾 Salvando na sua conta...');
+            clearTimeout(timerSalvamentoHtml);
+            const contexto = {
+                aulaId: aulaHtmlRespostasId,
+                nomeAula: nomeAulaHtmlAtual,
+                respostas: JSON.parse(JSON.stringify(Object.values(respostasHtmlAtual)))
+            };
+            timerSalvamentoHtml = setTimeout(() => salvarRespostasHtmlNuvem(contexto), 800);
+        }
+
+        async function salvarRespostasHtmlNuvem(contexto) {
+            if (!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste' || !contexto?.aulaId) return;
+            try {
+                const { error } = await bancoDados.from('respostas_alunos').upsert({
+                    id: `${alunoLogadoDados.id}__${contexto.aulaId}`,
+                    aluno_id: String(alunoLogadoDados.id),
+                    aluno_nome: alunoLogado,
+                    aula_id: contexto.aulaId,
+                    nome_aula: contexto.nomeAula || 'Aula HTML',
+                    respostas: contexto.respostas,
+                    prompt_gerado: 'Respostas salvas automaticamente na aula HTML.',
+                    criado_em: new Date().toISOString()
+                });
+                if (error) throw error;
+                if (contexto.aulaId === aulaHtmlRespostasId) atualizarStatusRespostasHtml('✅ Respostas salvas na sua conta');
+            } catch(e) {
+                if (contexto.aulaId === aulaHtmlRespostasId) atualizarStatusRespostasHtml('📱 Salvo neste aparelho. A nuvem será atualizada na próxima resposta.', 'erro');
+            }
         }
 
         window.addEventListener('message', evento => {
@@ -1613,6 +1802,10 @@
                 const alturaHeader = document.querySelector('header')?.offsetHeight || 0;
                 const topoNaPagina = window.scrollY + iframe.getBoundingClientRect().top + topoDentroDoHtml - alturaHeader - 16;
                 window.scrollTo({ top: Math.max(0, topoNaPagina), behavior: 'auto' });
+            } else if (evento.data.tipo === 'portal-html-pronto') {
+                enviarRespostasHtmlAoIframe(iframe);
+            } else if (evento.data.tipo === 'portal-resposta-html') {
+                registrarRespostaHtml(evento.data.registro);
             }
         });
 
@@ -2238,6 +2431,9 @@
                     if (alunoLogado !== 'professora_teste') {
                         try { respostasAbertas = JSON.parse(localStorage.getItem('respostas_' + aulaIdCompleto)) || {}; } catch(e) { respostasAbertas = {}; }
                     }
+                    nomeAulaHtmlAtual = data.nome_aula ? data.nome_aula.split('|||')[0].trim() : 'Aula HTML';
+                    if (passosAulaAtual.some(p => p.tipo === 'html_importado')) await carregarRespostasHtmlNuvem(aulaIdCompleto);
+                    else { respostasHtmlAtual = {}; aulaHtmlRespostasId = ''; }
 
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
@@ -2279,15 +2475,16 @@
                 iframe.setAttribute('referrerpolicy', 'no-referrer');
                 iframe.setAttribute('allowfullscreen', '');
                 iframe.srcdoc = prepararHtmlParaIframe(passo.html || '');
+                iframe.addEventListener('load', () => enviarRespostasHtmlAoIframe(iframe));
                 contPasso.appendChild(iframe);
-                if (htmlContemQuiz(passo.html)) {
-                    linkCont.innerHTML = `
-                        <div class="quiz-html-chamada">
-                            <strong>🧠 Hora de testar o que você aprendeu</strong>
-                            <p>O quiz desta aula está dentro do próprio conteúdo.</p>
-                            <button type="button" class="btn-action" onclick="irParaQuizHtml()">Fazer o quiz da aula</button>
-                        </div>`;
-                }
+                const temQuizHtml = htmlContemQuiz(passo.html);
+                linkCont.innerHTML = `
+                    <div class="quiz-html-chamada">
+                        <strong>${temQuizHtml ? '🧠 Hora de testar o que você aprendeu' : '💾 Seu conteúdo fica guardado'}</strong>
+                        <p>${temQuizHtml ? 'O quiz desta aula está dentro do próprio conteúdo.' : 'O que você escrever ou escolher será salvo automaticamente.'}</p>
+                        ${temQuizHtml ? '<button type="button" class="btn-action" onclick="irParaQuizHtml()">Fazer o quiz da aula</button>' : ''}
+                        <p id="status-respostas-html" style="margin:12px 0 0; font-size:0.9rem; color:var(--text-light);">${alunoLogado === 'professora_teste' ? '👁️ Modo de teste: as respostas não serão gravadas.' : '💾 Salvamento automático ativado para sua conta.'}</p>
+                    </div>`;
                 btnNext.style.display = 'block';
                 btnPrev.disabled = true;
                 aplicarEstiloBotaoFinal(btnNext);
