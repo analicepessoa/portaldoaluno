@@ -1376,6 +1376,36 @@
                 doc.head.appendChild(viewport);
             }
 
+            // Aulas HTML ficam em um sandbox sem acesso ao localStorage do portal.
+            // Redireciona o armazenamento próprio da aula para uma memória segura,
+            // evitando que um erro de segurança interrompa scripts como o do quiz.
+            Array.from(doc.querySelectorAll('script:not([src])')).forEach(script => {
+                script.textContent = (script.textContent || '')
+                    .replace(/\bwindow\.localStorage\b/g, 'window.portalStorageAula')
+                    .replace(/\blocalStorage\b/g, 'window.portalStorageAula')
+                    .replace(/\bwindow\.sessionStorage\b/g, 'window.portalStorageSessao')
+                    .replace(/\bsessionStorage\b/g, 'window.portalStorageSessao');
+            });
+            const compatibilidadeStorage = doc.createElement('script');
+            compatibilidadeStorage.textContent = `
+                (() => {
+                    const criarStorageSeguro = () => {
+                        const dados = Object.create(null);
+                        return {
+                            get length() { return Object.keys(dados).length; },
+                            key(indice) { return Object.keys(dados)[indice] ?? null; },
+                            getItem(chave) { chave = String(chave); return Object.prototype.hasOwnProperty.call(dados, chave) ? dados[chave] : null; },
+                            setItem(chave, valor) { dados[String(chave)] = String(valor); },
+                            removeItem(chave) { delete dados[String(chave)]; },
+                            clear() { Object.keys(dados).forEach(chave => delete dados[chave]); }
+                        };
+                    };
+                    window.portalStorageAula = criarStorageSeguro();
+                    window.portalStorageSessao = criarStorageSeguro();
+                })();
+            `;
+            doc.head.prepend(compatibilidadeStorage);
+
             const estiloQuizFinal = doc.createElement('style');
             estiloQuizFinal.textContent = `
                 #portal-quiz-final{max-width:980px;margin:40px auto 28px;padding:30px;border-radius:22px;background:#f5f3ff;border:3px solid #7c3aed;color:#1f2937;box-sizing:border-box}
@@ -1394,6 +1424,8 @@
                 #portal-quiz-final .portal-quiz-resultado{text-align:center;font-size:1.15rem;font-weight:800;margin:16px 0 0;color:#5b21b6}
                 #portal-quiz-final .portal-quiz-corrigir{display:block;margin:22px auto 0;padding:14px 24px;border:0;border-radius:12px;background:#7c3aed;color:#fff;font-size:1.05rem;font-weight:800;cursor:pointer}
                 #portal-quiz-final > section{margin-top:24px}
+                .portal-resposta-correta{outline:2px solid #16a34a!important;background:#dcfce7!important}
+                .portal-resposta-errada{outline:2px solid #dc2626!important;background:#fee2e2!important}
                 @media(max-width:650px){#portal-quiz-final{padding:20px 14px;border-radius:16px}#portal-quiz-final .portal-quiz-topo h2{font-size:1.55rem}}
                 @media print{#portal-quiz-final{break-before:page;page-break-before:always;border:2px solid #7c3aed;background:#fff;max-width:none}.portal-quiz-corrigir{display:none!important}.portal-quiz-opcao{break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
             `;
@@ -1462,6 +1494,47 @@
                         const grupos = Array.from(document.querySelectorAll('[data-resposta-id], [data-question], [data-pergunta]')).filter(item => item.querySelector('button'));
                         return 'botao-grupo-' + Math.max(0, grupos.indexOf(grupo));
                     };
+                    const ehBotaoDeCorrecao = botao => botao.matches('.portal-quiz-corrigir, #checkQuiz, [data-check-quiz], [data-corrigir-quiz]') || /corrigir\s*(o\s*)?quiz|verificar\s*respostas?/i.test(botao.textContent || '');
+                    const corrigirQuizHtmlGenerico = botao => {
+                        const area = botao.closest('form, [data-quiz], section, article') || document;
+                        const questoes = Array.from(area.querySelectorAll('.quiz-q[data-answer], .quiz-q[data-correct], [data-quiz-question][data-answer], [data-pergunta][data-correta]'));
+                        if (!questoes.length) return null;
+                        let acertos = 0;
+                        let respondidas = 0;
+                        questoes.forEach(questao => {
+                            const opcoes = Array.from(questao.querySelectorAll('input[type="radio"], input[type="checkbox"]'));
+                            const marcada = opcoes.find(opcao => opcao.checked);
+                            const respostaCorreta = String(questao.dataset.answer ?? questao.dataset.correct ?? questao.dataset.correta ?? '');
+                            const indiceCorreto = /^\\d+$/.test(respostaCorreta) ? Number(respostaCorreta) : -1;
+                            const correta = !!marcada && (String(marcada.value) === respostaCorreta || marcada.dataset.correct === 'true' || marcada.dataset.correta === 'true' || opcoes.indexOf(marcada) === indiceCorreto);
+                            if (marcada) respondidas++;
+                            if (correta) acertos++;
+                            opcoes.forEach((opcao, indice) => {
+                                const label = opcao.closest('label') || opcao.parentElement;
+                                const opcaoCorreta = String(opcao.value) === respostaCorreta || opcao.dataset.correct === 'true' || opcao.dataset.correta === 'true' || indice === indiceCorreto;
+                                label?.classList.toggle('portal-resposta-correta', opcaoCorreta);
+                                label?.classList.toggle('portal-resposta-errada', opcao.checked && !opcaoCorreta);
+                            });
+                            let feedback = questao.querySelector('.feedback, [data-feedback], .quiz-feedback');
+                            if (!feedback) {
+                                feedback = document.createElement('div');
+                                feedback.className = 'feedback';
+                                questao.appendChild(feedback);
+                            }
+                            feedback.textContent = !marcada ? '⚠️ Escolha uma alternativa.' : correta ? '✅ Correto!' : '❌ Revise esse ponto.';
+                            feedback.style.color = correta ? '#087f5b' : '#b42318';
+                            feedback.style.fontWeight = '800';
+                        });
+                        let placar = area.querySelector('.score, [data-score], #score') || document.querySelector('.score, [data-score], #score');
+                        if (!placar) {
+                            placar = document.createElement('span');
+                            placar.className = 'score';
+                            botao.after(placar);
+                        }
+                        placar.textContent = acertos + '/' + questoes.length + ' acertos';
+                        informarAltura();
+                        return { acertos, respondidas, total: questoes.length, texto: placar.textContent };
+                    };
                     const configurarSalvamento = () => {
                         document.addEventListener('input', evento => enviarRegistro(registroDoCampo(evento.target)), true);
                         document.addEventListener('change', evento => enviarRegistro(registroDoCampo(evento.target)), true);
@@ -1469,7 +1542,7 @@
                             const botao = evento.target.closest('button');
                             if (!botao) return;
                             const grupo = botao.closest('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta]');
-                            if (grupo && !botao.classList.contains('portal-quiz-corrigir')) {
+                            if (grupo && !ehBotaoDeCorrecao(botao)) {
                                 const botoes = Array.from(grupo.querySelectorAll('button'));
                                 enviarRegistro({
                                     campo_id: idDoGrupoDeBotoes(grupo),
@@ -1479,14 +1552,18 @@
                                     pergunta: textoCurto(grupo.querySelector('h1, h2, h3, h4, p')?.textContent || 'Escolha da atividade')
                                 });
                             }
-                            if (botao.classList.contains('portal-quiz-corrigir')) {
-                                setTimeout(() => enviarRegistro({
-                                    campo_id: 'portal-quiz-corrigido',
-                                    tipo: 'acao',
-                                    valor: 'true',
-                                    resposta: textoCurto(document.querySelector('.portal-quiz-resultado')?.textContent || 'Quiz corrigido'),
-                                    pergunta: 'Resultado do quiz final'
-                                }), 0);
+                            if (ehBotaoDeCorrecao(botao)) {
+                                setTimeout(() => {
+                                    const resultadoGenerico = corrigirQuizHtmlGenerico(botao);
+                                    const ehQuizPortal = botao.classList.contains('portal-quiz-corrigir');
+                                    enviarRegistro({
+                                        campo_id: ehQuizPortal ? 'portal-quiz-corrigido' : 'portal-quiz-html-corrigido',
+                                        tipo: 'acao',
+                                        valor: 'true',
+                                        resposta: textoCurto(resultadoGenerico?.texto || document.querySelector('.portal-quiz-resultado, .score, #score')?.textContent || 'Quiz corrigido'),
+                                        pergunta: 'Resultado do quiz'
+                                    });
+                                }, 0);
                             }
                         });
                     };
@@ -1511,6 +1588,10 @@
                             if (botao && !botao.disabled) botao.click();
                         });
                         if (porId['portal-quiz-corrigido']) document.querySelector('.portal-quiz-corrigir')?.click();
+                        if (porId['portal-quiz-html-corrigido']) {
+                            const botaoCorrecao = Array.from(document.querySelectorAll('button, input[type="button"]')).find(ehBotaoDeCorrecao);
+                            botaoCorrecao?.click();
+                        }
                         restaurandoRespostas = false;
                         informarAltura();
                     };
