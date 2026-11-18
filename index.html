@@ -673,7 +673,7 @@
                         <h2 style="margin:0;">📝 Respostas Enviadas</h2>
                         <button class="btn-action secondary" style="margin:0;" onclick="carregarRespostasAlunos()">🔄 Atualizar</button>
                     </div>
-                    <p>Respostas que os alunos enviaram nas <strong>Perguntas Abertas</strong> das aulas (mais recentes primeiro).</p>
+                    <p>Respostas, quizzes e conclusão das aulas (atualizações mais recentes primeiro). Textos mostram a última versão; quizzes e escolhas guardam até 100 tentativas por questão.</p>
                     <div id="lista-respostas-alunos"><p style="color:var(--text-light)">Clique em Atualizar para carregar.</p></div>
                 </div>
             </div>
@@ -812,6 +812,8 @@
         let aulaHtmlRespostasId = '';
         let nomeAulaHtmlAtual = '';
         let timerSalvamentoHtml = null;
+        let sincronizandoAtividades = false;
+        const atividadesPendentes = new Map();
         let promptTemplateAtual = '';
         let nomesCustomizados = {};
         let aulaHtmlImportada = null;
@@ -876,6 +878,8 @@
                 aplicarModoVisualCurso();
                 modulosLiberadosAluno = data.modulos_liberados || [];
                 aulasConcluidasAluno = data.aulas_concluidas || [];
+                recuperarAtividadesPendentes();
+                sincronizarAtividadesPendentes();
                 aulasBloqueadasAluno = data.aulas_bloqueadas || []; // Carrega bloqueios de reposição
 
                 const nomeVisivel = alunoLogado.charAt(0).toUpperCase() + alunoLogado.slice(1);
@@ -931,12 +935,9 @@
 
         async function salvarProgressoAlunoNuvem() {
             if(!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
-            try {
-                await bancoDados.from('alunos_matriculados').update({
-                    modulos_liberados: modulosLiberadosAluno,
-                    aulas_concluidas: aulasConcluidasAluno
-                }).eq('id', alunoLogadoDados.id);
-            } catch(e) {}
+            registrarRespostaHtml({ campo_id: 'portal-conclusao', tipo: 'progresso',
+                pergunta: 'Conclusão da aula', resposta: 'Aula concluída', valor: 'concluida' });
+            return sincronizarAtividadesPendentes();
         }
 
         // --- GAMEFICAÇÃO ---
@@ -1363,7 +1364,7 @@
             } catch (e) { return false; }
         }
 
-        function prepararHtmlParaIframe(html) {
+        function prepararHtmlParaIframe(html, registros = []) {
             const doc = new DOMParser().parseFromString(html || '', 'text/html');
             let base = doc.querySelector('base');
             if (!base) { base = doc.createElement('base'); doc.head.prepend(base); }
@@ -1389,19 +1390,29 @@
             const compatibilidadeStorage = doc.createElement('script');
             compatibilidadeStorage.textContent = `
                 (() => {
-                    const criarStorageSeguro = () => {
-                        const dados = Object.create(null);
+                    const iniciais = ${JSON.stringify(registros.filter(r => r.tipo === 'armazenamento')).replace(/</g, '\\u003c')};
+                    const criarStorageSeguro = (nome, persistente) => {
+                        const registro = iniciais.find(r => r.campo_id === nome);
+                        let valores = {};
+                        try { valores = JSON.parse(registro?.valor || '{}'); } catch(e) {}
+                        const dados = Object.assign(Object.create(null), valores);
+                        const informar = () => {
+                            if (persistente) parent.postMessage({ tipo: 'portal-resposta-html', registro: {
+                                campo_id: nome, tipo: 'armazenamento', pergunta: 'Estado interno da atividade',
+                                valor: JSON.stringify(dados), resposta: 'Estado da atividade guardado'
+                            } }, '*');
+                        };
                         return {
                             get length() { return Object.keys(dados).length; },
                             key(indice) { return Object.keys(dados)[indice] ?? null; },
                             getItem(chave) { chave = String(chave); return Object.prototype.hasOwnProperty.call(dados, chave) ? dados[chave] : null; },
-                            setItem(chave, valor) { dados[String(chave)] = String(valor); },
-                            removeItem(chave) { delete dados[String(chave)]; },
-                            clear() { Object.keys(dados).forEach(chave => delete dados[chave]); }
+                            setItem(chave, valor) { dados[String(chave)] = String(valor); informar(); },
+                            removeItem(chave) { delete dados[String(chave)]; informar(); },
+                            clear() { Object.keys(dados).forEach(chave => delete dados[chave]); informar(); }
                         };
                     };
-                    window.portalStorageAula = criarStorageSeguro();
-                    window.portalStorageSessao = criarStorageSeguro();
+                    window.portalStorageAula = criarStorageSeguro('portal-storage-local', true);
+                    window.portalStorageSessao = criarStorageSeguro('portal-storage-sessao', false);
                 })();
             `;
             doc.head.prepend(compatibilidadeStorage);
@@ -1447,6 +1458,8 @@
                         parent.postMessage({ tipo: 'portal-altura-aula-html', altura, temQuiz: !!encontrarQuiz() }, '*');
                     };
                     let restaurandoRespostas = false;
+                    let respostasRestauradas = false;
+                    let registrosRestaurados = [];
                     const textoCurto = texto => (texto || '').replace(/\\s+/g, ' ').trim().substring(0, 240);
                     const elementosDeFormulario = () => Array.from(document.querySelectorAll('textarea, select, [contenteditable="true"], input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="hidden"])'));
                     const contextoDoCampo = campo => {
@@ -1463,11 +1476,13 @@
                         const explicito = campo.dataset.respostaId || contextoDoCampo(campo)?.dataset?.respostaId;
                         let id = explicito || campo.id || campo.name;
                         if ((campo.type || '').toLowerCase() === 'radio' && campo.name) id = 'radio-' + campo.name;
+                        else if (campo.type === 'checkbox' && !campo.id) id = (id || 'checkbox') + '-' + elementosDeFormulario().indexOf(campo);
                         if (!id) id = 'campo-' + elementosDeFormulario().indexOf(campo);
                         campo.dataset.portalCampoId = String(id).substring(0, 160);
                         return campo.dataset.portalCampoId;
                     };
                     const registroDoCampo = campo => {
+                        if (!campo.matches('textarea, select, [contenteditable="true"], input') || ['password', 'file', 'hidden', 'button', 'submit', 'reset'].includes(campo.type)) return null;
                         const tipo = (campo.type || campo.tagName || 'texto').toLowerCase();
                         if (tipo === 'radio' && !campo.checked) return null;
                         let valor = campo.isContentEditable ? campo.innerText : campo.value;
@@ -1487,11 +1502,16 @@
                         if (!registro || restaurandoRespostas) return;
                         parent.postMessage({ tipo: 'portal-resposta-html', registro }, '*');
                     };
+                    // Atividades próprias (jogos, arrastar/soltar etc.) podem usar este contrato.
+                    window.portalAtividade = {
+                        registrar: enviarRegistro,
+                        obter: campoId => registrosRestaurados.find(r => r.campo_id === campoId) || null
+                    };
                     const idDoGrupoDeBotoes = grupo => {
                         const explicito = grupo.dataset.respostaId || grupo.id;
                         if (explicito) return 'botao-' + explicito;
                         if (grupo.matches('.scenario[data-correct]')) return 'botao-cenario-' + Array.from(document.querySelectorAll('.scenario[data-correct]')).indexOf(grupo);
-                        const grupos = Array.from(document.querySelectorAll('[data-resposta-id], [data-question], [data-pergunta]')).filter(item => item.querySelector('button'));
+                        const grupos = Array.from(document.querySelectorAll('[data-resposta-id], [data-question], [data-pergunta], .quiz-q, .question, .pergunta, [data-quiz-question]')).filter(item => item.querySelector('button, [role="radio"], .quiz-option, .option'));
                         return 'botao-grupo-' + Math.max(0, grupos.indexOf(grupo));
                     };
                     const ehBotaoDeCorrecao = botao => botao.matches('.portal-quiz-corrigir, #checkQuiz, [data-check-quiz], [data-corrigir-quiz]') || /corrigir\s*(o\s*)?quiz|verificar\s*respostas?/i.test(botao.textContent || '');
@@ -1539,11 +1559,11 @@
                         document.addEventListener('input', evento => enviarRegistro(registroDoCampo(evento.target)), true);
                         document.addEventListener('change', evento => enviarRegistro(registroDoCampo(evento.target)), true);
                         document.addEventListener('click', evento => {
-                            const botao = evento.target.closest('button');
+                            const botao = evento.target.closest('button, input[type="button"], [role="radio"], .quiz-option, .option');
                             if (!botao) return;
-                            const grupo = botao.closest('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta]');
+                            const grupo = botao.closest('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta], .quiz-q, .question, .pergunta, [data-quiz-question]');
                             if (grupo && !ehBotaoDeCorrecao(botao)) {
-                                const botoes = Array.from(grupo.querySelectorAll('button'));
+                                const botoes = Array.from(grupo.querySelectorAll('button, [role="radio"], .quiz-option, .option'));
                                 enviarRegistro({
                                     campo_id: idDoGrupoDeBotoes(grupo),
                                     tipo: 'botao',
@@ -1553,6 +1573,7 @@
                                 });
                             }
                             if (ehBotaoDeCorrecao(botao)) {
+                                if (restaurandoRespostas) return;
                                 setTimeout(() => {
                                     const resultadoGenerico = corrigirQuizHtmlGenerico(botao);
                                     const ehQuizPortal = botao.classList.contains('portal-quiz-corrigir');
@@ -1568,8 +1589,11 @@
                         });
                     };
                     const restaurarRespostas = registros => {
+                        if (respostasRestauradas) return;
+                        respostasRestauradas = true;
                         restaurandoRespostas = true;
                         const lista = Array.isArray(registros) ? registros : [];
+                        registrosRestaurados = lista;
                         const porId = Object.fromEntries(lista.filter(item => item?.campo_id).map(item => [item.campo_id, item]));
                         elementosDeFormulario().forEach(campo => {
                             const registro = porId[idDoCampo(campo)];
@@ -1582,9 +1606,9 @@
                             else campo.value = registro.valor ?? '';
                         });
                         lista.filter(item => item?.tipo === 'botao').forEach(registro => {
-                            const grupos = Array.from(document.querySelectorAll('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta]')).filter(item => item.matches('.scenario[data-correct]') || item.querySelector('button'));
+                            const grupos = Array.from(document.querySelectorAll('.scenario[data-correct], [data-resposta-id], [data-question], [data-pergunta], .quiz-q, .question, .pergunta, [data-quiz-question]')).filter(item => item.matches('.scenario[data-correct]') || item.querySelector('button, [role="radio"], .quiz-option, .option'));
                             const grupo = grupos.find(item => idDoGrupoDeBotoes(item) === registro.campo_id);
-                            const botao = grupo?.querySelectorAll('button')?.[Number(registro.valor)];
+                            const botao = grupo?.querySelectorAll('button, [role="radio"], .quiz-option, .option')?.[Number(registro.valor)];
                             if (botao && !botao.disabled) botao.click();
                         });
                         if (porId['portal-quiz-corrigido']) document.querySelector('.portal-quiz-corrigir')?.click();
@@ -1593,6 +1617,7 @@
                             botaoCorrecao?.click();
                         }
                         restaurandoRespostas = false;
+                        window.dispatchEvent(new CustomEvent('portal-atividades-restauradas', { detail: lista }));
                         informarAltura();
                     };
                     const montarQuizFinal = () => {
@@ -1767,6 +1792,7 @@
                         informarAltura();
                     };
                     addEventListener('message', evento => {
+                        if (evento.source !== parent) return;
                         if (evento.data?.tipo === 'portal-ir-quiz') {
                             const quiz = encontrarQuiz();
                             if (quiz) {
@@ -1808,69 +1834,141 @@
 
         function enviarRespostasHtmlAoIframe(iframe = document.querySelector('.aula-html-importada')) {
             if (!iframe?.contentWindow) return;
-            iframe.contentWindow.postMessage({ tipo: 'portal-restaurar-respostas-html', respostas: Object.values(respostasHtmlAtual) }, '*');
+            iframe.contentWindow.postMessage({ tipo: 'portal-restaurar-respostas-html', respostas: obterRespostasDoPassoHtml() }, '*');
+        }
+
+        function obterRespostasDoPassoHtml() {
+            const prefixo = 'html-' + passoAtual + ':';
+            return Object.values(respostasHtmlAtual).filter(r => r.campo_id.startsWith(prefixo) || !/^(html-\d+:|passo-|portal-conclusao|portal-andamento)/.test(r.campo_id))
+                .map(r => ({ ...r, campo_id: r.campo_id.startsWith(prefixo) ? r.campo_id.slice(prefixo.length) : r.campo_id }));
         }
 
         async function carregarRespostasHtmlNuvem(aulaId) {
+            clearTimeout(timerSalvamentoHtml);
             respostasHtmlAtual = {};
             aulaHtmlRespostasId = aulaId;
             if (alunoLogado === 'professora_teste') return;
             try {
                 const local = JSON.parse(localStorage.getItem(chaveLocalRespostasHtml(aulaId)) || '[]');
-                if (Array.isArray(local)) local.forEach(item => { if (item?.campo_id) respostasHtmlAtual[item.campo_id] = item; });
+                if (Array.isArray(local)) local.forEach(r => { if (r?.campo_id) respostasHtmlAtual[r.campo_id] = r; });
             } catch(e) {}
-            if (!bancoDados || !alunoLogadoDados) return;
-            try {
-                const idRegistro = `${alunoLogadoDados.id}__${aulaId}`;
-                const { data, error } = await bancoDados.from('respostas_alunos').select('respostas').eq('id', idRegistro).maybeSingle();
-                if (error) throw error;
-                if (Array.isArray(data?.respostas)) {
-                    data.respostas.forEach(item => { if (item?.campo_id) respostasHtmlAtual[item.campo_id] = item; });
+            if (bancoDados && alunoLogadoDados) {
+                try {
+                    const { data, error } = await bancoDados.from('respostas_alunos').select('respostas').eq('id', `${alunoLogadoDados.id}__${aulaId}`).maybeSingle();
+                    if (error) throw error;
+                    const perguntasLegadas = passosAulaAtual.map((p, indice) => p.tipo === 'pergunta' ? indice : -1).filter(indice => indice >= 0);
+                    let indiceLegado = 0;
+                    (data?.respostas || []).forEach(r => {
+                        if (!r.campo_id) {
+                            const indice = perguntasLegadas[indiceLegado++];
+                            if (indice === undefined) return;
+                            r = { ...r, campo_id: 'passo-' + indice, tipo: 'texto', valor: r.resposta || '' };
+                        }
+                        const local = respostasHtmlAtual[r.campo_id];
+                        if (!local || (r.atualizado_em || '') > (local.atualizado_em || '')) respostasHtmlAtual[r.campo_id] = r;
+                    });
                     localStorage.setItem(chaveLocalRespostasHtml(aulaId), JSON.stringify(Object.values(respostasHtmlAtual)));
-                }
-            } catch(e) {}
+                } catch(e) { console.warn('Não foi possível consultar as atividades na conta.', e); }
+            }
+            passosAulaAtual.forEach((passo, indice) => {
+                const registro = respostasHtmlAtual['passo-' + indice];
+                if (passo.tipo === 'pergunta' && registro) respostasAbertas[indice] = registro.valor;
+            });
         }
 
         function registrarRespostaHtml(registro) {
-            if (!registro?.campo_id || alunoLogado === 'professora_teste' || !aulaHtmlRespostasId) return;
+            if (!registro?.campo_id || !alunoLogadoDados || alunoLogado === 'professora_teste' || !aulaHtmlRespostasId) return;
             const campoId = String(registro.campo_id).substring(0, 160);
+            const anterior = respostasHtmlAtual[campoId];
+            const atualizadoEm = new Date().toISOString();
+            const tentativas = Array.isArray(anterior?.tentativas) ? anterior.tentativas : [];
+            const novaTentativa = ['quiz', 'botao', 'acao'].includes(registro.tipo);
             respostasHtmlAtual[campoId] = {
                 campo_id: campoId,
                 tipo: String(registro.tipo || 'texto').substring(0, 40),
-                valor: Array.isArray(registro.valor) ? registro.valor.slice(0, 100) : String(registro.valor ?? '').substring(0, 10000),
+                valor: Array.isArray(registro.valor) ? registro.valor.slice(0, 100) : String(registro.valor ?? '').substring(0, registro.tipo === 'armazenamento' ? 200000 : 10000),
                 pergunta: String(registro.pergunta || 'Resposta da aula').substring(0, 240),
-                resposta: String(registro.resposta ?? '').substring(0, 10000)
+                resposta: String(registro.resposta ?? '').substring(0, 10000), atualizado_em: atualizadoEm,
+                ...(typeof registro.correta === 'boolean' ? { correta: registro.correta } : {}),
+                ...(novaTentativa ? { tentativas: [...tentativas, { resposta: String(registro.resposta ?? '').substring(0, 1000), valor: registro.valor, correta: registro.correta, em: atualizadoEm }].slice(-100) } : {})
             };
-            try { localStorage.setItem(chaveLocalRespostasHtml(), JSON.stringify(Object.values(respostasHtmlAtual))); } catch(e) {}
-            atualizarStatusRespostasHtml('💾 Salvando na sua conta...');
+            let salvoLocal = true;
+            try { localStorage.setItem(chaveLocalRespostasHtml(), JSON.stringify(Object.values(respostasHtmlAtual))); } catch(e) { salvoLocal = false; }
+            atualizarStatusRespostasHtml(salvoLocal ? 'Salvando na sua conta...' : 'Não foi possível guardar neste aparelho. Mantenha a aula aberta até confirmar o envio.', salvoLocal ? '' : 'erro');
             clearTimeout(timerSalvamentoHtml);
             const contexto = {
-                aulaId: aulaHtmlRespostasId,
-                nomeAula: nomeAulaHtmlAtual,
+                aulaId: aulaHtmlRespostasId, nomeAula: nomeAulaHtmlAtual,
+                alunoId: String(alunoLogadoDados.id), alunoNome: alunoLogado,
                 respostas: JSON.parse(JSON.stringify(Object.values(respostasHtmlAtual)))
             };
-            timerSalvamentoHtml = setTimeout(() => salvarRespostasHtmlNuvem(contexto), 800);
+            atividadesPendentes.set(`${contexto.alunoId}__${contexto.aulaId}`, contexto);
+            persistirAtividadesPendentes(contexto.alunoId);
+            timerSalvamentoHtml = setTimeout(sincronizarAtividadesPendentes, 800);
         }
 
-        async function salvarRespostasHtmlNuvem(contexto) {
-            if (!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste' || !contexto?.aulaId) return;
+        function persistirAtividadesPendentes(alunoId) {
             try {
-                const { error } = await bancoDados.from('respostas_alunos').upsert({
-                    id: `${alunoLogadoDados.id}__${contexto.aulaId}`,
-                    aluno_id: String(alunoLogadoDados.id),
-                    aluno_nome: alunoLogado,
-                    aula_id: contexto.aulaId,
-                    nome_aula: contexto.nomeAula || 'Aula HTML',
-                    respostas: contexto.respostas,
-                    prompt_gerado: 'Respostas salvas automaticamente na aula HTML.',
-                    criado_em: new Date().toISOString()
-                });
-                if (error) throw error;
-                if (contexto.aulaId === aulaHtmlRespostasId) atualizarStatusRespostasHtml('✅ Respostas salvas na sua conta');
-            } catch(e) {
-                if (contexto.aulaId === aulaHtmlRespostasId) atualizarStatusRespostasHtml('📱 Salvo neste aparelho. A nuvem será atualizada na próxima resposta.', 'erro');
-            }
+                localStorage.setItem('atividades_pendentes_' + alunoId, JSON.stringify([...atividadesPendentes.values()].filter(item => item.alunoId === alunoId)));
+            } catch(e) { atualizarStatusRespostasHtml('Não foi possível guardar o envio pendente neste aparelho.', 'erro'); }
         }
+
+        function recuperarAtividadesPendentes() {
+            if (!alunoLogadoDados || alunoLogado === 'professora_teste') return;
+            const alunoId = String(alunoLogadoDados.id);
+            try {
+                const lista = JSON.parse(localStorage.getItem('atividades_pendentes_' + alunoId) || '[]');
+                lista.filter(item => item.alunoId === alunoId && item.aulaId).forEach(item => {
+                    atividadesPendentes.set(`${alunoId}__${item.aulaId}`, item);
+                    if (item.respostas.some(r => r.campo_id === 'portal-conclusao') && !aulasConcluidasAluno.includes(item.aulaId)) aulasConcluidasAluno.push(item.aulaId);
+                });
+            } catch(e) { console.warn('Não foi possível recuperar os envios pendentes.', e); }
+        }
+
+        async function sincronizarAtividadesPendentes() {
+            if (sincronizandoAtividades || !bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
+            sincronizandoAtividades = true;
+            const alunoId = String(alunoLogadoDados.id);
+            try {
+                // Um ciclo por versão: novas respostas permanecem na fila para o próximo ciclo.
+                for (const [id, contexto] of [...atividadesPendentes]) {
+                    if (contexto.alunoId !== alunoId) continue;
+                    const remoto = await bancoDados.from('respostas_alunos').select('respostas').eq('id', id).maybeSingle();
+                    if (remoto.error) throw remoto.error;
+                    const mescladas = new Map((remoto.data?.respostas || []).filter(r => r.campo_id).map(r => [r.campo_id, r]));
+                    contexto.respostas.forEach(r => {
+                        if (!mescladas.has(r.campo_id) || (r.atualizado_em || '') >= (mescladas.get(r.campo_id).atualizado_em || '')) mescladas.set(r.campo_id, r);
+                    });
+                    const legadas = (remoto.data?.respostas || []).filter(r => !r.campo_id);
+                    const { error } = await bancoDados.from('respostas_alunos').upsert({
+                        id, aluno_id: alunoId, aluno_nome: contexto.alunoNome, aula_id: contexto.aulaId,
+                        nome_aula: contexto.nomeAula || 'Aula', respostas: [...legadas, ...mescladas.values()],
+                        prompt_gerado: contexto.textoGerado || 'Atividades salvas automaticamente no portal.', criado_em: new Date().toISOString()
+                    });
+                    if (error) throw error;
+                    if (mescladas.has('portal-conclusao')) {
+                        const progresso = await bancoDados.from('alunos_matriculados').select('aulas_concluidas').eq('id', alunoId).single();
+                        if (progresso.error) throw progresso.error;
+                        const concluidas = [...new Set([...(progresso.data.aulas_concluidas || []), contexto.aulaId])];
+                        const resultado = await bancoDados.from('alunos_matriculados').update({ aulas_concluidas: concluidas }).eq('id', alunoId).select('id').single();
+                        if (resultado.error) throw resultado.error;
+                    }
+                    if (atividadesPendentes.get(id) === contexto) atividadesPendentes.delete(id);
+                    persistirAtividadesPendentes(alunoId);
+                    if (alunoLogadoDados && String(alunoLogadoDados.id) === alunoId && contexto.aulaId === aulaHtmlRespostasId && !atividadesPendentes.has(id)) atualizarStatusRespostasHtml('Respostas salvas na sua conta');
+                }
+            } catch(e) {
+                atualizarStatusRespostasHtml('Envio pendente. Tentaremos novamente ao recuperar a conexão.', 'erro');
+                console.warn('Falha ao sincronizar atividades.', e);
+            } finally { sincronizandoAtividades = false; }
+        }
+
+        window.addEventListener('online', sincronizarAtividadesPendentes);
+        window.addEventListener('pagehide', () => {
+            if (alunoLogadoDados && alunoLogado !== 'professora_teste') persistirAtividadesPendentes(String(alunoLogadoDados.id));
+        });
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizarAtividadesPendentes(); });
+        setInterval(sincronizarAtividadesPendentes, 30000);
+
 
         window.addEventListener('message', evento => {
             const iframe = document.querySelector('.aula-html-importada');
@@ -1886,7 +1984,8 @@
             } else if (evento.data.tipo === 'portal-html-pronto') {
                 enviarRespostasHtmlAoIframe(iframe);
             } else if (evento.data.tipo === 'portal-resposta-html') {
-                registrarRespostaHtml(evento.data.registro);
+                const registro = evento.data.registro;
+                if (registro?.campo_id) registrarRespostaHtml({ ...registro, campo_id: 'html-' + passoAtual + ':' + registro.campo_id });
             }
         });
 
@@ -2510,11 +2609,12 @@
                     const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aId}`;
                     respostasAbertas = {};
                     if (alunoLogado !== 'professora_teste') {
-                        try { respostasAbertas = JSON.parse(localStorage.getItem('respostas_' + aulaIdCompleto)) || {}; } catch(e) { respostasAbertas = {}; }
+                        try { respostasAbertas = JSON.parse(localStorage.getItem('respostas_' + alunoLogadoDados.id + '_' + aulaIdCompleto)) || {}; } catch(e) { respostasAbertas = {}; }
                     }
                     nomeAulaHtmlAtual = data.nome_aula ? data.nome_aula.split('|||')[0].trim() : 'Aula HTML';
-                    if (passosAulaAtual.some(p => p.tipo === 'html_importado')) await carregarRespostasHtmlNuvem(aulaIdCompleto);
-                    else { respostasHtmlAtual = {}; aulaHtmlRespostasId = ''; }
+                    await carregarRespostasHtmlNuvem(aulaIdCompleto);
+                    const andamento = Number(respostasHtmlAtual['portal-andamento']?.valor);
+                    if (Number.isInteger(andamento) && andamento >= 0 && andamento < passosAulaAtual.length) passoAtual = andamento;
 
                     document.getElementById('estudante-aulas').style.display = 'none';
                     document.getElementById('estudante-passos').style.display = 'block';
@@ -2555,7 +2655,7 @@
                 iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-popups');
                 iframe.setAttribute('referrerpolicy', 'no-referrer');
                 iframe.setAttribute('allowfullscreen', '');
-                iframe.srcdoc = prepararHtmlParaIframe(passo.html || '');
+                iframe.srcdoc = prepararHtmlParaIframe(passo.html || '', obterRespostasDoPassoHtml());
                 iframe.addEventListener('load', () => enviarRespostasHtmlAoIframe(iframe));
                 contPasso.appendChild(iframe);
                 const temQuizHtml = htmlContemQuiz(passo.html);
@@ -2588,7 +2688,18 @@
                     </div>
                 `;
 
-                btnNext.style.display = 'none'; // Esconde até acertar
+                btnNext.style.display = 'none';
+                const salvaQuiz = respostasHtmlAtual['passo-' + passoAtual];
+                if (salvaQuiz?.tipo === 'quiz' && salvaQuiz.correta === true) {
+                    const opcao = contPasso.querySelectorAll('.quiz-option')[Number(salvaQuiz.valor)];
+                    if (opcao && Number(salvaQuiz.valor) === passo.correta) {
+                        opcao.classList.add('correct');
+                        opcao.parentElement.classList.add('respondido');
+                        contPasso.querySelectorAll('.quiz-option').forEach(op => { if (op !== opcao) op.classList.add('disabled'); });
+                        btnNext.style.display = 'block';
+                        aplicarEstiloBotaoFinal(btnNext);
+                    }
+                }
                 btnPrev.disabled = passoAtual === 0;
             } else if (passo.tipo === 'pergunta') {
                 document.getElementById('btn-ler-audio').style.display = 'none';
@@ -2599,7 +2710,7 @@
                         <div style="font-size:2.8rem; margin-bottom:10px; text-align:center;">✍️</div>
                         <h3 style="font-size:1.6rem; margin-top:0; color:var(--success);">${passo.pergunta}</h3>
                         <textarea id="resposta-aberta-input" class="resposta-aberta-textarea" placeholder="${dica}" oninput="salvarRespostaAberta(${passoAtual}, this.value)"></textarea>
-                        <p style="color:var(--text-light); font-size:0.9rem; margin:6px 0 0 0;">💾 Sua resposta é salva automaticamente neste aparelho.</p>
+                        <p style="color:var(--text-light); font-size:0.9rem; margin:6px 0 0 0;">💾 Sua resposta é guardada neste aparelho e enviada automaticamente à sua conta.</p>
                     </div>
                 `;
                 const ta = document.getElementById('resposta-aberta-input');
@@ -2671,7 +2782,15 @@
                 aplicarEstiloBotaoFinal(btnNext);
             }
 
-            // Ações de fim de aula (PDF / copiar respostas) — só no último passo
+            if (passo.tipo !== 'html_importado') linkCont.insertAdjacentHTML('beforeend', '<p id="status-respostas-html" role="status" style="font-size:0.9rem;color:var(--text-light)"></p>');
+            if (respostasHtmlAtual['portal-andamento']?.valor !== String(passoAtual)) registrarRespostaHtml({
+                campo_id: 'portal-andamento', tipo: 'progresso', valor: String(passoAtual),
+                pergunta: 'Última etapa acessada', resposta: 'Passo ' + (passoAtual + 1) + ' de ' + passosAulaAtual.length
+            });
+            if (alunoLogado === 'professora_teste') atualizarStatusRespostasHtml('Modo de teste: as atividades não serão gravadas.');
+            else if (atividadesPendentes.has(alunoLogadoDados?.id + '__' + aulaHtmlRespostasId)) atualizarStatusRespostasHtml('Envio pendente. Suas atividades serão sincronizadas automaticamente.');
+
+            // Ações de fim de aula (PDF / copiar respostas) - só no último passo
             const acoesFim = document.getElementById('conclusao-acoes');
             if (passo.tipo === 'html_importado') {
                 acoesFim.style.display = 'none';
@@ -2696,6 +2815,9 @@
         function verificarRespostaQuiz(elemento, escolhida, correta) {
             if (elemento.parentElement.classList.contains('respondido')) return;
             
+            const passo = passosAulaAtual[passoAtual];
+            registrarRespostaHtml({ campo_id: 'passo-' + passoAtual, tipo: 'quiz',
+                pergunta: passo.pergunta, valor: String(escolhida), resposta: passo.opcoes[escolhida], correta: escolhida === correta });
             const opcoes = elemento.parentElement.querySelectorAll('.quiz-option');
             
             if (escolhida === correta) {
@@ -2728,8 +2850,8 @@
                 const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
                 if (!aulasConcluidasAluno.includes(aulaIdCompleto) && alunoLogado !== 'professora_teste') {
                     aulasConcluidasAluno.push(aulaIdCompleto);
-                    salvarProgressoAlunoNuvem();
                 }
+                salvarProgressoAlunoNuvem();
 
                 if (passosAulaAtual.some(p => p.tipo === 'pergunta')) {
                     salvarRespostasNuvem(gerarTextoRespostas());
@@ -2819,7 +2941,8 @@
             respostasAbertas[index] = valor;
             if (alunoLogado === 'professora_teste') return;
             const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
-            try { localStorage.setItem('respostas_' + aulaIdCompleto, JSON.stringify(respostasAbertas)); } catch(e) {}
+            try { localStorage.setItem('respostas_' + alunoLogadoDados.id + '_' + aulaIdCompleto, JSON.stringify(respostasAbertas)); } catch(e) {}
+            registrarRespostaHtml({ campo_id: 'passo-' + index, tipo: 'texto', valor, resposta: valor, pergunta: passosAulaAtual[index]?.pergunta });
         }
 
         // Encaixa as respostas do aluno nos placeholders {{variavel}} ou {{numero}} de um texto
@@ -2891,25 +3014,14 @@
         }
 
         async function salvarRespostasNuvem(textoGerado) {
-            if (!bancoDados || !alunoLogadoDados || alunoLogado === 'professora_teste') return;
-            const lista = [];
-            passosAulaAtual.forEach((p, idx) => {
-                if (p.tipo === 'pergunta') lista.push({ pergunta: p.pergunta, resposta: (respostasAbertas[idx] || '').trim() });
+            if (!alunoLogadoDados || alunoLogado === 'professora_teste') return;
+            passosAulaAtual.forEach((p, index) => {
+                if (p.tipo === 'pergunta') registrarRespostaHtml({ campo_id: 'passo-' + index, tipo: 'texto',
+                    pergunta: p.pergunta, valor: respostasAbertas[index] || '', resposta: respostasAbertas[index] || '' });
             });
-            if (lista.length === 0) return;
-            const aulaIdCompleto = `${cursoSelecionado}_${modSelecionado}_${aulaSelecionada}`;
-            try {
-                await bancoDados.from('respostas_alunos').upsert({
-                    id: `${alunoLogadoDados.id}__${aulaIdCompleto}`,
-                    aluno_id: String(alunoLogadoDados.id),
-                    aluno_nome: alunoLogado,
-                    aula_id: aulaIdCompleto,
-                    nome_aula: document.getElementById('titulo-aula-atual').innerText,
-                    respostas: lista,
-                    prompt_gerado: textoGerado,
-                    criado_em: new Date().toISOString()
-                });
-            } catch(e) {}
+            const contexto = atividadesPendentes.get(alunoLogadoDados.id + '__' + aulaHtmlRespostasId);
+            if (contexto) { contexto.textoGerado = textoGerado; persistirAtividadesPendentes(String(alunoLogadoDados.id)); }
+            return sincronizarAtividadesPendentes();
         }
 
         function salvarAulaPDF() {
@@ -2961,11 +3073,19 @@
                 if (error) throw error;
                 if (!data || data.length === 0) { div.innerHTML = "<p style='color:var(--text-light)'>Nenhuma resposta enviada ainda.</p>"; return; }
                 div.innerHTML = data.map(r => {
-                    const qa = (r.respostas || []).map(item => `<div style="margin-bottom:8px;"><strong>${escHtml(item.pergunta)}</strong><br><span style="color:var(--text-light);">${escHtml(item.resposta) || '(em branco)'}</span></div>`).join('');
+                    const registros = Array.isArray(r.respostas) ? r.respostas : [];
+                    const concluida = registros.some(item => item.campo_id === 'portal-conclusao');
+                    const respondidas = registros.filter(item => !['armazenamento', 'progresso', 'acao'].includes(item.tipo) && String(item.resposta || '').trim()).length;
+                    const qa = (r.respostas || []).filter(item => item.tipo !== 'armazenamento').map(item => {
+                        const tentativas = Array.isArray(item.tentativas) ? item.tentativas : [];
+                        const historico = tentativas.length ? `<details><summary>${tentativas.length} tentativa(s) registrada(s)</summary><ol>${tentativas.map(t => `<li>${escHtml(t.resposta)}${typeof t.correta === 'boolean' ? (t.correta ? ' — correta' : ' — incorreta') : ''} <small>${escHtml(t.em ? new Date(t.em).toLocaleString('pt-BR') : '')}</small></li>`).join('')}</ol></details>` : '';
+                        return `<div style="margin-bottom:12px;"><strong>${escHtml(item.pergunta)}</strong><br><span style="color:var(--text-light);">${escHtml(item.resposta) || '(em branco)'}</span>${historico}</div>`;
+                    }).join('');
                     const dataFmt = r.criado_em ? new Date(r.criado_em).toLocaleString('pt-BR') : '';
                     const promptAttr = (r.prompt_gerado || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                     return `<div class="aluno-gerenciamento-card">
                         <h4>${escHtml((r.aluno_nome || '').toUpperCase())} <span class="curso-tag">${escHtml(r.nome_aula || '')}</span></h4>
+                        <p style="margin:0 0 8px;font-weight:700;color:var(--primary)">${concluida ? 'Aula marcada como concluída' : 'Em andamento · sem conclusão registrada'} · ${respondidas} resposta(s) registrada(s)</p>
                         <p style="margin:0 0 10px 0; font-size:0.85rem; color:var(--text-light);">${dataFmt}</p>
                         ${qa}
                         <button class="btn-action secondary" style="margin-top:10px; padding:8px 14px; font-size:0.9rem;" data-prompt="${promptAttr}" onclick="copiarTexto(this.dataset.prompt, 'Prompt copiado!')">📋 Copiar prompt</button>
