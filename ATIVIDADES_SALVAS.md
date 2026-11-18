@@ -12,6 +12,8 @@ Implementado em 18/11/2026 no `index.html`, usando a tabela já existente `respo
 
 No painel da professora, abrir **Respostas dos Alunos** e **Atualizar**. Cada cartão apresenta a quantidade de respostas, se há conclusão registrada, a última atualização e permite expandir as tentativas. Dados internos do armazenamento da atividade ficam ocultos. Abrir a aula ou marcar conclusão, isoladamente, não comprova que todos os exercícios foram feitos; conferir as respostas no cartão.
 
+O campo **Filtrar por nome ou apelido do aluno** filtra os registros carregados conforme a digitação. Aceita parte do nome, sem diferenciar maiúsculas e acentos. **Limpar filtro** volta à lista completa. Atualizar os dados mantém o texto da busca.
+
 ## Recuperação e sincronização
 
 O portal mantém uma cópia e uma fila de envio por aluno neste navegador. Tenta enviar após a edição, ao entrar novamente, ao voltar a conexão, ao voltar à aba e a cada 30 segundos enquanto o portal está aberto e o aluno está conectado. Fechar o navegador não garante o envio imediato; a fila é retomada no próximo acesso à mesma conta neste aparelho. Limpar os dados do navegador remove registros que ainda não chegaram à nuvem.
@@ -65,4 +67,4 @@ Após a verificação SQL, foi executado `node tests/persistencia-real.cjs --ban
 
 No navegador, um HTML de teste isolado confirmou captura de edição e restauração de radio, textarea, alternativas em botões e armazenamento interno no iframe com sandbox. Isso complementa os testes das funções; não é uma simulação de cliques em todas as telas de login e navegação do portal.
 
-Versão do cache do PWA: `portal-educacional-v13`. A publicação pode ser acompanhada pelo histórico de implantação do GitHub Pages do repositório `analicepessoa/portaldoaluno`.
+Versão do cache do PWA: `portal-educacional-v14`. A publicação pode ser acompanhada pelo histórico de implantação do GitHub Pages do repositório `analicepessoa/portaldoaluno`.

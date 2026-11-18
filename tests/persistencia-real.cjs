@@ -43,13 +43,13 @@ const bancoDados = { from(tabela) {
 } };
 const local = new Map();
 const elementos = new Map();
-const elemento = id => { if (!elementos.has(id)) elementos.set(id,{style:{},textContent:'',innerHTML:''}); return elementos.get(id); };
+const elemento = id => { if (!elementos.has(id)) elementos.set(id,{style:{},textContent:'',innerHTML:'',value:''}); return elementos.get(id); };
 const ctx = vm.createContext({ bancoDados, console, setTimeout(){return 1;}, clearTimeout(){},
     localStorage:{getItem:k=>local.get(k)??null,setItem:(k,v)=>local.set(k,v)}, document:{getElementById:elemento} });
 vm.runInContext(`let alunoLogadoDados={id:${JSON.stringify(alunoId)}}, alunoLogado='teste automático';
 let respostasHtmlAtual={},aulaHtmlRespostasId=${JSON.stringify(aulaId)},nomeAulaHtmlAtual='Teste de salvamento';
 let timerSalvamentoHtml,sincronizandoAtividades=false; const atividadesPendentes=new Map();
-let aulasConcluidasAluno=[],respostasAbertas={},passosAulaAtual=[{tipo:'pergunta',pergunta:'Resposta de verificação'}];
+let aulasConcluidasAluno=[],respostasAbertas={},respostasAlunosProfessor=[],passosAulaAtual=[{tipo:'pergunta',pergunta:'Resposta de verificação'}];
 let cursoSelecionado='teste',modSelecionado='teste',aulaSelecionada='teste';`,ctx);
 function adicionar(nome) {
     const prefixo = fonte.includes('        async function '+nome+'(') ? '        async function ' : '        function ';
@@ -57,7 +57,7 @@ function adicionar(nome) {
     assert.ok(inicio>=0,nome);
     vm.runInContext(fonte.slice(inicio,fonte.indexOf('\n        }',inicio)+'\n        }'.length),ctx);
 }
-for (const nome of ['chaveLocalRespostasHtml','atualizarStatusRespostasHtml','carregarRespostasHtmlNuvem','registrarRespostaHtml','persistirAtividadesPendentes','recuperarAtividadesPendentes','sincronizarAtividadesPendentes','salvarRespostaAberta','salvarProgressoAlunoNuvem','escHtml','carregarRespostasAlunos']) adicionar(nome);
+for (const nome of ['chaveLocalRespostasHtml','atualizarStatusRespostasHtml','carregarRespostasHtmlNuvem','registrarRespostaHtml','persistirAtividadesPendentes','recuperarAtividadesPendentes','sincronizarAtividadesPendentes','salvarRespostaAberta','salvarProgressoAlunoNuvem','escHtml','renderizarRespostasAlunos','carregarRespostasAlunos']) adicionar(nome);
 const run = s=>vm.runInContext(s,ctx);
 async function testar() {
     try {

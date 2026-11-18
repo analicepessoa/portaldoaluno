@@ -674,6 +674,12 @@
                         <button class="btn-action secondary" style="margin:0;" onclick="carregarRespostasAlunos()">🔄 Atualizar</button>
                     </div>
                     <p>Respostas, quizzes e conclusão das aulas (atualizações mais recentes primeiro). Textos mostram a última versão; quizzes e escolhas guardam até 100 tentativas por questão.</p>
+                    <label for="filtro-respostas-aluno">Filtrar por nome ou apelido do aluno</label>
+                    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                        <input id="filtro-respostas-aluno" type="search" placeholder="Digite parte do nome ou apelido" oninput="renderizarRespostasAlunos()" style="flex:1;min-width:200px;margin:0;">
+                        <button type="button" class="btn-action secondary" style="margin:0;" onclick="document.getElementById('filtro-respostas-aluno').value = ''; renderizarRespostasAlunos();">Limpar filtro</button>
+                    </div>
+                    <p id="contador-respostas-alunos" role="status" style="font-size:0.9rem;color:var(--text-light);"></p>
                     <div id="lista-respostas-alunos"><p style="color:var(--text-light)">Clique em Atualizar para carregar.</p></div>
                 </div>
             </div>
@@ -814,6 +820,7 @@
         let timerSalvamentoHtml = null;
         let sincronizandoAtividades = false;
         const atividadesPendentes = new Map();
+        let respostasAlunosProfessor = [];
         let promptTemplateAtual = '';
         let nomesCustomizados = {};
         let aulaHtmlImportada = null;
@@ -3066,13 +3073,31 @@
 
         async function carregarRespostasAlunos() {
             const div = document.getElementById('lista-respostas-alunos');
+            respostasAlunosProfessor = [];
+            document.getElementById('contador-respostas-alunos').textContent = '';
             if (!bancoDados) { div.innerHTML = "<p style='color:var(--text-light)'>Sem conexão.</p>"; return; }
             div.innerHTML = "<p style='color:var(--text-light)'>Carregando...</p>";
             try {
                 const { data, error } = await bancoDados.from('respostas_alunos').select('*').order('criado_em', { ascending: false });
                 if (error) throw error;
-                if (!data || data.length === 0) { div.innerHTML = "<p style='color:var(--text-light)'>Nenhuma resposta enviada ainda.</p>"; return; }
-                div.innerHTML = data.map(r => {
+                respostasAlunosProfessor = data || [];
+                renderizarRespostasAlunos();
+            } catch(e) {
+                div.innerHTML = "<p style='color:var(--danger)'>Não foi possível carregar. Verifique se a tabela <strong>respostas_alunos</strong> foi criada no Supabase.</p>";
+            }
+        }
+
+        function renderizarRespostasAlunos() {
+            const div = document.getElementById('lista-respostas-alunos');
+            const normalizar = valor => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('pt-BR');
+            const busca = normalizar(document.getElementById('filtro-respostas-aluno').value);
+            const filtradas = respostasAlunosProfessor.filter(r => normalizar(r.aluno_nome).includes(busca));
+            document.getElementById('contador-respostas-alunos').textContent = 'Exibindo ' + filtradas.length + ' de ' + respostasAlunosProfessor.length + ' registro(s) de aula.';
+            if (!filtradas.length) {
+                div.innerHTML = respostasAlunosProfessor.length ? '<p>Nenhuma resposta encontrada para esse nome ou apelido.</p>' : '<p>Nenhuma resposta enviada ainda.</p>';
+                return;
+            }
+                div.innerHTML = filtradas.map(r => {
                     const registros = Array.isArray(r.respostas) ? r.respostas : [];
                     const concluida = registros.some(item => item.campo_id === 'portal-conclusao');
                     const respondidas = registros.filter(item => !['armazenamento', 'progresso', 'acao'].includes(item.tipo) && String(item.resposta || '').trim()).length;
@@ -3091,9 +3116,6 @@
                         <button class="btn-action secondary" style="margin-top:10px; padding:8px 14px; font-size:0.9rem;" data-prompt="${promptAttr}" onclick="copiarTexto(this.dataset.prompt, 'Prompt copiado!')">📋 Copiar prompt</button>
                     </div>`;
                 }).join('');
-            } catch(e) {
-                div.innerHTML = "<p style='color:var(--danger)'>Não foi possível carregar. Verifique se a tabela <strong>respostas_alunos</strong> foi criada no Supabase.</p>";
-            }
         }
 
         // --- PWA: Instalação e Service Worker ---
